@@ -21,6 +21,17 @@
     </style>
 @endsection
 
+@php
+    function extract_file_name($fileName) {
+        $path = explode('/', $fileName);
+        $nameIndex = count($path) - 1;
+        if ($nameIndex < 0)
+            return '';
+
+        return $path[$nameIndex];
+    }
+@endphp
+
 @section('content')
     <div class="container pd-x-0">
         <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
@@ -84,6 +95,33 @@
                 <div class="col-md-12">
                     <div class="row draggable-portlets">
                         <div class="col-md-12" id="banners">
+                            @php $banners = old('banners', []); @endphp
+                            @foreach ($banners as $key => $banner)
+                                @php
+                                    if(!isset($banner['id'])) {
+                                        $banner['id'] = $key;
+                                        $banner['new'] = true;
+                                    }
+                                @endphp
+                                <div class="sorted">
+                                    <div class="card upload-card p-10 mg-t-20">
+                                        <div class="card-header ui-sortable-handle"><i data-feather="move"></i> {{ extract_file_name($banner['image_path']) }}</div>
+                                        <div class="card-body">
+                                            <div class="row row-sm">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group upload-image mg-b-0" style="background: url('{{ $banner['image_path'] }}');background-size: cover;">
+                                                        <div class="marker pos-absolute t-10 l-20 p-0 bg-transparent">
+                                                            {{--                                                    <button class="btn btn-light btn-xs btn-uppercase" type="submit"><i data-feather="upload"></i> Upload image</button>--}}
+                                                            <button type="button" class="btn btn-danger btn-xs btn-uppercase remove-upload" type="button" data-id="{{ $banner['id'] }}"><i data-feather="x"></i> Remove image</button>
+                                                            <input name="banners[{{ $banner['id'] }}][image_path]" class="image_path" type="text" value="{{ $banner['image_path'] }}"  required/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                         <div class="col-lg-12 mg-t-30">
                             <hr>
@@ -122,16 +160,7 @@
     <script src="{{ asset('lib/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
 
     <script src="{{ asset('lib/jqueryui/jquery-ui.min.js') }}"></script>
-{{--    <script src="{{ asset('js/joinable.js') }}"></script>--}}
-{{--    <script src="{{ asset('js/resizeable.js') }}"></script>--}}
-
-    {{--    Image validation--}}
-    <script>
-        let BANNER_WIDTH = "{{ env('SUB_BANNER_WIDTH') }}";
-        let BANNER_HEIGHT =  "{{ env('SUB_BANNER_HEIGHT') }}";
-    </script>
-    <script src="{{ asset('js/image-upload-validation.js') }}"></script>
-    {{--    End Image validation--}}
+    <script src="{{ asset('js/file-upload-validation.js') }}"></script>
 @endsection
 
 @section('customjs')
@@ -198,7 +227,13 @@
             }
 
             $('#upload_image').on('change', function (evt) {
-                validate_images(evt, upload_image);
+                let files = evt.target.files;
+                let maxSize = 1;
+                let validateFileTypes = ["image/jpeg", "image/png"];
+                let requiredWidth = "{{ env('SUB_BANNER_WIDTH') }}";
+                let requiredHeight =  "{{ env('SUB_BANNER_HEIGHT') }}";
+
+                validate_files(files, upload_image, maxSize, validateFileTypes, requiredWidth, requiredHeight);
             });
 
             let image_path = '';

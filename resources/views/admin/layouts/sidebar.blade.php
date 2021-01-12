@@ -1,6 +1,6 @@
 <aside class="aside aside-fixed">
     <div class="aside-header">
-        <a href="../../index.html" class="aside-logo">Admin <span>Portal</span></a>
+        <a href="{{ route('dashboard') }}" class="aside-logo">Admin <span>Portal</span></a>
         <a href="" class="aside-menu-link">
             <i data-feather="menu"></i>
             <i data-feather="x"></i>
@@ -10,7 +10,7 @@
         <div class="aside-loggedin">
             @if(Auth::user()->avatar == '')
                 <div class="d-flex justify-content-center">
-                    <a href="" class="avatar wd-100"><img src="{{ asset('images/user.png') }}" class="rounded-circle" alt=""></a>
+                    <a href="{{ route('account.edit') }}" class="avatar wd-100"><img src="{{ asset('images/user.png') }}" class="rounded-circle" alt=""></a>
                 </div>
                 <div class="aside-loggedin-user tx-center">
                     <h6 class="tx-semibold mg-b-0">{{ Auth::user()->fullname }}</h6>
@@ -18,7 +18,7 @@
                 </div>
             @else
                 <div class="d-flex justify-content-center">
-                    <a href="" class="avatar wd-100"><img src="{{ Auth::user()->avatar }}" class="rounded-circle" alt=""></a>
+                    <a href="{{ route('account.edit') }}" class="avatar wd-100"><img src="{{ Auth::user()->avatar }}" class="rounded-circle" alt=""></a>
                 </div>
                 <div class="aside-loggedin-user tx-center">
                     <h6 class="tx-semibold mg-b-0">{{ Auth::user()->fullname }}</h6>

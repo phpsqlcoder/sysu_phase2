@@ -57,6 +57,7 @@
                                 @php
                                 $paid = \App\EcommerceModel\SalesHeader::paid($sale->id);
                                 $balance = \App\EcommerceModel\SalesHeader::balance($sale->id);
+                                $btn = '';
                                 @endphp
                                 <tr>
                                     <td align="right">
@@ -66,12 +67,16 @@
                                                 <a href="{{route('my-account.pay-again',$sale->id)}}" title="Pay now" class="btn btn-success btn-sm mb-1"><i class="fa fa-credit-card pb-1"></i></a>&nbsp;
                                             @endif
                                             @if($paid <= 0)                                            
-                                                <a href="#" title="Cancel Order" onclick="cancel_unpaid_order('{{$sale->order_number}}')" class="btn btn-success btn-sm mb-1"><i class="fa fa-danger pb-1"></i></a>&nbsp;
+                                                <a href="#" title="Cancel Order" onclick="cancel_unpaid_order('{{$sale->order_number}}')" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
                                             @else
                                                 <a target="_blank" href="https://forms.office.com/Pages/ResponsePage.aspx?id=XEGiMjf44Uyvp90T9OPGD8Ao7kIPdnhJk-AhXKYQL4JUQkRFMUo0MEEwS0ZDR0hHRFI0NEFVQTVTQy4u" title="Cancel Order" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
                                             @endif
                                             
                                             <a href="#" title="view delivery history" class="btn btn-success btn-sm mb-1" data-toggle="modal" data-target="#delivery{{$sale->id}}"><i class="fa fa-truck pb-1"></i></a>
+
+                                            @if($sale->delivery_status == 'Delivered')
+                                                <a href="#" title="Reorder" class="btn btn-success btn-sm mb-1" onclick="reorder('{{$sale->id}}')"><i class="fa fa-shopping-cart pb-1"></i></a>    
+                                            @endif
                                         @else
                                             <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                         @endif
@@ -282,6 +287,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal_reorder" tabindex="-1" role="dialog" aria-labelledby="reorder" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <form action="{{route('my-account.reorder')}}" method="post">
+                @csrf
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reorder this transaction?</p>
+                <input type="hidden" id="orderid" name="orderid">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input class="btn btn-success" type="submit" value="Yes, Reorder">
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {!!$modals!!}
 
 @endsection
@@ -340,6 +369,11 @@
             $('#cancel_orderid').html('Cancel Order#: '+id);
             $('#order_number').val(id);            
             $('#cancel_order').modal('show');
+        }
+
+        function reorder(id){
+            $('#orderid').val(id);            
+            $('#modal_reorder').modal('show');
         }
     </script>
 @endsection

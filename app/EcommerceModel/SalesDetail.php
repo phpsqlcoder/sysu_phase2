@@ -34,4 +34,9 @@ class SalesDetail extends Model
         return $this->belongsTo('\App\ProductCategory','product_category');
     }
 
+    public function getItemTotalPriceAttribute()
+    {
+        return $this->product->price;
+    }
+
 }

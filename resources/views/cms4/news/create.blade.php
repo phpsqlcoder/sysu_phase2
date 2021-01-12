@@ -6,6 +6,7 @@
 
 @section('pagecss')
 	<link href="{{ asset('lib/bselect/dist/css/bootstrap-select.css') }}" rel="stylesheet">
+    <script src="{{ asset('lib/ckeditor/ckeditor.js') }}"></script>
 @endsection
 
 @section('content')
@@ -26,12 +27,11 @@
     <form method="post" action="{{ route('news.store') }}" enctype="multipart/form-data">
         <div class="row row-sm">
             <div class="col-lg-6">
-
                 @csrf
                 <div class="form-group">
                     <label class="d-block">Title *</label>
-                    <input type="text" class="form-control @error('news_title') is-invalid @enderror" name="news_title" id="news_title" value="{{ old('news_title') }}" required @htmlValidationMessage({{__('standard.empty_all_field')}})>
-                    @hasError(['inputName' => 'news_title'])
+                    <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}" required @htmlValidationMessage({{__('standard.empty_all_field')}})>
+                    @hasError(['inputName' => 'name'])
                     @endhasError
                     <small id="news_slug"></small>
                 </div>
@@ -43,14 +43,14 @@
                 </div>
                 <div class="form-group">
                     <label class="d-block">Category</label>
-                    <select id="category" class="selectpicker mg-b-5 @error('category') is-invalid @enderror" name="category" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
+                    <select id="category_id" class="selectpicker mg-b-5 @error('category_id') is-invalid @enderror" name="category_id" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
                         <option value="0" selected>- None -</option>
                         @forelse($categories as $category)
                             <option value="{{$category->id}}">{{strtoupper($category->name)}}</option>
                         @empty
                         @endforelse
                     </select>
-                    @hasError(['inputName' => 'category'])
+                    @hasError(['inputName' => 'category_id'])
                     @endhasError
                 </div>
                 <div class="form-group">
@@ -70,16 +70,35 @@
                         <a href="javascript:void(0)" class="btn btn-xs btn-danger" onclick="remove_image();">Remove Image</a>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="d-block">Article thumbnail</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input @error('news_thumbnail') is-invalid @enderror" name="news_thumbnail" id="news_thumbnail"  accept="image/*">
+                        <label class="custom-file-label" for="news_thumbnail" id="img_name_thumbnail">Choose file</label>
+                    </div>
+                    @error('news_thumbnail')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
+                    @if (env('NEWS_THUMBNAIL_WIDTH') && env('NEWS_THUMBNAIL_HEIGHT'))
+                        <p class="tx-10">
+                            Required image dimension: {{ env('NEWS_THUMBNAIL_WIDTH') }}px by {{ env('NEWS_THUMBNAIL_HEIGHT') }}px <br /> Maximum file size: 1MB <br /> Required file type: .jpeg .png
+                        </p>
+                    @endif
+                    <div id="image_div_thumbnail" style="display:none;">
+                        <img src="" height="100" width="150" id="img_temp_thumbnail" alt="">  <br /><br />
+                        <a href="javascript:void(0)" class="btn btn-xs btn-danger" onclick="remove_image_thumbnail();">Remove Image</a>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-12">
                 <div class="form-group">
                     <label class="d-block">Content *</label>
-                    <textarea name="content" id="editor1" rows="10" cols="80" required>
-                         {{ old('content') }}
+                    <textarea name="contents" id="editor1" rows="10" cols="80" required>
+                         {{ old('contents') }}
                     </textarea>
-                    @hasError(['inputName' => 'content'])
+                    @hasError(['inputName' => 'contents'])
                     @endhasError
-                    <span class="invalid-feedback" role="alert" id="contentRequired" style="display: none;">
+                    <span class="invalid-feedback" role="alert" id="contentsRequired" style="display: none;">
                         <strong>The content field is required</strong>
                     </span>
                 </div>
@@ -102,9 +121,9 @@
                     @endhasError
                 </div>
                 <div class="form-group">
-                    <label class="d-block">Display</label>
+                    <label class="d-block">Display @if (\App\Article::has_featured_limit()) (Max Featured: {{ \App\Article::has_featured_limit() }}) @endif</label>
                     <div class="custom-control custom-switch @error('is_featured') is-invalid @enderror">
-                        <input type="checkbox" class="custom-control-input" name="is_featured" {{ (old("is_featured") ? "checked":"") }} id="customSwitch2">
+                        <input type="checkbox" class="custom-control-input" name="is_featured" {{ (old("is_featured") ? "checked":"") }} id="customSwitch2" @if (\App\Article::cannot_create_featured_news()) disabled @endif >
                         <label class="custom-control-label" for="customSwitch2">Featured</label>
                     </div>
                     @hasError(['inputName' => 'is_featured'])
@@ -120,22 +139,22 @@
             <div class="col-lg-6 mg-t-30">
                 <div class="form-group">
                     <label class="d-block">Title <code>(meta title)</code></label>
-                    <input type="text" class="form-control @error('seo_title') is-invalid @enderror" name="seo_title" value="{{ old('seo_title') }}">
-                    @hasError(['inputName' => 'seo_title'])
+                    <input type="text" class="form-control @error('meta_title') is-invalid @enderror" name="meta_title" value="{{ old('meta_title') }}">
+                    @hasError(['inputName' => 'meta_title'])
                     @endhasError
                     <p class="tx-11 mg-t-4">{{ __('standard.seo.title') }}</p>
                 </div>
                 <div class="form-group">
                     <label class="d-block">Description <code>(meta description)</code></label>
-                    <textarea rows="3" class="form-control @error('seo_description') is-invalid @enderror" name="seo_description">{{ old('seo_description') }}</textarea>
-                    @hasError(['inputName' => 'seo_description'])
+                    <textarea rows="3" class="form-control @error('meta_description') is-invalid @enderror" name="meta_description">{{ old('meta_description') }}</textarea>
+                    @hasError(['inputName' => 'meta_description'])
                     @endhasError
                     <p class="tx-11 mg-t-4">{{ __('standard.seo.description') }}</p>
                 </div>
                 <div class="form-group">
                     <label class="d-block">Keywords <code>(meta keywords)</code></label>
-                    <textarea rows="3" class="form-control @error('seo_keywords') is-invalid @enderror" name="seo_keywords">{{ old('seo_keywords') }}</textarea>
-                    @hasError(['inputName' => 'seo_keywords'])
+                    <textarea rows="3" class="form-control @error('meta_keyword') is-invalid @enderror" name="meta_keyword">{{ old('meta_keyword') }}</textarea>
+                    @hasError(['inputName' => 'meta_keyword'])
                     @endhasError
                     <p class="tx-11 mg-t-4">{{ __('standard.seo.keywords') }}</p>
                 </div>
@@ -150,17 +169,9 @@
 @endsection
 
 @section('pagejs')
-    <script src="{{ asset('lib/ckeditor/ckeditor.js') }}"></script>
 	<script src="{{ asset('lib/bselect/dist/js/bootstrap-select.js') }}"></script>
     <script src="{{ asset('lib/jqueryui/jquery-ui.min.js') }}"></script>
-
-    {{--    Image validation--}}
-    <script>
-        let BANNER_WIDTH = "{{ env('NEWS_BANNER_WIDTH') }}";
-        let BANNER_HEIGHT =  "{{ env('NEWS_BANNER_HEIGHT') }}";
-    </script>
-    <script src="{{ asset('js/image-upload-validation.js') }}"></script>
-    {{--    End Image validation--}}
+    <script src="{{ asset('js/file-upload-validation.js') }}"></script>
 @endsection
 
 @section('customjs')
@@ -173,10 +184,10 @@
             filebrowserUploadUrl: '{{ env('APP_URL') }}/laravel-filemanager/upload?type=Files&_token={{ csrf_token() }}',
             allowedContent: true,
         };
-        let editor = CKEDITOR.replace('content', options);
+        let editor = CKEDITOR.replace('contents', options);
         editor.on('required', function (evt) {
             if ($('.invalid-feedback').length == 1) {
-                $('#contentRequired').show();
+                $('#contentsRequired').show();
             }
             $('#cke_editor1').addClass('is-invalid');
             evt.cancel();
@@ -185,18 +196,6 @@
         $(function() {
             $('.selectpicker').selectpicker();
         });
-
-        // document.getElementById("category").selectedIndex = -1;
-        // $('#category').on('change', function() {
-        //     if ($(this).val() == 0) {
-        //         document.getElementById("category").selectedIndex = -1;
-        //     }
-        // });
-
-        // $('#news-date').datepicker({
-        //     changeMonth: true,
-        //     changeYear: true
-        // });
 
         $(function() {
             $("#customSwitch1").change(function() {
@@ -208,8 +207,8 @@
                 }
             });
 
-            $('#news_title').change(function(){
-                let url = $('#news_title').val();
+            $('#name').change(function(){
+                let url = $('#name').val();
                 $.ajax({
                     type: "POST",
                     url: "{{ route('news.get-slug') }}",
@@ -236,15 +235,75 @@
         }
 
         $("#news_image").change(function(evt) {
-            validate_images(evt, readURL);
+
+            $('#img_name').html('Choose file');
+            $('#img_temp').attr('src', '');
+            $('#image_div').hide();
+
+            let files = evt.target.files;
+            let maxSize = 1;
+            let validateFileTypes = ["image/jpeg", "image/png"];
+            let requiredWidth = "{{ env('NEWS_BANNER_WIDTH') }}";
+            let requiredHeight =  "{{ env('NEWS_BANNER_HEIGHT') }}";
+
+            validate_files(files, readURL, maxSize, validateFileTypes, requiredWidth, requiredHeight, empty_banner_value);
         });
 
-        function remove_image(){
+        function empty_banner_value()
+        {
+            $('#news_image').removeAttr('title');
+            $('#news_image').val('');
+        }
+
+        function remove_image() {
             $('#img_name').html('Choose file');
             $('#news_image').removeAttr('title');
             $('#news_image').val('');
             $('#img_temp').attr('src', '');
             $('#image_div').hide();
+        }
+
+        // Thumbnail
+        function readURLThumb(file) {
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                $('#img_name_thumbnail').html(file.name);
+                $('#news_thumbnail').attr('title', file.name);
+                $('#img_temp_thumbnail').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(file);
+            $('#image_div_thumbnail').show();
+        }
+
+        $("#news_thumbnail").change(function(evt) {
+
+            $('#img_name_thumbnail').html('Choose file');
+            $('#img_temp_thumbnail').attr('src', '');
+            $('#image_div_thumbnail').hide();
+
+            let files = evt.target.files;
+            let maxSize = 1;
+            let validateFileTypes = ["image/jpeg", "image/png"];
+            let requiredWidth = "{{ env('NEWS_THUMBNAIL_WIDTH') }}";
+            let requiredHeight =  "{{ env('NEWS_THUMBNAIL_HEIGHT') }}";
+
+            validate_files(files, readURLThumb, maxSize, validateFileTypes, requiredWidth, requiredHeight, empty_thumbnail_value);
+        });
+
+        function empty_thumbnail_value()
+        {
+            $('#news_thumbnail').val('');
+            $('#news_thumbnail').removeAttr('title');
+        }
+
+        function remove_image_thumbnail(){
+            $('#img_name_thumbnail').html('Choose file');
+            $('#news_thumbnail').removeAttr('title');
+            $('#news_thumbnail').val('');
+            $('#img_temp_thumbnail').attr('src', '');
+            $('#image_div_thumbnail').hide();
         }
 
     </script>

@@ -474,6 +474,10 @@
             success: function(returnData) {
                 $("#loading-overlay").hide();
                 if (returnData['success']) {
+
+                    $('.cart-counter').html(returnData['totalItems']);
+                    $('.counter').html(returnData['totalItems']);
+
                     $.notify("Product Added to your cart",
                         { 
                             position:"bottom right", 

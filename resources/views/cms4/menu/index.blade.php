@@ -80,31 +80,31 @@
                                 </form>
                             </div>
                         </div>
-                        <div class="list-search d-inline">
-                            <div class="dropdown d-inline mg-r-10">
-                                @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/menu/delete') == 1)
+                        @if(auth()->user()->has_access_to_route('menus.destroy_many'))
+                            <div class="list-search d-inline">
+                                <div class="dropdown d-inline mg-r-10">
                                     <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Actions
                                     </button>
-                                @endif
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button id="deleteMenus" class="dropdown-item tx-danger">Delete</button>
-                                    <form id="menusForm" method="POST" action="{{ route('menus.destroy_many') }}">
-                                        @method('DELETE')
-                                        @csrf
-                                        <input name="ids" id="menuIds" type="hidden">
-                                    </form>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <button id="deleteMenus" class="dropdown-item tx-danger">Delete</button>
+                                        <form id="menusForm" method="POST" action="{{ route('menus.destroy_many') }}">
+                                            @method('DELETE')
+                                            @csrf
+                                            <input name="ids" id="menuIds" type="hidden">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                     <div class="ml-auto bd-highlight mg-t-10">
                         <form class="form-inline" id="searchForm">
                             <div class="search-form mg-r-10">
-                                <input type="search" id="search" class="form-control" placeholder="Search by Name" value="{{ $filter->search }}">
-                                <button class="btn" type="button"><i data-feather="search"></i></button>
+                                <input name="search" type="search" id="search" class="form-control" placeholder="Search by Name" value="{{ $filter->search }}">
+                                <button class="btn"><i data-feather="search"></i></button>
                             </div>
-                            @if(\App\ViewPermissions::check_permission(Auth::user()->role_id, 'admin/menu/create') == 1)
+                            @if(auth()->user()->has_access_to_route('menus.create'))
                                 <a href="{{ route('menus.create') }}" class="btn btn-primary btn-sm mg-b-5">Create a Menu</a>
                             @endif
                         </form>
@@ -140,7 +140,7 @@
                                         </div>
                                     </th>
                                     <td style="overflow: hidden;text-overflow: ellipsis;">
-                                        <strong>{{ $menu->name }}</strong><br />
+                                        <strong @if($menu->trashed()) style="text-decoration:line-through;" @endif title="{{ $menu->name }}">{{ $menu->name }}</strong><br />
                                         <p class="mg-b-0 tx-gray-500 tx-11" style="overflow: hidden;text-overflow: ellipsis;">
                                             @foreach ($menu->navigation as $link)
                                                 @if ($link->page_id == 0)
@@ -163,33 +163,39 @@
                                     </td>
                                     <td>
                                         @if($menu->trashed())
-                                            <nav class="nav table-options justify-content-end">
-                                                <a class="nav-link" href="{{route('menus.restore', $menu->id)}}" title="Restore this menu"><i data-feather="rotate-ccw"></i></a>
-                                            </nav>
+                                            @if (auth()->user()->has_access_to_route('menus.restore'))
+                                                <nav class="nav table-options justify-content-end">
+                                                    <a class="nav-link" href="{{route('menus.restore', $menu->id)}}" title="Restore this menu"><i data-feather="rotate-ccw"></i></a>
+                                                </nav>
+                                            @endif
                                         @else
                                             <nav class="nav table-options justify-content-end">
-                                                @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/menu/edit') == 1)
-                                                <a class="nav-link" href="{{ route('menus.edit', $menu->id) }}">
-                                                    <i data-feather="edit"></i>
-                                                </a>
+                                                @if(auth()->user()->has_access_to_route('menus.edit'))
+                                                    <a class="nav-link" title="Edit menu" href="{{ route('menus.edit', $menu->id) }}">
+                                                        <i data-feather="edit"></i>
+                                                    </a>
                                                 @endif
-                                                <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <i data-feather="settings"></i>
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-right">
-                                                    @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/menu/edit') == 1)
-                                                    <a class="dropdown-item" data-target="#promptQuickEdit" data-toggle="modal" data-animation="effect-scale" data-id="{{$menu->id}}" data-name="{{ $menu->name }}" data-is-active="{{ $menu->is_active }}">Quick Edit</a>
-                                                    @endif
-                                                    @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/menu/delete') == 1)
-                                                    <button type="button" class="dropdown-item" @if ($menu->is_active) disabled @endif data-target="#prompt-delete-menu" data-toggle="modal" data-animation="effect-scale" data-id="{{ $menu->id }}" data-name="{{ $menu->name }}" data-is-active="{{ $menu->is_active }}">Delete</button>
-                                                    @endif
-                                                    @if (!$menu->is_active)
-                                                        <form id="menuForm{{ $menu->id }}" method="POST" action="{{ route('menus.destroy', $menu->id) }}">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endif
-                                                </div>
+
+                                                @if (auth()->user()->has_access_to_route('menus.edit') || auth()->user()->has_access_to_route('menus.destroy'))
+                                                    <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i data-feather="settings"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        @if(auth()->user()->has_access_to_route('menus.edit'))
+                                                            <a class="dropdown-item" data-target="#promptQuickEdit" data-toggle="modal" data-animation="effect-scale" data-id="{{$menu->id}}" data-name="{{ $menu->name }}" data-is-active="{{ $menu->is_active }}">Quick Edit</a>
+                                                        @endif
+
+                                                        @if(auth()->user()->has_access_to_route('menus.destroy'))
+                                                            <button type="button" class="dropdown-item" @if ($menu->is_active) disabled @endif data-target="#prompt-delete-menu" data-toggle="modal" data-animation="effect-scale" data-id="{{ $menu->id }}" data-name="{{ $menu->name }}" data-is-active="{{ $menu->is_active }}">Delete</button>
+                                                            @if (!$menu->is_active)
+                                                                <form id="menuForm{{ $menu->id }}" method="POST" action="{{ route('menus.destroy', $menu->id) }}">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             </nav>
                                         @endif
                                     </td>

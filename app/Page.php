@@ -25,7 +25,7 @@ class Page extends Model
 
     public function parent_page()
     {
-        return $this->hasOne(Page::class, 'id', 'parent_page_id');
+        return $this->hasOne(Page::class, 'id', 'parent_page_id')->where('status', 'PUBLISHED');
     }
 
     public function has_parent_page()
@@ -69,6 +69,16 @@ class Page extends Model
     public function is_customize_page()
     {
         return $this->page_type == 'customize';
+    }
+
+    public function is_home_page()
+    {
+        return $this->id == 1;
+    }
+
+    public function is_contact_us_page()
+    {
+        return $this->id == 3;
     }
 
     public function is_standard_page()
@@ -187,5 +197,17 @@ class Page extends Model
             return '';
 
         return $path[$nameIndex];
+    }
+
+    public static function page_not_found()
+    {
+        $view404 = 'theme.'.env('FRONTEND_TEMPLATE').'.pages.404';
+        if (view()->exists($view404)) {
+            $page = new Page();
+            $page->name = 'Page not found';
+            return view($view404, compact('page'));
+        }
+
+        return abort(404);
     }
 }

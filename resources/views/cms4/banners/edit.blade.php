@@ -46,11 +46,14 @@
             </nav>
             <h4 class="mg-b-0 tx-spacing--1">Edit an Album</h4>
         </div>
-        <div>
-            <a href="#" data-toggle="modal" data-target="#preview-banner" class="btn btn-outline-primary btn-sm btn-uppercase" data-toggle="modal">Preview banner</a>
-        </div>
+{{--        <div>--}}
+{{--            <a href="#" data-toggle="modal" data-target="#preview-banner" class="btn btn-outline-primary btn-sm btn-uppercase" data-toggle="modal">Preview banner</a>--}}
+{{--        </div>--}}
     </div>
     <form id="updateForm" method="POST" action="{{ route('albums.update', $album->id) }}" enctype="multipart/form-data">
+        @foreach (old('remove_banners', []) as $bannerId)
+            <input type="hidden" name="remove_banners[]" value="{{ $bannerId }}">
+        @endforeach
         @method('PUT')
         @csrf
         <div class="row row-sm">
@@ -178,11 +181,6 @@
             </div>
             <div class="modal-body">
                 <div class="owl-carousel owl-theme" id="previewCarousel">
-                    @foreach ($banners as $key => $banner)
-                        <div class="item">
-                            <img src="{{$banner->image_path}}">
-                        </div>
-                    @endforeach
                 </div>
             </div>
             <div class="modal-footer">
@@ -199,22 +197,7 @@
     <script src="{{ asset('lib/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
     <script src="{{ asset('lib/jqueryui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('lib/owl.carousel/owl.carousel.js') }}"></script>
-    {{--    Image validation--}}
-    <script>
-        const IS_MAIN_BANNER = "{{ $album->is_main_banner() }}";
-        let BANNER_WIDTH;
-        let BANNER_HEIGHT;
-
-        if (IS_MAIN_BANNER) {
-            BANNER_WIDTH = "{{ env('MAIN_BANNER_WIDTH') }}";
-            BANNER_HEIGHT = "{{ env('MAIN_BANNER_HEIGHT') }}";
-        } else {
-            BANNER_WIDTH = "{{ env('SUB_BANNER_WIDTH') }}";
-            BANNER_HEIGHT =  "{{ env('SUB_BANNER_HEIGHT') }}";
-        }
-    </script>
-    <script src="{{ asset('js/image-upload-validation.js') }}"></script>
-    {{--    End Image validation--}}
+    <script src="{{ asset('js/file-upload-validation.js') }}"></script>
 @endsection
 
 @section('customjs')
@@ -305,7 +288,15 @@
             }
 
             $('#upload_image').change(function (evt) {
-                validate_images(evt, upload_image);
+                // validate_images(evt, upload_image);
+
+                let files = evt.target.files;
+                let maxSize = 1;
+                let validateFileTypes = ["image/jpeg", "image/png"];
+                let requiredWidth = "{{ env('SUB_BANNER_WIDTH') }}";
+                let requiredHeight =  "{{ env('SUB_BANNER_HEIGHT') }}";
+
+                validate_files(files, upload_image, maxSize, validateFileTypes, requiredWidth, requiredHeight);
             });
 
             $(document).on('click', '.remove-upload', function() {

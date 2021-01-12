@@ -88,12 +88,13 @@
                                 <div id="scroll3" class="nav-pagelist scrollbar-lg pos-relative" style="height: 400px;">
                                     <ul>
                                         @foreach ($pages as $page)
-                                            @include('admin.menu.page-item', ['page' => $page])
+                                            @if ($page->name == 'Footer' && $page->page_type == 'default')
+                                            @else
+                                                @include('admin.menu.page-item', ['page' => $page])
+                                            @endif
                                         @endforeach
                                     </ul>
-
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -114,7 +115,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="d-block">Label *</label>
-                                        <input type="text" class="form-control" required id="external_label">
+                                        <input type="text" class="form-control" required id="external_label" maxlength="150">
                                     </div>
                                     <div class="form-group">
                                         <input type="checkbox" id="external_target"><label for="external_target">Open in New Tab</label>
@@ -195,7 +196,7 @@
                         <input type="hidden" name="type" value="page" required />
                         <div class="form-group">
                             <label class="d-block">Label *</label>
-                            <input type="text" class="form-control" name="label" id="page-label" required>
+                            <input type="text" class="form-control" name="label" id="page-label" maxlength="150" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -221,7 +222,7 @@
                         <input type="hidden" name="type" value="external" required />
                         <div class="form-group">
                             <label class="d-block">Label *</label>
-                            <input type="text" class="form-control" name="label" id="external-label" required>
+                            <input type="text" class="form-control" name="label" id="external-label" maxlength="150" required>
                         </div>
                         <div class="form-group">
                             <label class="d-block">URL *</label>

@@ -78,9 +78,9 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="list-search d-inline">
-                                <div class="dropdown d-inline mg-r-10">
-                                    @if(auth()->user()->has_access_to_route('albums.destroy_many'))
+                            @if(auth()->user()->has_access_to_route('albums.destroy_many'))
+                                <div class="list-search d-inline">
+                                    <div class="dropdown d-inline mg-r-10">
                                         <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Actions
                                         </button>
@@ -89,18 +89,18 @@
                                             @csrf
                                             <input name="ids" id="albumIds" type="hidden">
                                         </form>
-                                    @endif
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <button id="deleteAlbums" class="dropdown-item tx-danger">Delete</button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <button id="deleteAlbums" class="dropdown-item tx-danger">Delete</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                         <div class="ml-auto bd-highlight mg-t-10">
                             <form class="form-inline" id="searchForm">
                                 <div class="search-form mg-r-10">
                                     <input name="search" type="search" id="search" class="form-control" placeholder="Search by Name" value="{{ $filter->search }}">
-                                    <button class="btn" type="button"><i data-feather="search"></i></button>
+                                    <button class="btn"><i data-feather="search"></i></button>
                                 </div>
                                 @if(auth()->user()->has_access_to_route('albums.edit'))
                                     <a href="{{ route('albums.edit', 1) }}" class="btn btn-primary btn-sm mg-b-5">Manage Home Banner</a>
@@ -148,36 +148,40 @@
                                         <td>{{ Setting::date_for_listing($album->updated_at) }}</td>
                                         <td>
                                             @if($album->trashed())
-                                                @if(auth()->user()->has_access_to_route('albums.restore'))
+                                                @if (auth()->user()->has_access_to_route('albums.restore'))
                                                     <nav class="nav table-options justify-content-end">
                                                         <form id="form{{$album->id}}" method="post" action="{{ route('albums.restore', $album->id) }}">
                                                             @csrf
                                                             @method('POST')
-                                                            <a class="nav-link" href="#" title="Restore this page" onclick="document.getElementById('form{{$album->id}}').submit()"><i data-feather="rotate-ccw"></i></a>
+                                                            <a class="nav-link" href="#" title="Restore this banner" onclick="document.getElementById('form{{$album->id}}').submit()"><i data-feather="rotate-ccw"></i></a>
                                                         </form>
                                                     </nav>
                                                 @endif
                                             @else
                                                 <nav class="nav table-options justify-content-end">
-                                                    <a class="nav-link" data-toggle="modal" data-target="#preview-banner" data-id="{{$album->id}}"><i data-feather="eye"></i></a>
+{{--                                                    <a class="nav-link" data-toggle="modal" data-target="#preview-banner" data-id="{{$album->id}}"><i data-feather="eye"></i></a>--}}
+
                                                     @if(auth()->user()->has_access_to_route('albums.edit'))
-                                                        <a class="nav-link" href="{{ route('albums.edit', $album->id) }}"><i data-feather="edit"></i></a>
+                                                        <a class="nav-link" title="Edit banner" href="{{ route('albums.edit', $album->id) }}"><i data-feather="edit"></i></a>
                                                     @endif
-                                                    <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <i data-feather="settings"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        @if(auth()->user()->has_access_to_route('albums.quick_update'))
-                                                            <a class="dropdown-item" data-toggle="modal" data-target="#promptQuickEdit" href="#" data-id="{{ $album->id }}" data-name="{{ $album->name }}" data-transition-in="{{ $album->transition_in }}" data-transition-out="{{ $album->transition_out }}" data-transition="{{ $album->transition }}">Quick Edit</a>
-                                                        @endif
-                                                        @if(auth()->user()->has_access_to_route('albums.destroy'))
-                                                            <button type="button" class="dropdown-item" data-target="#prompt-delete" data-toggle="modal" data-animation="effect-scale" data-id="{{ $album->id }}" data-name="{{ $album->name }}">Delete</button>
-                                                            <form id="albumForm{{ $album->id }}" method="POST" action="{{ route('albums.destroy', $album->id) }}" class="d-none">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                            </form>
-                                                        @endif
-                                                    </div>
+
+                                                    @if (auth()->user()->has_access_to_route('albums.quick_update') || auth()->user()->has_access_to_route('albums.destroy'))
+                                                        <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i data-feather="settings"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            @if(auth()->user()->has_access_to_route('albums.quick_update'))
+                                                                <a class="dropdown-item" data-toggle="modal" data-target="#promptQuickEdit" href="#" data-id="{{ $album->id }}" data-name="{{ $album->name }}" data-transition-in="{{ $album->transition_in }}" data-transition-out="{{ $album->transition_out }}" data-transition="{{ $album->transition }}">Quick Edit</a>
+                                                            @endif
+                                                            @if(auth()->user()->has_access_to_route('albums.destroy'))
+                                                                <button type="button" class="dropdown-item" data-target="#prompt-delete" data-toggle="modal" data-animation="effect-scale" data-id="{{ $album->id }}" data-name="{{ $album->name }}">Delete</button>
+                                                                <form id="albumForm{{ $album->id }}" method="POST" action="{{ route('albums.destroy', $album->id) }}" class="d-none">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 </nav>
                                             @endif
                                         </td>

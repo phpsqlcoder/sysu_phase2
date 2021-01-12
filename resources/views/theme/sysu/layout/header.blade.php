@@ -10,7 +10,8 @@
             <div class="rd-navbar-top-panel__left d-block d-lg-none mt-2">
                 <ul class="rd-navbar-items-list e-options">
                     <li>
-                        <a href="{{route('cart.front.show')}}"><i class="fa fa-shopping-cart"></i> <span>Shopping Cart</span></a>
+                        <!-- <a href="{{route('cart.front.show')}}"><i class="fa fa-shopping-cart"></i> <span>Shopping Cart</span></a> -->
+                        <a href="{{route('cart.front.show')}}"><i class="fa fa-shopping-cart"></i><small class="counter">{!! Setting::EcommerceCartTotalItems() !!}</small></a>
                     </li>
                     @if(auth()->check())
                     <li><a  href="{{route('profile.sales')}}"><i class="fa fa-user"></i> <span>My Account</span></a></li>
@@ -125,7 +126,7 @@
                         <ul class="rd-navbar-items-list">
                         
                             <li>
-                                <a href="{{route('cart.front.show')}}"><i class="fa fa-shopping-cart"></i> <span>Cart</span></a>
+                                <a href="{{route('cart.front.show')}}"><i class="fa fa-shopping-cart"></i> <span>Cart <span class="badge badge-danger cart-counter">{!! Setting::EcommerceCartTotalItems() !!}</span></span></a>
                             </li>
                             @if(auth()->check())
                             <li><a  href="{{route('profile.sales')}}"><i class="fa fa-user"></i> <span>My Account</span></a></li>

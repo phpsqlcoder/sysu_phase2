@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ArticlePost extends FormRequest
+class PageCustomizeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class ArticlePost extends FormRequest
     public function attributes()
     {
         return [
-            'seo_title' => 'SEO Title',
-            'seo_description' => 'SEO Description',
-            'seo_keywords' => 'SEO Keywords',
+            'meta_title' => 'SEO Title',
+            'meta_description' => 'SEO Description',
+            'meta_keyword' => 'SEO Keywords',
         ];
     }
 
@@ -38,16 +38,13 @@ class ArticlePost extends FormRequest
     public function rules()
     {
         return [
-            'news_title' => 'required|max:150',
-            'date' => 'required|date',
-            'news_image' => 'nullable|max:5000',
-            'content' => 'required',
+            'album_id' => 'nullable|exists:albums,id',
+            'label' => 'required|max:150',
+            'image_url' => 'nullable',
             'visibility' => '',
-            'teaser' => 'required',
-            'is_featured' => '',
-            'seo_title' => 'max:60',
-            'seo_description' => 'max:160',
-            'seo_keywords' => 'max:160',
+            'meta_title' => 'max:60',
+            'meta_description' => 'max:160',
+            'meta_keyword' => 'max:160'
         ];
     }
 }

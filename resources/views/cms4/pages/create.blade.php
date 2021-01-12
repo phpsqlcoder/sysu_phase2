@@ -32,8 +32,8 @@
 				@csrf
 				<div class="form-group">
 					<label class="d-block">Page Title *</label>
-					<input type="text" class="form-control @error('page_title') is-invalid @enderror" name="page_title" id="page_title" value="{{ old('page_title') }}" required @htmlValidationMessage({{__('standard.empty_all_field')}})>
-                    @hasError(['inputName' => 'page_title'])
+					<input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}" required @htmlValidationMessage({{__('standard.empty_all_field')}})>
+                    @hasError(['inputName' => 'name'])
                     @endhasError
                     <small id="page_slug"></small>
                     @hasError(['inputName' => 'slug'])
@@ -47,15 +47,15 @@
                 </div>
 				<div class="form-group">
 					<label class="d-block">Parent Page</label>
-					<select id="parentPage" class="selectpicker mg-b-5 @error('parent_page') is-invalid @enderror" name="parent_page" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
-                        <option value="0" selected>- None -</option>
+					<select id="parentPage" class="selectpicker mg-b-5 @error('parent_page_id') is-invalid @enderror" name="parent_page_id" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
+                        <option selected value>- None -</option>
 						@forelse($pages as $page)
-							<option value="{{$page->id}}" {{ (old("parent_page") == $page->id ? "selected":"") }}> {{$page->name}} </option>
+							<option value="{{$page->id}}" {{ (old("parent_page_id") == $page->id ? "selected":"") }}> {{$page->name}} </option>
 						@empty
 						@endforelse
 
 					</select>
-                    @hasError(['inputName' => 'parent_page'])
+                    @hasError(['inputName' => 'parent_page_id'])
                     @endhasError
 				</div>
 
@@ -68,15 +68,15 @@
 						<button type="button" id="banner_image" class="btn page_banner_btn btn-secondary
 							@if(old('banner_type') == 'banner_image') active @endif">Image
 						</button>
-						<input type="hidden" name="banner_type" id="banner_type" value="{{old('banner_type','banner_slider') }}">
+						<input type="hidden" name="banner_type" id="banner_type" value="{{ old('banner_type','banner_slider') }}">
 					</div>
 				</div>
 				<div class="form-group banner-image" @if(old('banner_type') != 'banner_image') style="display:none;" @endif>
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input @error('page_image') is-invalid @enderror" name="page_image" id="page_image" accept="image/*">
-                        <label class="custom-file-label" for="page_image" id="img_name">Choose file</label>
+                        <input type="file" class="custom-file-input @error('image_url') is-invalid @enderror" name="image_url" id="image_url" accept="image/*">
+                        <label class="custom-file-label" for="image_url" id="img_name">Choose file</label>
                     </div>
-                    @error('page_image')
+                    @error('image_url')
                         <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
 					<p class="tx-10">
@@ -92,32 +92,32 @@
 				<div class="form-group banner-slider" @if(old('banner_type') == 'banner_image') style="display:none;" @endif>
 					<div class="row">
 						<div class="col-md-10">
-							<select class="selectpicker mg-b-5 @error('page_banner') is-invalid @enderror" id="page_banner" name="page_banner" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
-                                <option value="0" selected>- None -</option>
+							<select class="selectpicker mg-b-5 @error('album_id') is-invalid @enderror" id="album_id" name="album_id" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
+                                <option selected value>- None -</option>
 								@forelse($albums as $album)
-									<option value="{{$album->id}}" {{ (old("page_banner") == $album->id ? "selected":"") }}> {{$album->name}} </option>
+									<option value="{{$album->id}}" {{ (old("album_id") == $album->id ? "selected":"") }}> {{$album->name}} </option>
 								@empty
 								@endforelse
 							</select>
 						</div>
-						<div class="col-md-2" id="preview_btn_div" style="display:none;">
-							<a href="#" data-toggle="modal" data-target="#preview-banner" id="preview_btn" class="btn btn-xs btn-success">Preview</a>
-						</div>
+{{--						<div class="col-md-2" id="preview_btn_div" style="display:none;">--}}
+{{--							<a href="#" data-toggle="modal" data-target="#preview-banner" id="preview_btn" class="btn btn-xs btn-success">Preview</a>--}}
+{{--						</div>--}}
 					</div>
 
-                    @hasError(['inputName' => 'page_banner'])
+                    @hasError(['inputName' => 'album_id'])
                     @endhasError
 				</div>
 			</div>
 			<div class="col-lg-12">
 				<div class="form-group">
 					<label class="d-block" id="contentLabel">Content *</label>
-                    <textarea name="content" id="editor1" rows="10" cols="80" required>
-                         {{ old('content') }}
+                    <textarea name="contents" id="editor1" rows="10" cols="80" required>
+                         {{ old('contents') }}
                     </textarea>
-                    @hasError(['inputName' => 'content'])
+                    @hasError(['inputName' => 'contents'])
                     @endhasError
-                    <span class="invalid-feedback" role="alert" id="contentRequired" style="display: none;">
+                    <span class="invalid-feedback" role="alert" id="contentsRequired" style="display: none;">
                         <strong>The content field is required</strong>
                     </span>
 				</div>
@@ -138,22 +138,22 @@
 			<div class="col-lg-6 mg-t-30">
 				<div class="form-group">
 					<label class="d-block">Title <code>(meta title)</code></label>
-					<input type="text" class="form-control @error('seo_title') is-invalid @enderror" name="seo_title" value="{{ old('seo_title') }}">
-                    @hasError(['inputName' => 'seo_title'])
+					<input type="text" class="form-control @error('meta_title') is-invalid @enderror" name="meta_title" value="{{ old('meta_title') }}">
+                    @hasError(['inputName' => 'meta_title'])
                     @endhasError
 					<p class="tx-11 mg-t-4">{{ __('standard.seo.title') }}</p>
 				</div>
 				<div class="form-group">
 					<label class="d-block">Description <code>(meta description)</code></label>
-					<textarea rows="3" class="form-control @error('seo_description') is-invalid @enderror" name="seo_description">{{ old('seo_description') }}</textarea>
-                    @hasError(['inputName' => 'seo_description'])
+					<textarea rows="3" class="form-control @error('meta_description') is-invalid @enderror" name="meta_description">{{ old('meta_description') }}</textarea>
+                    @hasError(['inputName' => 'meta_description'])
                     @endhasError
 					<p class="tx-11 mg-t-4">{{ __('standard.seo.description') }}</p>
 				</div>
 				<div class="form-group">
 					<label class="d-block">Keywords <code>(meta keywords)</code></label>
-					<textarea rows="3" class="form-control @error('seo_keywords') is-invalid @enderror" name="seo_keywords">{{ old('seo_keywords') }}</textarea>
-                    @hasError(['inputName' => 'seo_keywords'])
+					<textarea rows="3" class="form-control @error('meta_keyword') is-invalid @enderror" name="meta_keyword">{{ old('meta_keyword') }}</textarea>
+                    @hasError(['inputName' => 'meta_keyword'])
                     @endhasError
 					<p class="tx-11 mg-t-4">{{ __('standard.seo.keywords') }}</p>
 				</div>
@@ -192,13 +192,7 @@
 	<script src="{{ asset('lib/bselect/dist/js/bootstrap-select.js') }}"></script>
     <script src="{{ asset('lib/bselect/dist/js/i18n/defaults-en_US.js') }}"></script>
     <script src="{{ asset('lib/owl.carousel/owl.carousel.js') }}"></script>
-    {{--    Image validation--}}
-    <script>
-        let BANNER_WIDTH = "{{ env('SUB_BANNER_WIDTH') }}";
-        let BANNER_HEIGHT =  "{{ env('SUB_BANNER_HEIGHT') }}";
-    </script>
-    <script src="{{ asset('js/image-upload-validation.js') }}"></script>
-    {{--    End Image validation--}}
+    <script src="{{ asset('js/file-upload-validation.js') }}"></script>
 @endsection
 
 
@@ -214,36 +208,23 @@
             allowedContent: true,
 
         };
-        let editor = CKEDITOR.replace('content', options);
+        let editor = CKEDITOR.replace('contents', options);
         editor.on('required', function (evt) {
             if ($('.invalid-feedback').length == 1) {
-                $('#contentRequired').show();
+                $('#contentsRequired').show();
             }
             $('#cke_editor1').addClass('is-invalid');
             evt.cancel();
         });
 
-        function has_none_option(objectId)
-        {
-            document.getElementById(objectId).selectedIndex = -1;
-            $('#'+objectId).on('change', function() {
-                if ($(this).val() == 0) {
-                    document.getElementById(objectId).selectedIndex = -1;
-                }
-            });
-        }
-
         $(function() {
             $('.selectpicker').selectpicker();
-
-            has_none_option("parentPage");
-            has_none_option("page_banner");
         });
 
         /**  START Slider Preview **/
-        $('#page_banner').on('change', function() {
-            $("#preview_btn").data("id", $('#page_banner').val());
-            if($('#page_banner').val() && $('#page_banner').val() > 0){
+        $('#album_id').on('change', function() {
+            $("#preview_btn").data("id", $('#album_id').val());
+            if($('#album_id').val() && $('#album_id').val() > 0){
 				$('#preview_btn_div').show();
 			} else {
                 $('#preview_btn_div').hide();
@@ -309,7 +290,7 @@
 
         /** Generation of the page slug **/
         function get_page_slug() {
-            var url = $('#page_title').val();
+            var url = $('#name').val();
             var parentPage = $('#parentPage').val();
             $.ajaxSetup({
                 headers: {
@@ -336,7 +317,7 @@
             get_page_slug();
         });
 
-        $('#page_title').change(function(){
+        $('#name').change(function(){
         	get_page_slug();
         });
 
@@ -352,23 +333,23 @@
     		else{
 
     			/** reset the input boxes **/
-    			$('#page_image').val('');
+    			$('#image_url').val('');
                 $('#img_name').html('Choose file');
-    			$('#page_banner').val('');
+    			$('#album_id').val('');
                 $('#image_div').hide();
 
 
     			$('#banner_type').val(btn);
 
 
-                $('#page_image').val();
+                $('#image_url').val();
     			if(btn == 'banner_slider'){ // if user selected the banner slider
 
     				$("#banner_image").removeClass("active");
         			$("#banner_slider").addClass("active");
 
-        			// $("#page_banner").prop('required',true);
-        			// $("#page_image").prop('required',false);
+        			// $("#album_id").prop('required',true);
+        			// $("#image_url").prop('required',false);
 
         			$(".banner-image").hide();
         			$(".banner-slider").show();
@@ -380,8 +361,8 @@
 	        		$("#banner_slider").removeClass("active");
         			$("#banner_image").addClass("active");
 
-        			// $("#page_image").prop('required',true);
-        			// $("#page_banner").prop('required',false);
+        			// $("#image_url").prop('required',true);
+        			// $("#album_id").prop('required',false);
 
         			$(".banner-slider").hide();
         			$(".banner-image").show();
@@ -399,7 +380,7 @@
 
             reader.onload = function(e) {
                 $('#img_name').html(file.name);
-                $('#page_image').attr('title', file.name);
+                $('#image_url').attr('title', file.name);
                 $('#img_temp').attr('src', e.target.result);
             }
 
@@ -407,14 +388,31 @@
             $('#image_div').show();
         }
 
-        $("#page_image").change(function(evt) {
-            validate_images(evt, readURL);
+        $("#image_url").change(function(evt) {
+
+            $('#img_name').html('Choose file');
+            $('#img_temp').attr('src', '');
+            $('#image_div').hide();
+
+            let files = evt.target.files;
+            let maxSize = 1;
+            let validateFileTypes = ["image/jpeg", "image/png"];
+            let requiredWidth = "{{ env('SUB_BANNER_WIDTH') }}";
+            let requiredHeight =  "{{ env('SUB_BANNER_HEIGHT') }}";
+
+            validate_files(files, readURL, maxSize, validateFileTypes, requiredWidth, requiredHeight, remove_banner_value_when_error);
         });
 
-        function remove_image(){
+        function remove_banner_value_when_error()
+        {
+            $('#image_url').val('');
+            $('#image_url').removeAttr('title');
+        }
+
+        function remove_image() {
             $('#img_name').html('Choose file');
-            $('#page_image').removeAttr('title');
-            $('#page_image').val('');
+            $('#image_url').removeAttr('title');
+            $('#image_url').val('');
             $('#img_temp').attr('src', '');
             $('#image_div').hide();
         }

@@ -54,7 +54,7 @@
 					@endhasError
                     <input type="hidden" required name="pages_json" id="menuPages">
                     <input type="hidden" required name="is_active" id="menuIsActive">
-                    <input type="submit" id="submitForm" class="d-none"></button>
+                    <input type="submit" id="submitForm" class="d-none">
                 </div>
             </form>
         </div>
@@ -87,7 +87,10 @@
                             <div id="scroll3" class="nav-pagelist scrollbar-lg pos-relative" style="height: 400px;">
                                 <ul>
                                     @foreach ($pages as $page)
-                                        @include('admin.menu.page-item', ['page' => $page])
+                                        @if ($page->name == 'Footer' && $page->page_type == 'default')
+                                        @else
+                                            @include('admin.menu.page-item', ['page' => $page])
+                                        @endif
                                     @endforeach
                                 </ul>
                             </div>
@@ -164,7 +167,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>{{__('standard.menu.remove_item')}}</p>
+                <p>Are you sure you want to remove this item? You can not undo this action.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-danger" id="btnRemove">Yes, Remove</button>

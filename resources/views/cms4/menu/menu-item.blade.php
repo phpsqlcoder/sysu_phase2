@@ -16,9 +16,9 @@
                 <a href="#prompt-remove" class="tx-bold tx-uppercase tx-10 tx-danger" data-toggle="modal" data-element-id="{{ $randomId }}" data-id="{{ $link->id }}">Remove</a>
             </div>
         </div>
-        @if ($link->sub_pages->count())
+        @if ($link->sub_pages_by_order()->count())
             <ol class="dd-list">
-                @foreach ($link->sub_pages as $subLink)
+                @foreach ($link->sub_pages_by_order() as $subLink)
                     @include('admin.menu.menu-item', ['link' => $subLink])
                 @endforeach
             </ol>
@@ -39,9 +39,9 @@
                 <a href="#prompt-remove" class="tx-bold tx-uppercase tx-10 tx-danger" data-toggle="modal" data-element-id="{{ $randomId }}" data-id="{{ $link->id }}">Remove</a>
             </div>
         </div>
-        @if ($link->sub_pages->count())
+        @if ($link->sub_pages_by_order()->count())
             <ol class="dd-list">
-                @foreach ($link->sub_pages as $subLink)
+                @foreach ($link->sub_pages_by_order() as $subLink)
                     @include('admin.menu.menu-item', ['link' => $subLink])
                 @endforeach
             </ol>

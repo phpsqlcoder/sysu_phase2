@@ -52,6 +52,10 @@ Manage News
                                                 <input type="radio" id="orderBy2" name="orderBy" class="custom-control-input" value="name" @if ($filter->orderBy == 'name') checked @endif>
                                                 <label class="custom-control-label" for="orderBy2">{{__('common.title')}}</label>
                                             </div>
+                                            <div class="custom-control custom-radio">
+                                                <input type="radio" id="orderBy3" name="orderBy" class="custom-control-input" value="is_featured" @if ($filter->orderBy == 'is_featured') checked @endif>
+                                                <label class="custom-control-label" for="orderBy3">Featured</label>
+                                            </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleDropdownFormEmail1">{{__('common.sort_order')}}</label>
@@ -79,37 +83,37 @@ Manage News
                                     </form>
                                 </div>
                             </div>
-                            <div class="list-search d-inline">
-                                <div class="dropdown d-inline mg-r-10">
-                                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Actions
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/page/publish') == 1)
-                                            <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PUBLISHED')">{{__('common.publish')}}</a>
-                                        @endif
-                                        @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/page/private') == 1)
-                                            <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PRIVATE')">{{__('common.private')}}</a>
-                                        @endif
-                                        @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/page/delete') == 1)
-                                            <a class="dropdown-item tx-danger" href="javascript:void(0)" onclick="delete_page()">{{__('common.delete')}}</a>
-                                        @endif
+                            @if(auth()->user()->has_access_to_route('news.change.status') || auth()->user()->has_access_to_route('news.delete'))
+                                <div class="list-search d-inline">
+                                    <div class="dropdown d-inline mg-r-10">
+                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            @if(auth()->user()->has_access_to_route('news.change.status'))
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PUBLISHED')">{{__('common.publish')}}</a>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PRIVATE')">{{__('common.private')}}</a>
+                                            @endif
+                                            @if(auth()->user()->has_access_to_route('news.delete'))
+                                                <a class="dropdown-item tx-danger" href="javascript:void(0)" onclick="delete_page()">{{__('common.delete')}}</a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
                         <div class="ml-auto bd-highlight mg-t-10 mg-r-10">
                             <form class="form-inline" id="searchForm">
                                 <div class="search-form mg-r-10">
                                     <input name="search" type="search" id="search" class="form-control" placeholder="Search by Title" value="{{ $filter->search }}">
-                                    <button class="btn filter" type="button" id="btnSearch"><i data-feather="search"></i></button>
+                                    <button class="btn filter" id="btnSearch"><i data-feather="search"></i></button>
                                 </div>
                                 <a class="btn btn-success btn-sm mg-b-5" href="javascript:void(0)" data-toggle="modal" data-target="#advanceSearchModal">{{__('common.advance_search')}}</a>
                             </form>
                         </div>
                         <div class="mg-t-10">
-                            @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/news/create') == 1)
+                            @if(auth()->user()->has_access_to_route('news.create'))
                                 <a class="btn btn-primary btn-sm mg-b-20" href="{{ route('news.create') }}">{{__('standard.news.article.create')}}</a>
                             @endif
                         </div>
@@ -163,31 +167,37 @@ Manage News
                                         <td>{{ Setting::date_for_listing($new->updated_at) }}</td>
                                         <td>
                                             @if($new->trashed())
-                                                <nav class="nav table-options justify-content-end">
-                                                    <a class="nav-link" href="{{route('news.restore',$new->id)}}" title="Restore this page"><i data-feather="rotate-ccw"></i></a>
-                                                </nav>
+                                                @if (auth()->user()->has_access_to_route('news.restore'))
+                                                    <nav class="nav table-options justify-content-end">
+                                                        <a class="nav-link" href="{{route('news.restore',$new->id)}}" title="Restore this news"><i data-feather="rotate-ccw"></i></a>
+                                                    </nav>
+                                                @endif
                                             @else
                                                 <nav class="nav table-options justify-content-end">
-                                                @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/news/edit') == 1)
-                                                    <a class="nav-link" href="{{ route('news.edit', $new->id) }}" title="Edit Page"><i data-feather="edit"></i></a>
-                                                @endif
-                                                @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/news/show') == 1)
-                                                    <a class="nav-link" target="_blank" href="{{route('news.front.show',$new->slug)}}" title="View Page"><i data-feather="eye"></i></a>
-                                                @endif
-                                                @if(\App\ViewPermissions::check_permission(Auth::user()->role_id,'admin/news/published') == 1)
-                                                    <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <i data-feather="settings"></i>
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        @if(strtoupper($new->status)=='PUBLISHED')
-                                                            <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('news.change.status')}}','PRIVATE',{{$new->id}})"> Private</a>
-                                                        @else
-                                                            <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('news.change.status')}}','PUBLISHED',{{$new->id}})"> Publish</a>
-                                                        @endif
+                                                    <a class="nav-link" target="_blank" href="{{route('news.front.show',$new->slug)}}" title="View News"><i data-feather="eye"></i></a>
 
-                                                        <a class="dropdown-item" href="javascript:void(0);" onclick="delete_one_page({{$new->id}},'{{$new->name}}');">Delete</a>
-                                                    </div>
-                                                @endif
+                                                    @if(auth()->user()->has_access_to_route('news.edit'))
+                                                        <a class="nav-link" href="{{ route('news.edit', $new->id) }}" title="Edit News"><i data-feather="edit"></i></a>
+                                                    @endif
+
+                                                    @if(auth()->user()->has_access_to_route('news.change.status') || auth()->user()->has_access_to_route('news.delete'))
+                                                        <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i data-feather="settings"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            @if (auth()->user()->has_access_to_route('news.change.status'))
+                                                                @if(strtoupper($new->status)=='PUBLISHED')
+                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('news.change.status')}}','PRIVATE',{{$new->id}})"> Private</a>
+                                                                @else
+                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('news.change.status')}}','PUBLISHED',{{$new->id}})"> Publish</a>
+                                                                @endif
+                                                            @endif
+
+                                                            @if (auth()->user()->has_access_to_route('news.delete'))
+                                                                <a class="dropdown-item" href="javascript:void(0);" onclick="delete_one_page({{$new->id}},'{{$new->name}}');">Delete</a>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 </nav>
                                             @endif
                                         </td>
@@ -263,8 +273,16 @@ Manage News
                             <div>
                                 <select name="category_id" class="form-control input-sm">
                                     <option value="">- All Category -</option>
+                                    @php $noCategory = 0; @endphp
                                     @foreach($uniqueNewsByCategory as $news)
-                                        <option value="{{ ($news->category_id) ? $news->category_id : 0 }}" @if ($advanceSearchData->category_id != null && $advanceSearchData->category_id == $news->category_id) selected @endif>{{$news->category->name}}</option>
+                                        @php $categoryId = ($news->category_id) ? $news->category_id : 0; @endphp
+                                        @if ($categoryId == 0)
+                                            @if ($noCategory)
+                                                @continue
+                                            @endif
+                                            @php $noCategory += 1; @endphp
+                                        @endif
+                                        <option value="{{ $categoryId }}" @if ($advanceSearchData->category_id != null && $advanceSearchData->category_id == $news->category_id) selected @endif>{{$news->category->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -453,7 +471,8 @@ Manage News
             else{
 
                 if(parseInt(counter) > 1){ // ask for confirmation when multiple pages was selected
-                    $('#newsStatus').html(status)
+                    let statusName = (status == 'PUBLISHED') ? 'PUBLISH' : status;
+                    $('#newsStatus').html(statusName)
                     $('#prompt-update-status').modal('show');
 
                     $('#btnUpdateStatus').on('click', function() {

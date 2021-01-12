@@ -77,32 +77,32 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="list-search d-inline">
-                                <div class="dropdown d-inline mg-r-10">
-                                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Actions
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                                
-                                        @if(auth()->user()->has_access_to_route('pages.change.status'))
-                                            <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PUBLISHED')">{{__('common.publish')}}</a>
-                                        @endif
-                                        @if(auth()->user()->has_access_to_route('pages.change.status'))
-                                            <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PRIVATE')">{{__('common.private')}}</a>
-                                        @endif
-                                        @if(auth()->user()->has_access_to_route('pages.delete'))
-                                            <a class="dropdown-item tx-danger" href="javascript:void(0)" onclick="delete_page()">{{__('common.delete')}}</a>
-                                        @endif
+                            @if(auth()->user()->has_access_to_route('pages.change.status') || auth()->user()->has_access_to_route('pages.delete'))
+                                <div class="list-search d-inline">
+                                    <div class="dropdown d-inline mg-r-10">
+                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Actions
+                                        </button>
+
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            @if(auth()->user()->has_access_to_route('pages.change.status'))
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PUBLISHED')">{{__('common.publish')}}</a>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="change_status('PRIVATE')">{{__('common.private')}}</a>
+                                            @endif
+                                            @if(auth()->user()->has_access_to_route('pages.delete'))
+                                                <a class="dropdown-item tx-danger" href="javascript:void(0)" onclick="delete_page()">{{__('common.delete')}}</a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
                         <div class="ml-auto bd-highlight mg-t-10 mg-r-10">
                             <form class="form-inline" id="searchForm">
                                 <div class="search-form mg-r-10">
                                     <input name="search" type="search" id="search" class="form-control"  placeholder="Search by Title" value="{{ $filter->search }}">
-                                    <button class="btn filter" type="button" id="btnSearch"><i data-feather="search"></i></button>
+                                    <button class="btn filter" id="btnSearch"><i data-feather="search"></i></button>
                                 </div>
                                 <a class="btn btn-success btn-sm mg-b-5" href="javascript:void(0)" data-toggle="modal" data-target="#advanceSearchModal">{{__('common.advance_search')}}</a>
                             </form>
@@ -158,9 +158,11 @@
                                     <td>{{ Setting::date_for_listing($page->updated_at) }}</td>
                                     <td>
                                         @if($page->trashed())
-                                            <nav class="nav table-options justify-content-end">
-                                                <a class="nav-link" href="{{route('pages.restore',$page->id)}}" title="Restore this page"><i data-feather="rotate-ccw"></i></a>
-                                            </nav>
+                                            @if (auth()->user()->has_access_to_route('pages.restore'))
+                                                <nav class="nav table-options justify-content-end">
+                                                    <a class="nav-link" href="{{route('pages.restore',$page->id)}}" title="Restore this page"><i data-feather="rotate-ccw"></i></a>
+                                                </nav>
+                                            @endif
                                         @else
                                             <nav class="nav table-options justify-content-end">
                                                 @if(auth()->user()->has_access_to_route('pages.show'))
@@ -169,21 +171,19 @@
                                                 @if(auth()->user()->has_access_to_route('pages.edit'))
                                                     <a class="nav-link" href="{{route('pages.edit',$page->id)}}" title="Edit Page"><i data-feather="edit"></i></a>
                                                 @endif
-                                                @if ($page->is_not_default_page())
+                                                @if ($page->is_not_default_page() && (auth()->user()->has_access_to_route('pages.change.status') || (auth()->user()->has_access_to_route('pages.delete')) && $page->is_standard_page()))
                                                     <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         <i data-feather="settings"></i>
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-right">
-                                                        @if($page->status=='PUBLISHED')                                                            
-                                                            @if(auth()->user()->has_access_to_route('pages.change.status'))
+                                                        @if(auth()->user()->has_access_to_route('pages.change.status'))
+                                                            @if($page->status=='PUBLISHED')
                                                                 <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('pages.change.status')}}','PRIVATE',{{$page->id}})"> Private</a>
-                                                            @endif
-                                                        @else
-                                                            @if(auth()->user()->has_access_to_route('pages.change.status'))
+                                                            @else
                                                                 <a class="dropdown-item" href="javascript:void(0);" onclick="post_form('{{route('pages.change.status')}}','PUBLISHED',{{$page->id}})"> Publish</a>
                                                             @endif
                                                         @endif
-                                                        @if(auth()->user()->has_access_to_route('pages.delete') && $page->page_type == 'standard')                                                        
+                                                        @if(auth()->user()->has_access_to_route('pages.delete') && $page->is_standard_page())
                                                             <button type="button" class="dropdown-item" data-target="#prompt-delete" data-toggle="modal" data-animation="effect-scale" data-id="{{ $page->id }}" data-name="{{ $page->name }}">Delete</button>
                                                             <form id="pageForm{{ $page->id }}" method="POST" action="{{ route('pages.destroy', $page->id) }}">
                                                                 @csrf
@@ -258,8 +258,16 @@
                             <div>
                                 <select name="album_id" class="form-control input-sm">
                                     <option value="">- All Albums -</option>
+                                    @php $noAlbum = 0; @endphp
                                     @foreach($uniquePagesByAlbum as $page)
-                                        <option value="{{($page->album_id) ? $page->album_id : 0}}" @if ($advanceSearchData->album_id && $advanceSearchData->album_id == $page->album_id) selected @endif>{{$page->album->name}}</option>
+                                        @php $pageId = ($page->album_id) ? $page->album_id : 0; @endphp
+                                        @if ($pageId == 0)
+                                            @if ($noAlbum)
+                                                @continue
+                                            @endif
+                                            @php $noAlbum += 1; @endphp
+                                        @endif
+                                        <option value="{{ $pageId }}" @if (isset($advanceSearchData->album_id) && $advanceSearchData->album_id == $page->album_id) selected @endif>{{$page->album->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -455,6 +463,7 @@
                 return false;
             } else {
                 if (parseInt(counter) > 1) { // ask for confirmation when multiple pages was selected
+                    status = (status == 'PUBLISHED') ? 'PUBLISH' : status;
                     $('#pageStatus').html(status)
                     $('#prompt-update-status').modal('show');
                 } else {
