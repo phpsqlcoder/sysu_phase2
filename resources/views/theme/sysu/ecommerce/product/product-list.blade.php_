@@ -1,0 +1,309 @@
+@extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
+
+@section('pagecss')
+    <style>
+        .product-img{
+            padding: 10px 10px 0px 10px !important;
+        }
+        .product-title{
+            font-weight:bold;
+            font-family:"Lato", sans-serif !important !important !important;
+            font-size:30px;
+        }
+    </style>
+@endsection
+
+@section('content')
+    <main>
+        <section class="mt-4">
+            <div class="container">
+                <div class="row no-gutters">
+                    <div class="col-md-9">
+                        <div class="main-banner">
+                            <div class="slick-slider" id="banner">
+                              <div class="banner-wrapper">
+                                <div class="banner-image"><img src="{{ asset('theme/sysu/images/banners/banner1.jpg') }}" /></div>
+                                
+                              </div>
+                              <div class="banner-wrapper">
+                                <div class="banner-image"><img src="{{ asset('theme/sysu/images/banners/banner2.jpg') }}" /></div>
+                                
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="#">
+                            <img src="{{ asset('theme/sysu/images/ads/ads1.jpg') }}" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="listing-wrapper">
+            <div class="container">
+                <div class="breadcrumb dark">
+                    <a href="/">Home</a>
+                    <span class="fa default"></span>
+                    <a href="{{route('product.front.list')}}"><span class="current">Products</span></a>
+                    
+                </div>
+                <div class="gap-20"></div>
+                <div class="row">
+                    <div id="col1" class="col-lg-3">
+                        <nav class="rd-navbar-listing">
+                            <div class="listing-filter-wrap">
+                                <h3 class="listing-title">Product Categories</h3>
+                                <div class="side-menu menu-category">
+
+                                    @if ($categories->count())
+                                        
+                                        <ul class="listing-category">
+                                            @foreach ($categories as $category)
+                                                <li @if(request()->has('criteria') && $category->id == $selectedCategory) class="active" @endif>
+                                                    <a href="{{ route('product.front.list') }}?type=category&criteria={{$category->id}}">{{$category->name}}</a>
+                                                    @php $subCategories = $category->child_categories; @endphp
+                                                    @if ($subCategories && $subCategories->count())
+                                                        <ul style="display:none;" class="jt-sub">
+                                                            @foreach ($subCategories as $subCategory)
+                                                                <li @if(request()->has('criteria') && $subCategory->id == $selectedCategory) class="active" @endif>
+                                                                    <a href="{{ route('product.front.list') }}?type=category&criteria={{$subCategory->id}}">{{$subCategory->name}}</a>
+                                                                    @php $subSubCategories = $subCategory->child_categories; @endphp
+                                                                    @if ($subSubCategories && $subSubCategories->count())
+                                                                        <ul>
+                                                                            @foreach ($subSubCategories as $subSubCategory)
+                                                                                <li @if(request()->has('criteria') && $subSubCategory->id == $selectedCategory) class="active" @endif>
+                                                                                    <a href="{{ route('product.front.list') }}?type=category&criteria={{$subSubCategory->id}}">{{$subSubCategory->name}}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @endif
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                      
+                                    @endif
+                                    
+                                </div>
+
+                                <div class="gap-20"></div>
+
+                                <h3 class="listing-title">Price</h3>
+                                <div class="gap-10"></div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <input type="text" class="js-range-slider" name="my_range" id="my_range" value="" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a href="#" onclick="filter_price();" class="btn btn-xs btn-info" style="margin-top:13px;color:white;"><span class="fa fa-search"></span></a>
+                                    </div>
+                                </div>
+
+                                <div class="gap-40"></div>
+
+                                <h3 class="listing-title">Brand</h3>
+                                <div class="side-menu menu-category">
+
+                                    @if ($brands->count())
+                                        
+                                        <ul class="listing-category">
+                                            @foreach ($brands as $brand)
+                                                <li>
+                                                    <a href="{{ route('product.front.list') }}?type=brand&criteria={{$brand->brand}}">
+                                                        {{$brand->brand}}
+                                                    </a>                                                    
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                      
+                                    @endif
+                                    
+                                </div>
+                                
+                            </div>
+                        </nav>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="filter-product">
+                            <div class="form-row">
+                                <div id="col2" class="col-6">
+                                
+                                    <nav>
+
+                                    </nav>
+                                    <div class="btn-group">
+                                        <p class="filter-item-count">Sort: </p>
+                                        <button type="button" class="btn dropdown-filter-btn dropdown-toggle mr-lg-auto" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                                @if(isset($_GET['sort']))
+                                                    {{$_GET['sort']}}
+                                                @else
+                                                    Sort by
+                                                @endif
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#" onclick="filter_sort('Price low to high')">Price low to high</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_sort('Price high to low')">Price high to low</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="btn-group">
+                                        <p class="filter-item-count ml-auto">Show products:</p>
+                                        <button type="button" class="btn dropdown-filter-btn dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                                @if(isset($_GET['limit']))
+                                                    {{$_GET['limit']}}
+                                                @else
+                                                    16
+                                                @endif item/s
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('16')">16</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('24')">24</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('40')">40</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('60')">60</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('100')">100</a>
+                                            <a class="dropdown-item" href="#" onclick="filter_limit('All')">All</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gap-20"></div>
+                        <div class="list-product">
+                            <div class="row no-gutters">
+                                @forelse($products as $product)
+                                    <div class="col-lg-3 col-md-6 item">
+                                        <div class="product-link border">
+                                            <div class="product-card">
+                                               
+                                                <a href="{{route('product.front.show',$product->slug)}}">
+                                                    <div class="product-img">
+                                                        <img src="{{ asset('storage/products/'.$product->photoPrimary) }}" alt="" />
+                                                    </div>
+                                                    <div class="gap-20"></div>
+                                                    <p class="product-title px-3" 
+                                                    style="font:normal normal bold 12px Arial, sans-serif; height: 5em;">
+                                                    {{ucwords($product->name)}}</p>
+                                                </a>
+                                                <div class="info position-relative">
+                                                    <div class="row no-gutters px-3 pb-3">
+                                                        <div class="col-10"><h3 class="product-price">
+                                                            <span style="color:#f57224 !important;padding-top:10px;">₱ {{number_format($product->price,2)}}</span> | {{$product->uom}}</h3></div>
+                                                        <div class="col-2 text-right"><a href="#"><i class="fa fa-plus bg-success text-light p-1"></i></a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    No Product Found..
+                                @endforelse
+                                
+                            </div>
+                        </div>
+                        {{ $products->links() }}
+                        <ul class="pagination" style="display:none;">
+                            <li class="page-item">
+                                <a class="page-link" href="#" title="Back"><i class="lnr lnr-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3 <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">4</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" title="Next"><i class="lnr lnr-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+    </main>
+@endsection
+
+@section('pagejs')
+<script src="{{ asset('theme/sysu/plugins/ion.rangeslider/js/ion.rangeSlider.js') }}"></script>
+
+<script>
+    $(document).ready(function () {
+        $(".js-range-slider").ionRangeSlider({
+            type: "double",
+            min: 0,
+            max: {{$max}},
+            from: @if(isset($_GET['price_start'])){{$_GET['price_start']}}@else 0 @endif,
+            to: @if(isset($_GET['price_end'])){{$_GET['price_end']}}@else 500 @endif,
+            grid: true
+        });
+
+
+    });
+
+
+
+    function filter_price(){
+        var slider = $("#my_range").data("ionRangeSlider");
+
+        var from = slider.result.from;
+        var to = slider.result.to;
+
+        var url = "?type=price&price_start="+from+"&price_end="+to;
+        return filter(url);
+    }
+
+    function filter_sort(par){
+
+        var url = '';
+        if(location.search.length > 1)
+            url = location.search+"&sort="+par;
+        else
+            url = "?sort="+par;
+        return filter(url);
+
+    }
+
+    function filter_limit(par){
+
+        if(location.search.length > 1)
+            url = location.search+"&limit="+par;
+        else
+            url = "?limit="+par;
+        //var url = location.search+"&limit="+par;
+        return filter(url);
+
+    }
+
+
+    function filter_category(par){
+
+        var url = "?type=category&criteria="+par;
+        return filter(url);
+
+    }
+
+    function filter_rating(par){
+        var url = "?type=rating&criteria="+par;
+        return filter(url);
+    }
+
+    function filter(filters){
+        window.location.href = "{{route('product.front.list')}}"+filters;
+    }
+
+</script>
+@endsection
