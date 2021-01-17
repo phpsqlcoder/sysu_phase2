@@ -15,12 +15,8 @@
                 <div class="col-lg-3">                          
                     <div class="desk-cat d-none d-lg-block">
                         <div class="quick-nav">
-                            <h3 class="catalog-title">My Account</h3>
-                            <ul>
-                                <li class="active"><a href="{{ route('my-account.manage-account')}}">Manage Account</a></li>
-                                <li><a href="{{ route('my-account.update-password') }}">Change Password</a></li>
-                                <li><a href="{{ route('profile.sales') }}">My Orders</a></li>
-                            </ul>
+                            <h3 class="catalog-title">{{ $page->name }}</h3>
+                            @include('theme.sysu.layout.sidebar-menu')
                         </div>
                     </div>
                 </div>

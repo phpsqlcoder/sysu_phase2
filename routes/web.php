@@ -64,6 +64,20 @@ Route::group(['middleware' => ['authenticated']], function () {
 
     // Paynamics Notification
 
+    // Favorites
+    Route::get('/account/favorites','EcommerceControllers\FavoriteController@index_front')->name('profile.favorites');
+    Route::get('/favorite/product-add-to-cart/{id}','EcommerceControllers\FavoriteController@add_to_cart')->name('favorite.product-add-to-cart');
+    Route::post('/favorite/remove-product','EcommerceControllers\FavoriteController@remove_product')->name('favorite.remove-product');
+    Route::post('/add-to-favorites','EcommerceControllers\FavoriteController@btn_add_to_favorites')->name('btn-add-to-favorites');
+    Route::post('/remove-to-favorites','EcommerceControllers\FavoriteController@btn_remove_to_favorites')->name('btn-remove-to-favorites');
+
+    // Wishlist
+    Route::get('/account/wishlist','EcommerceControllers\WishlistController@index_front')->name('profile.wishlist');
+
+    Route::post('/add-to-wishlist','EcommerceControllers\WishlistController@add_to_wishlist')->name('add-to-wishlist');
+    Route::post('/remove-to-wishlist','EcommerceControllers\WishlistController@remove_to_wishlist')->name('remove-to-wishlist');
+    Route::post('/wishlist/remove-product','EcommerceControllers\WishlistController@remove_product')->name('wishlist.remove-product');
+
 
 });
 ##############################################################
@@ -115,6 +129,12 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         Route::resource('/admin/customers', 'Settings\CustomerController');
         Route::resource('/admin/sales-transaction', 'EcommerceControllers\SalesController');
         Route::resource('/admin/deliveryrate', 'EcommerceControllers\DeliveryRateController');
+
+        // Product Favorite
+        Route::get('/product-favorites/', 'EcommerceControllers\FavoriteController@index')->name('product-favorite.list');
+        // Product Wishlist
+        Route::get('/product-wishlist/', 'EcommerceControllers\WishlistController@index')->name('product-wishlist.list');
+
 
         //product review
         Route::get('/product-review/', 'EcommerceControllers\ProductReviewController@index')->name('product-review.list');

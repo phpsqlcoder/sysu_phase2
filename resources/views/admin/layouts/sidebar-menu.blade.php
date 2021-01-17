@@ -122,6 +122,15 @@
                     @if (auth()->user()->has_access_to_module('product_reviews'))
                         <li @if (\Route::current()->getName() == 'product-review.list') class="active" @endif><a href="{{ route('product-review.list') }}">Product Reviews</a></li>
                     @endif
+
+                    {{--@if (auth()->user()->has_access_to_module('product_reviews'))--}}
+                        <li @if (\Route::current()->getName() == 'product-favorite.list') class="active" @endif><a href="{{ route('product-favorite.list') }}">Favorites</a></li>
+                    {{--@endif--}}
+
+                    {{--@if (auth()->user()->has_access_to_module('product_reviews'))--}}
+                        <li @if (\Route::current()->getName() == 'product-wishlist.list') class="active" @endif><a href="{{ route('product-wishlist.list') }}">Wishlist</a></li>
+                    {{--@endif--}}
+
                     @if (auth()->user()->has_access_to_module('product_category'))
                         <li @if (\Route::current()->getName() == 'product-categories.index' || \Route::current()->getName() == 'product-categories.edit') class="active" @endif><a href="{{ route('product-categories.index') }}">Manage Categories</a></li>
                         @if (auth()->user()->has_access_to_route('product-categories.create'))

@@ -270,7 +270,9 @@
                                     <div class="col-lg-3 col-md-4 col-6 item">
                                         <div class="product-link border">
                                             <div class="product-card">
-                                               
+                                               <button class="add-to-cart-btn" data-toggle="tooltip" data-placement="left" title="Add to Favorites">
+                                                    <span class="lnr lnr-heart"></span>
+                                              </button>
                                                 <a href="{{route('product.front.show',$product->slug)}}" title="{{$product->name}}">
                                                     <div class="product-img">
                                                         <img src="{{ asset('storage/products/'.$product->photoPrimary) }}" alt="" />

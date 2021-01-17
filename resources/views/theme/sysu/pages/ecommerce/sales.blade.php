@@ -2,6 +2,7 @@
 @section('pagecss')
    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/ion.rangeslider/css/ion.rangeSlider.css') }}">
 @endsection
+
 @section('content')
 @php
     $modals='';
@@ -10,18 +11,15 @@
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 </div>
 <span onclick="closeNav()" class="dark-curtain"></span>
+
 <section class="py-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-3">                          
                 <div class="desk-cat d-none d-lg-block">
                     <div class="quick-nav">
-                        <h3 class="catalog-title">My Account</h3>
-                        <ul>
-                            <li><a href="{{ route('my-account.manage-account')}}">Manage Account</a></li>
-                            <li><a href="{{ route('my-account.update-password') }}">Change Password</a></li>
-                            <li class="active"><a href="{{ route('profile.sales') }}">My Orders</a></li>
-                        </ul>
+                        <h3 class="catalog-title">{{ $page->name }}</h3>
+                        @include('theme.sysu.layout.sidebar-menu')
                     </div>
                 </div>
             </div>

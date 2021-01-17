@@ -87,4 +87,11 @@ class Cart extends Model
         
     }
 
+    public static function on_cart($productid)
+    {
+        $cart = Cart::where('user_id', auth()->id())->where('product_id',$productid)->count();
+
+        return $cart;
+    }
+
 }
