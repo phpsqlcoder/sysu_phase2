@@ -104,6 +104,21 @@ class Album extends Model
         return $total;
     }
 
+    public static function totalNotDeletedAlbums()
+    {
+        $total = Album::where('type','sub_banner')->count();
+
+        return $total;
+    }
+
+    public static function totalDeletePages()
+    {
+        $withTrashed = Album::withTrashed()->get()->count();
+        $total = $withTrashed - Album::count();
+
+        return $total;
+    }
+
 //    public function getUpdatedAtAttribute($value)
 //    {
 //        if ($value == null || trim($value) == '') {
