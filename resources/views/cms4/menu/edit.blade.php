@@ -139,7 +139,7 @@
                         <!-- .dd-list -->
                         <ol class="dd-list">
                             @foreach ($menu->parent_navigation() as $item)
-                                @include('admin.menu.menu-item', ['link' => $item])
+                                @include('cms4.menu.menu-item', ['link' => $item])
                             @endforeach
                         </ol>
                         <!-- /.dd-list -->

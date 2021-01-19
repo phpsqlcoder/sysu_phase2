@@ -19,7 +19,7 @@
         @if ($link->sub_pages_by_order()->count())
             <ol class="dd-list">
                 @foreach ($link->sub_pages_by_order() as $subLink)
-                    @include('admin.menu.menu-item', ['link' => $subLink])
+                    @include('cms4.menu.menu-item', ['link' => $subLink])
                 @endforeach
             </ol>
         @endif
@@ -42,7 +42,7 @@
         @if ($link->sub_pages_by_order()->count())
             <ol class="dd-list">
                 @foreach ($link->sub_pages_by_order() as $subLink)
-                    @include('admin.menu.menu-item', ['link' => $subLink])
+                    @include('cms4.menu.menu-item', ['link' => $subLink])
                 @endforeach
             </ol>
         @endif
