@@ -79,36 +79,36 @@
                                         Website Summary
                                     </div>
                                     <div class="card-body" style="height:800px !important;">
-                                        {{--@if (auth()->user()->has_access_to_pages_module())
+                                        @if (auth()->user()->has_access_to_pages_module())
                                             <h6><strong>Pages</strong></h6>
                                             <p><a href="{{route('pages.index.advance-search')}}?status=published"><span class="badge badge-dark">{{ \App\Page::totalPublicPages() }}</span> Published Pages</a></p>
                                             <p><a href="{{route('pages.index.advance-search')}}?status=private"><span class="badge badge-dark">{{ \App\Page::totalPrivatePages() }}</span> Private Pages</a></p>
                                             <p><a href="{{route('pages.index.advance-search')}}?showDeleted=on"><span class="badge badge-dark">{{ \App\Page::totalDeletePages() }}</span> Deleted Pages</a></p>
                                             <hr>
-                                        @endif--}}
-                                        {{--@if (auth()->user()->has_access_to_albums_module())
+                                        @endif
+                                        @if (auth()->user()->has_access_to_albums_module())
                                             <h6><strong>Sub Banners</strong></h6>
                                             <p><a href="{{ route('albums.index') }}"><span class="badge badge-dark">{{ \App\Album::totalNotDeletedAlbums() }}</span> Albums</a></p>
                                             <p><a href="{{ route('albums.index') }}?showDeleted=on"><span class="badge badge-dark">{{ \App\Album::totalDeletePages() }}</span> Deleted Albums</a></p>
                                             <hr>
-                                        @endif--}}
+                                        @endif
                                         @if (auth()->user()->has_access_to_user_module())
                                             <h6><strong>Users</strong></h6>
                                             <p><a href="{{ route('users.index') }}"><span class="badge badge-dark">{{ \App\User::activeTotalUser() }}</span> Active Users</a></p>
                                             <p><a href="{{ route('users.index') }}?showDeleted=on"><span class="badge badge-dark">{{ \App\User::inactiveTotalUser() }}</span> Inactive Users</a></p>
                                             <hr>
                                         @endif
-                                        {{--@if (auth()->user()->has_access_to_news_module())
+                                        @if (auth()->user()->has_access_to_news_module())
                                             <h6><strong>News</strong></h6>
                                             <p><a href="{{ route('news.index.advance-search') }}?status=published"><span class="badge badge-dark">{{ \App\Article::totalPublishedArticles() }}</span> Published News</a></p>
                                             <p><a href="{{ route('news.index.advance-search') }}?status=private"><span class="badge badge-dark">{{ \App\Article::totalDraftArticles() }}</span> Private News</a></p>
                                             <p><a href="{{ route('news.index.advance-search') }}?showDeleted=on"><span class="badge badge-dark">{{ \App\Article::totalDeletedArticles() }}</span> Deleted News</a></p>
 
-                                        @endif--}}
+                                        @endif
                                     </div>
                                 </div>
                                 @if (auth()->user()->has_access_to_pages_module() || auth()->user()->has_access_to_news_module() || auth()->user()->has_access_to_albums_module())
-                                    {{--<div class="dashboard-quick mg-t-20">
+                                    <div class="dashboard-quick mg-t-20">
                                         @if (auth()->user()->has_access_to_pages_module())
                                             <a href="{{ route('pages.create') }}" class="btn btn-sm pd-x-15 btn-primary btn-uppercase btn-block tx-left text-white">
                                                 <i data-feather="layers" class="wd-10 mg-r-5"></i> Create a Page
@@ -124,7 +124,7 @@
                                                 <i data-feather="image" class="wd-10 mg-r-5"></i> Create an Album
                                             </a>
                                         @endif
-                                    </div>--}}
+                                    </div>
                                 @endif
                             @endif
                         </div>
