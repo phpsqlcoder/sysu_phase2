@@ -101,7 +101,7 @@ class AlbumController extends Controller
         $animations = Option::where('type', 'animation')->get();
 
         if ($album->type == 'main_banner') {
-            return view('admin.banners.home', compact('album', 'animations'));
+            return view('cms4.banners.home', compact('album', 'animations'));
         }
 
         return view('cms4.banners.edit', compact('album', 'animations'));
