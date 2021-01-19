@@ -27,7 +27,7 @@
     </div>
     <iframe src="{{ route('file-manager.show') }}" style="width: 100%; height: 600px; overflow: hidden; border: solid 1px #eee;"></iframe>
 </div>
-@include('admin.files.modals')
+@include('cms4.files.modals')
 @endsection
 
 @section('pagejs')
