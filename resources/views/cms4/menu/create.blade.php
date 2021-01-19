@@ -89,7 +89,7 @@
                                     @foreach ($pages as $page)
                                         @if ($page->name == 'Footer' && $page->page_type == 'default')
                                         @else
-                                            @include('admin.menu.page-item', ['page' => $page])
+                                            @include('cms4.menu.page-item', ['page' => $page])
                                         @endif
                                     @endforeach
                                 </ul>

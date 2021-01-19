@@ -7,7 +7,7 @@
 @if ($page->sub_pages)
     <ul>
         @foreach ($page->sub_pages as $sub_page)
-            @include('admin.menu.page-item', ['page' => $sub_page])
+            @include('cms4.menu.page-item', ['page' => $sub_page])
         @endforeach
     </ul>
 @endif
