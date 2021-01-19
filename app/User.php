@@ -80,6 +80,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $total;
     }
 
+    public static function activeTotalUser()
+    {
+        $total = User::where('role_id','<>',3)->where('is_active','=',1)->count();
+
+        return $total;
+    }
+
+    public static function inactiveTotalUser()
+    {
+        $total = User::where('role_id','<>',3)->where('is_active','=',0)->count();
+
+        return $total;
+    }
+
     public static function userEmail($id)
     {
         $data = User::where('id',$id)->first();
