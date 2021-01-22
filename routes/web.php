@@ -49,6 +49,7 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::get('/checkout', 'EcommerceControllers\CheckoutController@checkout')->name('cart.front.checkout');
     Route::post('/temp_save','EcommerceControllers\CartController@save_sales')->name('cart.temp_sales');
     Route::get('/account/sales', 'EcommerceControllers\SalesFrontController@sales_list')->name('profile.sales');
+    Route::post('/account/product-reorder','EcommerceControllers\SalesFrontController@reorder')->name('profile.sales-reorder-product');
     Route::post('/account/reorder', 'EcommerceControllers\SalesFrontController@reorder')->name('my-account.reorder');
     Route::post('/account/cancel/order', 'EcommerceControllers\SalesFrontController@cancel_order')->name('my-account.cancel-order');
     Route::get('/account/manage', 'EcommerceControllers\MyAccountController@manage_account')->name('my-account.manage-account');
@@ -74,6 +75,7 @@ Route::group(['middleware' => ['authenticated']], function () {
     // Wishlist
     Route::get('/account/wishlist','EcommerceControllers\WishlistController@index_front')->name('profile.wishlist');
 
+    Route::get('/wishlist/add-to-cart/{id}','EcommerceControllers\WishlistController@add_to_cart')->name('wishlist.add-to-cart');
     Route::post('/add-to-wishlist','EcommerceControllers\WishlistController@add_to_wishlist')->name('add-to-wishlist');
     Route::post('/remove-to-wishlist','EcommerceControllers\WishlistController@remove_to_wishlist')->name('remove-to-wishlist');
     Route::post('/wishlist/remove-product','EcommerceControllers\WishlistController@remove_product')->name('wishlist.remove-product');

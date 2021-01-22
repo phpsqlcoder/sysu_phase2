@@ -1,97 +1,145 @@
- @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
-@section('pagecss')
-    <link rel="stylesheet" href="{{ asset('theme/artemissalt/plugins/jssocials/jssocials.css') }}">
-    <link rel="stylesheet" href="{{ asset('theme/artemissalt/plugins/jssocials/jssocials-theme-flat.css') }}">
-    <style>
-        
-    </style>
+@extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
+@section('pagecss')
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/jssocials/jssocials.css') }}" />
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/jssocials/jssocials-theme-flat.min.css') }}" />
 @endsection
+
 @section('content')
-    <section id="default-wrapper">
-        <div class="container">
-            <div class="row row-article">
-                <div class="col-lg-3">
-                    <div class="article-opt">
-                        <p>
-                            <a href="news.htm"><span><i class="fas fa-long-arrow-alt-left"></i></span>Back to
-                            news listing</a>
-                        </p>
-                        <p>
-                            <a href="#"><span><i class="fa fa-share"></i></span>E-mail
-                            this article</a>
-                        </p>
-                        <p>
-                            <a href="#"><span><i class="fa fa-print"></i></span>Print this
-                            article</a>
-                        </p>
-                    </div>
-                    <div class="gap-20"></div>
-                    <div class="article-widget">
-                        <div class="article-widget-title">Tags</div>
-                        <div class="article-widget-badge">
-                            <span class="badge badge-secondary">lorem</span>
-                            <span class="badge badge-secondary">ornare</span>
-                            <span class="badge badge-secondary">bibendum</span>
-                            <span class="badge badge-secondary">lorem</span>
-                            <span class="badge badge-secondary">ornare</span>
-                            <span class="badge badge-secondary">bibendum</span>
-                            <span class="badge badge-secondary">lorem</span>
-                            <span class="badge badge-secondary">bibendum</span>
+    <section class="mb-5">
+        <div class="container pt-2">
+            <div class="gap-20"></div>
+            <div class="row">
+                <span onclick="closeNav()" class="dark-curtain"></span> 
+                <span onclick="openNav()" class="mb-4 btn btn-primary btn-bg open-nav rounded-0 d-block d-lg-none openNav"><i class="fa fa-1x fa-th-list"></i></span>
+
+                <div class="col-md-3">
+                    <div class="tablet-view">
+                        <a href="javascript:void(0)" class="closebtn d-block d-lg-none mt-5" onclick="closeNav()">&times;</a>
+
+                        <div class="article-opt mb-5">
+                            <p><a href="{{ route('news.front.index') }}"><span><i class="fa fa-arrow-left"></i></span>Back to news listing</a></p>
+                            <p><a href="#" data-toggle="modal" data-target="#email-article"><span><i class="fa fa-envelope-open"></i></span>E-mail this article</a></p>
                         </div>
-                    </div>
-                    <div class="gap-20"></div>
-                    
-                    <div class="article-widget">
-                        <div class="article-widget-title">
-                            Latest News
+                        <div class="article-widget mb-5">
+                            <h3 class="font-weight-bold">Search</h3>
+                            <div class="article-widget-search">
+                                <div class="search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search news" aria-label="Search news" aria-describedby="button-addon2" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="button-addon2"><span class="fa fa-search"></span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        @foreach ($latestArticles as $article)
+                        <div class="article-widget">
+                            <h3 class="font-weight-bold">Latest News</h3>
+                            @foreach($latestArticles as $latest)
                             <div class="article-widget-news">
-                                <p class="news-date">February 27, 2020</p>
+                                <p class="news-date">{{ date('F d, Y',strtotime($latest->date)) }}</p>
                                 <p class="news-title">
-                                    <a href="article.html">We're divided land his creature which have evening subdue</a>
+                                    <a href="{{ route('news.front.show',$latest->slug) }}">{{ $latest->name }}</a>
                                 </p>
                             </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
                 </div>
+
                 <div class="col-lg-9">
-                    <div class="breadcrumb dark" style="color:black;line-height: 1.8;">
-                        <a href="{{route('home')}}" style="color:blue">Home</a>
-                        <span class="fa default" style="color:black"></span>
-                        <a href="{{route('news.front.index')}}" style="color:blue">News</a>
-                        <span class="fa default" style="color:black"></span>
-                        <span class="current" style="color:#EA891B !important">{{ $news->name }}</span>
-                    </div>
                     <div class="article-meta-share">
                         <div class="article-meta">
-                            <p>
-                                Posted on {{ date('M d, Y h:i A', strtotime($news->created_at)) }} by
-                                <span class="article-meta-author">{{ $news->user->name }}</span>
-                            </p>
-                        </div>
-                        <div class="article-share">
-                            <div id="article-social"></div>                           
+                            <h2 class="h1 font-weight-bold secondary-title">{{ $news->name }}</h2>
+                            <p class="small">Posted {{ Setting::date_for_news_list($news->date) }}, by<span class="article-meta-author"><strong> {{$news->user->name}}</strong></span></p>
                         </div>
                     </div>
-                    <div class="article-content">
-                        <img src="{{ $news->image_url }}" alt="" />
-                        <div class="gap-10"></div>
-                       
+                    <div class="article-content mb-5">
                         {!! $news->contents !!}
+                    </div>
 
+                    <div class="article-share">
+                        <div class="article-share-text">Share:</div>
+                        <div id="article-social"></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-   
+    
+    <div class="modal fade" id="email-article" tabindex="-1" role="dialog" aria-labelledby="email-article" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">E-mail this article</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                <form id="shareEmailForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input id="form_email_to" type="email" name="email_to" class="form-control" placeholder="Email to" required="required" data-error="Valid email is required.">
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="form-group">
+                            <input id="form_recipient_name" type="text" name="name" class="form-control" placeholder="Recipient's Name" required="required">
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="form-group">
+                            <input id="form_email_from" type="email" name="email_from" class="form-control" placeholder="Your email address" required="required" data-error="Valid email is required.">
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="form-group">
+                            <input id="form_name" type="text" name="sender_name" class="form-control" placeholder="Your name" >
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="btnSendArticle"><span id="spanSendArticle">Send Article</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="email-success" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">E-mail this article</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Article successfully sent!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="email-failed" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+       <div class="modal-dialog modal-dialog-centered" role="document">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="exampleModalLabel">E-mail this article</h5>
+                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                       <span aria-hidden="true">&times;</span>
+                   </button>
+               </div>
+               <div class="modal-body">
+                   Failed to share email. Try it again later.
+               </div>
+           </div>
+       </div>
+    </div>
 @endsection
 
 @section('pagejs')
-    <script src="{{ asset('theme/artemissalt/plugins/jssocials/jssocials.js') }}"></script>
-    <script src="{{ asset('theme/artemissalt/plugins/jssocials/jssocials.extension.js') }}"></script>
+    <script src="{{ asset('theme/sysu/plugins/jssocials/jssocials.js') }}"></script>
+    <script src="{{ asset('theme/sysu/plugins/jssocials/jssocials-extension.js') }}"></script>
 @endsection
 
 @section('customjs')
@@ -114,6 +162,13 @@
     });
 </script>
 <script>
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     $(function() {
         $('#frm_search').on('submit', function(e) {
             e.preventDefault();
@@ -121,9 +176,12 @@
         });
 
         $('#shareEmailForm').submit(function(evt) {
+            evt.preventDefault();
             let data = $('#shareEmailForm').serialize();
-            // console.log(data);
 
+            $('#spanSendArticle').html('Sending...');
+            $('#btnSendArticle').prop('disabled',true);
+            
             $.ajax({
                 data: data,
                 type: "POST",
@@ -139,8 +197,6 @@
                     $('#email-article input').val('');
                 }
             });
-
-            evt.preventDefault();
             return false;
         });
     });

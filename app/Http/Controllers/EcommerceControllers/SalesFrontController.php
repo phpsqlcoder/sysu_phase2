@@ -5,6 +5,7 @@ namespace App\Http\Controllers\EcommerceControllers;
 use App\EcommerceModel\SalesHeader;
 use App\EcommerceModel\SalesDetail;
 use App\EcommerceModel\Cart;
+use App\EcommerceModel\Product;
 
 use App\Page;
 use Illuminate\Http\Request;
@@ -32,18 +33,34 @@ class SalesFrontController extends Controller
         return back()->with('success','Successfully cancelled your order');
     }
 
-    public function reorder(Request $request){
-        $orders = SalesDetail::where('sales_header_id',$request->orderid)->get();
+    public function reorder(Request $request)
+    {
+        $str_products = rtrim($request->products, '|');
+        $products = explode("|",$str_products);
 
-        foreach($orders as $order){
-            if($order->product->Maxpurchase > 0){
+        $str_qty = rtrim($request->qty, '|');
+        $qty = explode("|",$str_qty);
+
+        foreach($products as $key => $prodid){
+            $cart = Cart::where('user_id',Auth::id())->where('product_id',$prodid);
+            $product = Product::find($prodid);
+
+            if($cart->count() > 0){
+                $data = $cart->first();
+
+                $cart->update([
+                    'qty' => $data->qty+$qty[$key],
+                    'price' => $product->price
+                ]);
+            } else {
                 Cart::create([
                     'user_id' => Auth::id(),
-                    'product_id' => $order->product_id,
-                    'qty' => 1,
-                    'price' => $order->product->price
+                    'product_id' => $prodid,
+                    'qty' => $qty[$key],
+                    'price' => $product->price
                 ]);
             }
+            
         }
 
         return redirect(route('cart.front.show'))->with('success','Successfully reorder.');

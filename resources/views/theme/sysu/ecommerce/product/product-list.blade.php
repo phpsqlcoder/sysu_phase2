@@ -1,7 +1,8 @@
 @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+
     <style>
         .product-img{
             padding: 10px 10px 0px 10px !important;
@@ -270,9 +271,15 @@
                                     <div class="col-lg-3 col-md-4 col-6 item">
                                         <div class="product-link border">
                                             <div class="product-card">
-                                               <button class="add-to-cart-btn" data-toggle="tooltip" data-placement="left" title="Add to Favorites">
-                                                    <span class="lnr lnr-heart"></span>
-                                              </button>
+                                                @if(Auth::check())
+                                                <label class="add-wishlist-btn label_wishlist{{$product->id}}" for="wishlist{{$product->id}}" data-toggle="tooltip" data-placement="left" title="@if(\App\EcommerceModel\CustomerFavorite::is_favorite($product->id) > 0) Remove @else Add @endif to Favorites">
+                                                    <input type="checkbox" id="wishlist{{$product->id}}" class="wishlist{{$product->id}}" name="wishlist{{$product->id}}" onchange="add_to_favorites('{{$product->id}}')" @if(\App\EcommerceModel\CustomerFavorite::is_favorite($product->id) > 0) checked @endif>
+                                                    <span>
+                                                      <i class="far fa-heart unchecked"></i>
+                                                      <i class="fas fa-heart checked"></i>
+                                                    </span>
+                                                </label> 
+                                                @endif
                                                 <a href="{{route('product.front.show',$product->slug)}}" title="{{$product->name}}">
                                                     <div class="product-img">
                                                         <img src="{{ asset('storage/products/'.$product->photoPrimary) }}" alt="" />
@@ -314,7 +321,7 @@
                                                             
                                                         </div>
                                                         <div class="rounded">
-                                                            <a href="javascript:void(0)" onclick="add_to_cart({{$product->id}},'qty{{$loop->iteration}}');" id="btn{{$product->id}}">
+                                                            <a href="javascript:void(0)" onclick="add_to_cart('{{$product->id}}','qty{{$loop->iteration}}');" id="btn{{$product->id}}">
                                                                 @if($added_on_cart <= 0)
                                                                     <i class="fa fa-cart-plus bg-success text-light p-1 rounded"></i>
                                                                 @else
@@ -324,9 +331,21 @@
                                                         </div>
                                                     </div>
                                                 @else
+                                                    @php
+                                                        $is_wishlist = \App\EcommerceModel\CustomerWishlist::is_wishlist($product->id);
+                                                    @endphp
+
+                                                    
                                                     <div class="listing-bottom row no-gutters px-3 pb-3">
-                                                        <a href="#" class="btn btn-secondary btn-sm disabled" tabindex="-1" role="button" aria-disabled="true">Out of Stock</a>
+                                                        @if(Auth::check())
+                                                        <a style="display: {{ $is_wishlist == 1 ? 'none' : 'block' }};" href="javascript:void(0)" class="btn btn-primary btn-sm" tabindex="-1" id="wishlistBtnAdd{{$product->id}}" onclick="add_to_wishlist('{{$product->id}}')">Add to Wishlist</a>
+
+                                                        <a style="display: {{ $is_wishlist == 0 ? 'none' : 'block' }};" href="javascript:void(0)" class="btn btn-warning btn-sm" tabindex="-1" id="wishlistBtnRemove{{$product->id}}" onclick="remove_to_wishlist('{{$product->id}}')">Remove to Wishlist</a>
+                                                        @else
+                                                        <a href="javascript:void(0)" class="btn btn-secondary btn-sm" tabindex="-1" role="button">Out of Stock</a>
+                                                        @endif
                                                     </div>
+                                                    
                                                 @endif
 
                                             </div>
@@ -378,198 +397,212 @@
 @endsection
 
 @section('pagejs')
-<script src="{{ asset('theme/sysu/plugins/ion.rangeslider/js/ion.rangeSlider.js') }}"></script>
-<script src="{{ asset('js/notify.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-<!-- <script src="{{ asset('theme/sysu/js/ecommerce.js') }}"></script> -->
-<script>
-    // $('#filter_form').on('submit',function(){
-    //     $("#filter_form :input").each(function(){
-    //      console.log($(this).val()); // This is the jquery object of the input, do what you will
-    //     });
-    //     return false;
-    // }); 
+    <script src="{{ asset('theme/sysu/plugins/ion.rangeslider/js/ion.rangeSlider.js') }}"></script>
+    <script src="{{ asset('js/notify.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <!-- <script src="{{ asset('theme/sysu/js/ecommerce.js') }}"></script> -->
+    <script>
 
-    function reset_form(){        
-        $('#filter_form').find(':checkbox, :radio').prop('checked', false);
-        $('#filter_form').submit(); 
-    }
-
-    $('.parent-category').change(function() {  
-        if ($(this).prop('checked')) 
-            $('.child-' + (this.id).replace('category-','')).prop('checked', true);
-        else
-            $('.child-' + (this.id).replace('category-','')).prop('checked', false);
-        
-    });
-
-    $('.child').change(function() {  
-        var h = (this.id).split("-");
-
-        if ($(this).prop('checked')){  
-            var x = check_if_any_is_unchecked(h[1]);
-            if(x == 0){
-                $('#category-' +h[1]).prop('checked', true);
-            }
-            
+        function reset_form(){        
+            $('#filter_form').find(':checkbox, :radio').prop('checked', false);
+            $('#filter_form').submit(); 
         }
-        else{
-            $('#category-' +h[1]).prop('checked', false);
-        }
-        
-    });
 
-    function check_if_any_is_unchecked(i){
-        var x = 0;
-        $('.child-'+i).each(function() {
+        $('.parent-category').change(function() {  
+            if ($(this).prop('checked')) 
+                $('.child-' + (this.id).replace('category-','')).prop('checked', true);
+            else
+                $('.child-' + (this.id).replace('category-','')).prop('checked', false);
             
-            if($(this).prop('checked') == true){
-               
+        });
+
+        $('.child').change(function() {  
+            var h = (this.id).split("-");
+
+            if ($(this).prop('checked')){  
+                var x = check_if_any_is_unchecked(h[1]);
+                if(x == 0){
+                    $('#category-' +h[1]).prop('checked', true);
+                }
+                
             }
             else{
-                 x = 1;
+                $('#category-' +h[1]).prop('checked', false);
             }
             
-        });     
-        return x;     
-    }
-
-    function filter_sort(par){
-
-       $('#sort').val(par);
-        $('#filter_form').submit(); 
-
-    }
-
-    function filter_limit(par){
-        $('#limit').val(par);
-        $('#filter_form').submit();     
-    }   
-
-    function add_to_cart(product,qty) {
-
-        if($('#'+qty).val() < 1){
-            swal({
-                title: '',
-                text: 'Please specify the item quantity.',
-                icon: 'warning'
-                });
-            return false;
-        }
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
         });
 
-        $.ajax({
-            data: {
-                "product_id": product, 
-                "qty": $('#'+qty).val(),
-                "_token": "{{ csrf_token() }}",
-            },
-            type: "post",
-            url: "{{route('cart.add')}}",
-            beforeSend: function(){
-                $('#btn'+product).html('<img src="{{asset('img/ajax-loader.gif')}}">');
-            },
-            success: function(returnData) {
-                $("#loading-overlay").hide();
-                if (returnData['success']) {
-
-                    $('.cart-counter').html(returnData['totalItems']);
-                    $('.counter').html(returnData['totalItems']);
-
-                    $.notify("Product Added to your cart",
-                        { 
-                            position:"bottom right", 
-                            className: "success" 
-                        }
-                    );
-                    $('#btn'+product).html('<i class="fa fa-cart-plus bg-warning text-light p-1 rounded" title="Already added on cart"></i>');
-                }
-                else{
-                    swal({
-                        toast: true,
-                        position: 'center',
-                        title: "Warning!",
-                        text: "We have insufficient inventory for this item.",
-                        type: "warning",
-                        showCancelButton: true,
-                        timerProgressBar: true, 
-                        closeOnCancel: false
-                        
-                    });
-                }
-            },
-            failed: function() {
-                //$("#loading-overlay").hide(); 
-            }
-            /*
-            beforeSend: function(){
-                $("#loading-overlay").show();
-            },
-            success: function(returnData) {
-                $("#loading-overlay").hide();
-                if (returnData['success']) {
-                    //$('.cart-counter').html(returnData['totalItems']);                    
+        function check_if_any_is_unchecked(i){
+            var x = 0;
+            $('.child-'+i).each(function() {
+                
+                if($(this).prop('checked') == true){
                    
-                    swal({
-                        // toast: true,
-                        // position: 'bottom-right',
-                        // title: "Product Added to your cart!",
-                        // type: "success",
-                        // //showCancelButton: true,
-                        // timerProgressBar: true,
-                        // confirmButtonClass: "btn-danger",
-                        // confirmButtonText: "View Cart",
-                        // cancelButtonText: "Continue Shopping",
-                        // closeOnConfirm: false,
-                        // closeOnCancel: false,
-                        // timer: 1000
-                        heading: 'Positioning',
-                        title: 'Positioning',
-                        text: 'Specify the custom position object or use one of the predefined ones',
-                        position: 'bottom-left',
-                        stack: false
-                        
-                    },
-                    function(isConfirm) {
-                        if (isConfirm) {
-                            //swal("Deleted!", "Your imaginary file has been deleted.", "success");
-                            window.location.href = "{{route('cart.front.show')}}";
-                        } 
-                        else {
-                            $('#btn'+product).html('<i class="fa fa-cart-plus bg-warning text-light p-1 rounded" title="Already added on cart"></i>');
-                            swal.close();
-                            //window.location.href = "{{route('product.front.list')}}";
-                           
-                        }
-                    });
-                    
-                    
                 }
                 else{
-                    swal({
-                        toast: true,
-                        position: 'center',
-                        title: "Warning!",
-                        text: "We have insufficient inventory for this item.",
-                        type: "warning",
-                        showCancelButton: true,
-                        timerProgressBar: true, 
-                        closeOnCancel: false
-                        
-                    });
+                     x = 1;
                 }
-            },
-            failed: function() {
-                $("#loading-overlay").hide(); 
+                
+            });     
+            return x;     
+        }
+
+        function filter_sort(par){
+
+           $('#sort').val(par);
+            $('#filter_form').submit(); 
+
+        }
+
+        function filter_limit(par){
+            $('#limit').val(par);
+            $('#filter_form').submit();     
+        }
+
+        function add_to_wishlist(product_id){
+            $.ajax({
+                data: {
+                    "product_id": product_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('add-to-wishlist')}}",
+                success: function(returnData) {
+                    if (returnData['success']) {
+                        $('#wishlistBtnRemove'+product_id).css('display','block');
+                        $('#wishlistBtnAdd'+product_id).css('display','none');
+
+                        swal({
+                            title: '',
+                            text: "Product has been added to wishlist.",         
+                        });
+                    }
+                }
+            });
+        }
+
+        function remove_to_wishlist(product_id){
+            $.ajax({
+                data: {
+                    "product_id": product_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('remove-to-wishlist')}}",
+                success: function(returnData) {
+                    if (returnData['success']) {
+                        $('#wishlistBtnRemove'+product_id).css('display','none');
+                        $('#wishlistBtnAdd'+product_id).css('display','block');
+
+                        swal({
+                            title: '',
+                            text: "Product has been removed to wishlit.",         
+                        });
+                    }
+                }
+            });
+        }
+
+        function add_to_favorites(prodId){
+
+            if($('#wishlist'+prodId).prop("checked") == true){
+                $.ajax({
+                    data: {
+                        "product_id": prodId,
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    type: "post",
+                    url: "{{route('btn-add-to-favorites')}}",
+                    success: function(returnData) {
+                        $('.label_wishlist'+prodId).attr('data-original-title','Remove to Favorites');
+                        swal({
+                            title: '',
+                            text: "Product has been added to favorites.",         
+                        });
+                    }
+                });
             }
-            */
-        });
-    }
+            else if($('#wishlist'+prodId).prop("checked") == false){
+                $.ajax({
+                    data: {
+                        "product_id": prodId,
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    type: "post",
+                    url: "{{route('btn-remove-to-favorites')}}",
+                    success: function(returnData) {
+                        $('.label_wishlist'+prodId).attr('data-original-title','Add to Favorites');
+                        swal({
+                            title: '',
+                            text: "Product has been removed to favorites.",         
+                        });
+                    }
+                });
+            }
+        }
+
+        function add_to_cart(product,qty) {
+
+            if($('#'+qty).val() < 1){
+                swal({
+                    title: '',
+                    text: 'Please specify the item quantity.',
+                    icon: 'warning'
+                    });
+                return false;
+            }
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $.ajax({
+                data: {
+                    "product_id": product, 
+                    "qty": $('#'+qty).val(),
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('cart.add')}}",
+                beforeSend: function(){
+                    $('#btn'+product).html('<img src="{{asset('img/ajax-loader.gif')}}">');
+                },
+                success: function(returnData) {
+                    $("#loading-overlay").hide();
+                    if (returnData['success']) {
+
+                        $('.cart-counter').html(returnData['totalItems']);
+                        $('.counter').html(returnData['totalItems']);
+
+                        $.notify("Product Added to your cart",
+                            { 
+                                position:"bottom right", 
+                                className: "success" 
+                            }
+                        );
+                        $('#btn'+product).html('<i class="fa fa-cart-plus bg-warning text-light p-1 rounded" title="Already added on cart"></i>');
+                    }
+                    else{
+                        swal({
+                            toast: true,
+                            position: 'center',
+                            title: "Warning!",
+                            text: "We have insufficient inventory for this item.",
+                            type: "warning",
+                            showCancelButton: true,
+                            timerProgressBar: true, 
+                            closeOnCancel: false
+                            
+                        });
+                    }
+                },
+                failed: function() {
+
+                }
+            });
+        }
 
 
-</script>
+    </script>
 @endsection

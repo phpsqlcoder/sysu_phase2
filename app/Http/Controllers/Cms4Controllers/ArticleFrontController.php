@@ -114,10 +114,21 @@ class ArticleFrontController extends Controller
         else{
             $years = DB::select('SELECT year(date) as yr,count(id) as total_articles FROM `articles`  where deleted_at is null and status="Published" GROUP by year(date) ORDER BY year(date)');
 
-            $data = '<ul>';
+            $data = '<div class="card">';
 
+            $row = 0;
             foreach($years as $year){
-                $data .= '<li><a href="'.route('news.front.index').'?type=year&criteria='.$year->yr.'">'.$year->yr.' ('.$year->total_articles.')</a><ul>';
+                $r = $row++;
+                $data .= '<div class="card-header" id="heading'.$r.'">
+                            <h2 class="mb-0 text-left border-bottom" style="line-height:1;">
+                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse'.$r.'" aria-expanded="true" aria-controls="collapseOne">
+                                    <i class="fa fa-chevron-right"></i> '.$year->yr.'
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapse'.$r.'" class="collapse" aria-labelledby="headingZero" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <ul class="side-navigation ul-none no-padding quicklinks">';
 
                 $months = DB::select('SELECT year(date) as yr,month(date) as mo,count(id) as total_articles FROM `articles` WHERE year(date)="'.$year->yr.'" and deleted_at is null and status="Published" GROUP by year(date),month(date) ORDER BY month(date)');
 
@@ -125,10 +136,11 @@ class ArticleFrontController extends Controller
                     $data .= '<li><a href="'.route('news.front.index').'?type=month&criteria='.$year->yr.'-'.$month->mo.'">'.date("F", mktime(0, 0, 0, $month->mo, 1)).' ('.$month->total_articles.')</a></li>';
                 }
 
-                $data .= '</ul></li>';
+                $data .= '</div>
+                        </div>';
             }
 
-            $data .= '</ul>';
+            $data .= '</div>';
         }
 
         return $data;
@@ -143,7 +155,7 @@ class ArticleFrontController extends Controller
         else{
             $categories = DB::select('SELECT ifnull(c.name, "Uncategorized") as cat, ifnull(c.id,0) as cid,count(ifnull(c.id,0)) as total_articles FROM `articles` a left join article_categories c on c.id=a.category_id where a.deleted_at is null and status="Published" GROUP BY c.name,c.id ORDER BY c.name');
 
-            $data = '<ul class="list-group">';
+            $data = '<ul class="quicklinks ul-none no-padding mb-4">';
 
             foreach($categories as $category){
 
@@ -194,15 +206,6 @@ class ArticleFrontController extends Controller
         }
 
         $latestArticles = Article::whereStatus('Published')->orderBy('date', 'desc')->take(5)->get();
-        // $articleCategories = Article::leftJoin('article_categories', 'article_categories.id', 'articles.category_id')
-        //     ->select([
-        //         DB::raw('ifnull(article_categories.id, 0) as id'),
-        //         DB::raw('ifnull(article_categories.name, "Uncategorized") as name'),
-        //         DB::raw('count(ifnull(article_categories.id, 0)) as total_articles')
-        //     ])->where('articles.status', 'PUBLISHED')
-        //     ->groupBy(DB::raw('article_categories.name, article_categories.id'))
-        //     ->orderBy(DB::raw('article_categories.name'))
-        //     ->get();
         $breadcrumb = $this->breadcrumb($news->id);
 
         $footer = Page::where('slug', 'footer')->where('name', 'footer')->first();

@@ -42,7 +42,7 @@
 
                                         @if($product->product_details->maxpurchase > 0)
                                             @if(\App\EcommerceModel\Cart::on_cart($product->product_id) == 0)
-                                            <a href="{{ route('favorite.product-add-to-cart',$product->product_id) }}" title="Add to Cart" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
+                                            <a href="{{ route('wishlist.add-to-cart',$product->product_id) }}" title="Add to Cart" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
                                             @endif
                                         @endif
 

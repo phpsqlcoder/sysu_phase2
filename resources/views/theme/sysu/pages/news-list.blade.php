@@ -3,119 +3,90 @@
 
 @endsection
 @section('content')
-    <section id="default-wrapper">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3">
-                    <h3>News</h3>
-                    <div class="gap-20"></div>
-                    <div class="side-menu">
-                        <ul>
-                            @foreach ($articleYears as $year)
-                                <li><a href="#">{{ $year->year }}</a>
-                                    <ul>
-                                        @foreach ($articleMonthsByYear[$year->year] as $month)
-                                            <li @if ($search == $month->year.'-'.$month->month) class="active" @endif>
-                                                <a href="{{ route('news.front.index') }}?type=month&criteria={{ $month->year.'-'.$month->month }}">{{ $month->month_name }}</a>
-                                            </li>                                            
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+<section class="mb-5">
+    <div class="container pt-2">
+        <div class="gap-20"></div>
+        <div class="row">
+            <span onclick="closeNav()" class="dark-curtain"></span> 
+            <span onclick="openNav()" class="mb-4 btn btn-primary btn-bg open-nav rounded-0 d-block d-lg-none"><i class="fa fa-1x fa-th-list"></i></span>
 
-                    <div class="gap-40"></div>
+            <div class="col-md-3">
+                <div class="tablet-view">
+                    <a href="javascript:void(0)" class="closebtn d-block d-lg-none mt-5" onclick="closeNav()">&times;</a>
                     <h3>Categories</h3>
-                    <div class="gap-20"></div>
-                    <div class="side-menu">                        
-                        <ul>
-                            @foreach ($articleCategories as $category)
-                                <li @if ($type == "category" && $search == $category->id) class="active" @endif>
-                                    <a href="{{route('news.front.index')}}?type=category&criteria={{ $category->id }}">{{ $category->name }}</a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    <div class="gap-80"></div>
-                </div>
-                <div class="col-lg-9">
-                    <div class="search">
-                        <form action="news" method="get">
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="Search news" aria-label="Search news"
-                                aria-describedby="button-addon1" />
-                                <span class="search-icon"><i class="fa fa-search"></i></span>
-                            </div>
-                            <button class="primary-btn btn-md" type="submit" id="button-addon1">
-                                Search
-                            </button>
-                        </form>
-                    </div>
-                    @foreach($articles as $article)
-                        <div class="news-post">
-                            @if (empty($article->image_url))
-                                <div class="news-post-img" style="background-image:url({{ asset('theme/'.env('FRONTEND_TEMPLATE').'/images/misc/news1.jpg') }})"></div>
-                            @else
-                                <div class="news-post-img" style="background-image:url({{ $article->image_url }})"></div>
-                            @endif
-                            
-                            <div class="news-post-info">
-                                <div class="news-post-content">
-                                    <h3>
-                                        <a href="{{ $article->get_url() }}">{{ $article->name }}</a>
-                                    </h3>
-                                    <p class="news-post-info-excerpt">
-                                       {{ $article->teaser }}
-                                    </p>
-                                </div>
-                                <div class="news-post-share">
-                                    <div class="share_link"></div>
-                                    <p class="news-post-info-meta">Posted on  {{ Setting::date_for_news_list($article->created_at) }}</p>
-                                </div>
-                            </div>
-                            
-                        </div>
-                    @endforeach
+                        {!! $categories !!}
 
-                    {{ $articles->links('theme.'.env('FRONTEND_TEMPLATE').'.layout.pagination') }}
+                    <h5>Archive</h5>
+                    <div class="accordion" id="accordionExample">
+                      {!! $dates !!}
+                    </div>
                 </div>
             </div>
+            
+            <div class="col-lg-9">
+                <div class="search mb-5">
+                    <form id="frm_search">
+                        <div class="searchbar">
+                            <input type="text" name="searchtxt" id="searchtxt" class="form-control form-input form-search" placeholder="Search news" aria-label="Search news" aria-describedby="button-addon1" />
+                            <button class="form-submit-search" type="submit" name="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    @foreach($articles as $article)
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card news-post-list">
+                                @if($article->thumbnail_url)
+                                    <a href="{{ route('news.front.show',$article->slug) }}" class="news-post-image"><img src="{{ $article->thumbnail_url }}" alt="..."></a>
+                                @else
+                                    <a href="{{ route('news.front.show',$article->slug) }}" class="news-post-image"><img src="{{ asset('storage/news_image/news_thumbnail/No_Image_Available.jpg')}}" alt="no image"></a>
+                                @endif
+                                <div class="card-body">
+                                    <p class="news-post-time">Posted {{ Setting::date_for_news_list($article->created_at) }}</p>
+                                    <h5 class="card-title"><a href="{{ route('news.front.show',$article->slug) }}">{{ $article->name }}</a></h5>
+                                    <p class="card-text">{{ $article->teaser }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                {{ $articles->links('theme.'.env('FRONTEND_TEMPLATE').'.layout.pagination') }}
+            </div>
         </div>
-    </section>
-    
+    </div>
+</section>
 @endsection
 
 @section('pagejs')
-
 @endsection
 
 @section('customjs')
-<script>
-    var navikMenuListDropdown = $(".side-menu ul li:has(ul)");
+    <script>
+        var navikMenuListDropdown = $(".side-menu ul li:has(ul)");
 
-    navikMenuListDropdown.each(function() {
-        $(this).append('<span class="dropdown-append"></span>');
-    });
+        navikMenuListDropdown.each(function() {
+            $(this).append('<span class="dropdown-append"></span>');
+        });
 
-    $(".side-menu .active").each(function() {
-        $(this).parents("ul").css("display", "block");
-        $(this).parents("ul").prev("a").css("color", "#00bfca");
-        $(this).parents("ul").next(".dropdown-append").addClass("dropdown-open");
-    });
+        $(".side-menu .active").each(function() {
+            $(this).parents("ul").css("display", "block");
+            $(this).parents("ul").prev("a").css("color", "#00bfca");
+            $(this).parents("ul").next(".dropdown-append").addClass("dropdown-open");
+        });
 
-    $(".dropdown-append").on("click", function() {
-        $(this).prev("ul").slideToggle(300);
-        $(this).toggleClass("dropdown-open");
-    });
-</script>
-<script>
-$(function() {
-    $('#frm_search').on('submit', function(e) {
-        e.preventDefault();
-        window.location.href = "/news?type=searchbox&criteria="+$('#searchtxt').val();
-    });
-});
-
-</script>
+        $(".dropdown-append").on("click", function() {
+            $(this).prev("ul").slideToggle(300);
+            $(this).toggleClass("dropdown-open");
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#frm_search').on('submit', function(e) {
+                e.preventDefault();
+                window.location.href = "{{route('news.front.index')}}?type=searchbox&criteria="+$('#searchtxt').val();
+            });
+        });
+    </script>
 @endsection

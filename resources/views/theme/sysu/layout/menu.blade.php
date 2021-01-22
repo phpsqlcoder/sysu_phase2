@@ -6,14 +6,14 @@
                 <!-- RD Navbar Nav -->
                 <ul class="rd-navbar-nav">
                     <li><a href="{{route('product.front.list')}}">Shop</a></li>
-                    <!--
+                    
                         @php
                             $menu = \App\Menu::where('is_active', 1)->first();
                         @endphp
                         @foreach ($menu->parent_navigation() as $item)
                             @include('theme.sysu.layout.menu-item', ['item' => $item])
                         @endforeach
-                    -->
+                    
                 </ul>
                 <!-- END RD Navbar Nav -->
             </div>

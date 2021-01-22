@@ -1,6 +1,7 @@
 @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
+
 @section('pagecss')
-   <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/ion.rangeslider/css/ion.rangeSlider.css') }}">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 @endsection
 
 @section('content')
@@ -73,7 +74,9 @@
                                             <a href="#" title="view delivery history" class="btn btn-success btn-sm mb-1" data-toggle="modal" data-target="#delivery{{$sale->id}}"><i class="fa fa-truck pb-1"></i></a>
 
                                             @if($sale->delivery_status == 'Delivered')
-                                                <a href="#" title="Reorder" class="btn btn-success btn-sm mb-1" onclick="reorder('{{$sale->id}}')"><i class="fa fa-shopping-cart pb-1"></i></a>    
+                                                <a href="#" title="reorder items" data-toggle="modal" data-target="#reorder_products{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>
+
+                                                <!-- <a href="#" title="Reorder" class="btn btn-success btn-sm mb-1" onclick="reorder('{{$sale->id}}')"><i class="fa fa-shopping-cart pb-1"></i></a> -->    
                                             @endif
                                         @else
                                             <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
@@ -88,7 +91,8 @@
                                     
                                 </tr>
                                 @php
-                                    $modals .='                                        
+
+                                    $modals .='  
                                         <div class="modal fade" id="delivery'.$sale->id.'" tabindex="-1" role="dialog" aria-labelledby="trackModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                                 <div class="modal-content">
@@ -135,6 +139,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="modal fade" id="detail'.$sale->id.'" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                                 <div class="modal-content">
@@ -206,6 +211,100 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="modal fade" id="reorder_products'.$sale->id.'" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewModalLabel">'.$sale->order_number.'</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        
+                                                        <div class="gap-20"></div>
+                                                        <div class="table-modal-wrap">
+                                                            <table class="table table-md table-modal" style="font-size:12px !important;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>&nbsp;</th>
+                                                                        <th>Description</th>
+                                                                        <th>Qty</th>
+                                                                        <th>Price</th>
+                                                                        <th>Total</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>';
+
+                                                                        $total_qty = 0;
+                                                                        $total_sales = 0;
+                                                                        $btn = '';
+                                                                        $is_fav = '';
+                                                                        $display = '';
+
+                                                                    foreach($sale->items as $item){
+                                                                        $is_fav = \App\EcommerceModel\CustomerWishlist::is_wishlist($item->product_id);
+                                                                        if($item->product->maxpurchase > 0){
+                                                                            $total_qty += $item->qty;
+                                                                            $total_sales += $item->qty * $item->price;
+
+                                                                            $btn = '<input checked type="checkbox" onchange="cb('.$sale->id.','.$item->product_id.');" class="cb'.$sale->id.'" id="cb'.$sale->id.'_'.$item->product_id.'">';
+                                                                        } else {
+                                                                            if($is_fav == 0){
+                                                                                $btn = '<a style="display: none;" id="wishrmv" href="#" onclick="remove_to_wishlist('.$item->product_id.')">Remove to Wishlist</a>
+                                                                                        <a style="display: block;" id="wishadd" href="#" onclick="add_to_wishlist('.$item->product_id.')">Add to Wishlist</a>';
+                                                                            } else {
+                                                                                $btn = '<a style="display: block;" id="wishrmv" href="#" onclick="remove_to_wishlist('.$item->product_id.')">Remove to Wishlist</a>
+                                                                                        <a style="display: none;" id="wishadd" href="#" onclick="add_to_wishlist('.$item->product_id.')">Add to Wishlist</a>';
+                                                                            }
+                                                                            
+                                                                        }
+
+                                                                        $modals.='
+                                                                        <tr>
+                                                                            <td>
+                                                                                '.$btn.'
+                                                                            </td>
+                                                                            <td>'.$item->product_name.'</td>
+                                                                            <td>
+                                                                                <input type="number" class="form-control sale'.$sale->id.'_product_totalqty" value="'.number_format($item->qty,0).'" min="1" id="sale'.$sale->id.'_product'.$item->product_id.'_qty" onchange="reorder_qty('.$sale->id.','.$item->product_id.')">
+                                                                            </td>
+                                                                            <td>
+                                                                                '.number_format($item->product->price,2).'
+                                                                                <input type="hidden" id="sale'.$sale->id.'_product'.$item->product_id.'_price" value="'.number_format($item->product->price,2).'">
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="hidden" class="sale'.$sale->id.'_product_totalprice"  id="sale'.$sale->id.'_product'.$item->product_id.'_totalprice" value="'.number_format(($item->product->price * $item->qty),2).'">
+                                                                                <span id="sale'.$sale->id.'_product'.$item->product_id.'_span">'.number_format(($item->product->price * $item->qty),2).'</span>
+                                                                            </td>
+                                                                        </tr>';
+                                                                    }
+                                                                    $modals.='
+                                                                     <tr style="font-weight:bold;">
+                                                                        <td colspan="2">Sub total</td>
+                                                                        <td>
+                                                                            <input type="hidden" id="input_sale'.$sale->id.'_totalqty" value="'.number_format($total_qty,2).'">
+                                                                            <span id="sale'.$sale->id.'_totalqty">'.number_format($total_qty,2).'</span>
+                                                                        </td>
+                                                                        <td>&nbsp;</td>
+                                                                        <td>
+                                                                            <input type="hidden" id="input_sale'.$sale->id.'_subtotal" value="'.number_format($total_sales,2).'">
+                                                                            <span id="sale'.$sale->id.'_subtotal">'.number_format($total_sales,2).'</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="gap-20"></div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-success" onclick="reorder('.$sale->id.');">Reorder</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     ';
                                 @endphp
                             @empty
@@ -223,6 +322,13 @@
             </div>
         </div>
     </div>
+
+    <form action="" id="posting_form" style="display:none;" method="post">
+        @csrf
+        <input type="text" id="products" name="products">
+        <input type="text" id="qty" name="qty">
+    </form>
+
 </section>
 <div class="modal fade" id="cancel_order" tabindex="-1" role="dialog" aria-labelledby="cancel_orderid" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -310,11 +416,147 @@
 </div>
 
 {!!$modals!!}
-
 @endsection
+
 @section('pagejs')
-    <script src="{{ asset('theme/sysu/plugins/ion.rangeslider/js/ion.rangeSlider.js') }}"></script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
     <script>
+        /*** Handles the Select All Checkbox ***/
+        function checkbox_all(saleid){
+            var status = $('#ckbox'+saleid).is(":checked") ? true : false;
+            $('.cb'+saleid).prop("checked",status);
+        }
+
+        function reorder_qty(saleid,productid){
+            var qty = $('#sale'+saleid+'_product'+productid+'_qty').val();
+            var price = $('#sale'+saleid+'_product'+productid+'_price').val();
+            var total_price = parseFloat(price)*parseInt(qty);
+
+            $('#sale'+saleid+'_product'+productid+'_span').html(total_price.toFixed(2));
+            $('#sale'+saleid+'_product'+productid+'_totalprice').val(total_price.toFixed(2));
+
+            subtotal(saleid);
+        }
+
+        function subtotal(sid){
+            var subtotal = 0;
+            $('.sale'+sid+'_product_totalprice').each(function() {
+                if(!isNaN(this.value) && this.value.length!=0) {
+                    subtotal += parseFloat(this.value); 
+                }
+            });
+
+            var totalqty = 0;
+            $('.sale'+sid+'_product_totalqty').each(function() {
+                if(!isNaN(this.value) && this.value.length!=0) {
+                    totalqty += parseInt(this.value);
+                }
+            });
+            
+            $('#input_sale'+sid+'_totalqty').val(totalqty.toFixed(2));
+            $('#input_sale'+sid+'_subtotal').val(subtotal.toFixed(2));
+            $('#sale'+sid+'_subtotal').html(subtotal.toFixed(2));
+            $('#sale'+sid+'_totalqty').html(totalqty.toFixed(2));
+        }
+
+        function reorder(saleid){
+            var counter = 0;
+            var selected_products = '';
+            var product_qty = '';
+
+            $('.cb'+saleid+':checked').each(function(){
+                counter++;
+                fid = $(this).attr('id');
+                selected_products += fid.substring(2, fid.length)+'|';
+                product_qty += $('#sale'+saleid+'_product'+fid.substring(2, fid.length)+'_qty').val()+'|';
+            });
+
+            if(parseInt(counter) < 1){
+                swal({
+                    title: '',
+                    text: "Please select at least one (1) product.",         
+                });
+                return false;
+            }
+            else{
+                post_form("{{route('profile.sales-reorder-product')}}",selected_products,product_qty);
+            }
+        }
+
+        function cb(sid,pid){
+            var subtotal = $('#input_sale'+sid+'_subtotal').val();
+            var totalqty = $('#input_sale'+sid+'_totalqty').val();
+
+            var product_tqty   = $('#sale'+sid+'_product'+pid+'_qty').val();
+            var product_tprice = $('#sale'+sid+'_product'+pid+'_totalprice').val();
+
+            if($('#cb'+sid+'_'+pid).is(':checked')) {
+                var total = parseFloat(subtotal)+parseFloat(product_tprice);
+                var qty   = parseFloat(totalqty)+parseFloat(product_tqty);
+            } else {
+                var total = parseFloat(subtotal)-parseFloat(product_tprice);
+                var qty   = parseFloat(totalqty)-parseFloat(product_tqty);
+            }
+
+
+            $('#input_sale'+sid+'_subtotal').val(total.toFixed(2));
+            $('#sale'+sid+'_subtotal').html(total.toFixed(2));  
+
+            $('#input_sale'+sid+'_totalqty').val(qty.toFixed(2));
+            $('#sale'+sid+'_totalqty').html(qty.toFixed(2));  
+        }
+
+        function post_form(url,products,qty){
+            $('#posting_form').attr('action',url);
+            $('#products').val(products);
+            $('#qty').val(qty);
+            $('#posting_form').submit();
+        }
+
+        function add_to_wishlist(product_id){
+            $.ajax({
+                data: {
+                    "product_id": product_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('add-to-wishlist')}}",
+                success: function(returnData) {
+                    if (returnData['success']) {
+                        $('#wishrmv').css('display','block');
+                        $('#wishadd').css('display','none');
+
+                        swal({
+                            title: '',
+                            text: "Product has been added to wishlist.",         
+                        });
+                    }
+                }
+            });
+        }
+
+        function remove_to_wishlist(product_id){
+            $.ajax({
+                data: {
+                    "product_id": product_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('remove-to-wishlist')}}",
+                success: function(returnData) {
+                    if (returnData['success']) {
+                        $('#wishrmv').css('display','none');
+                        $('#wishadd').css('display','block');
+
+                        swal({
+                            title: '',
+                            text: "Product has been removed to wishlit.",         
+                        });
+                    }
+                }
+            });
+        }
+
         $(document).ready(function () {
             $('#salesTransaction').DataTable({
                 "responsive": true,
@@ -367,11 +609,6 @@
             $('#cancel_orderid').html('Cancel Order#: '+id);
             $('#order_number').val(id);            
             $('#cancel_order').modal('show');
-        }
-
-        function reorder(id){
-            $('#orderid').val(id);            
-            $('#modal_reorder').modal('show');
         }
     </script>
 @endsection

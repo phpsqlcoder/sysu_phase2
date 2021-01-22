@@ -4,6 +4,7 @@ namespace App\Http\Controllers\EcommerceControllers;
 
 use App\EcommerceModel\Wishlist;
 use App\EcommerceModel\CustomerWishlist;
+use App\EcommerceModel\Cart;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -168,18 +169,42 @@ class WishlistController extends Controller
 
     public function remove_product(Request $request){
 
-        $qry = Wishlist::where('product_id',$request->productid)->decrement('total_count',1);
+        $qry = Wishlist::where('product_id',$productid);
 
-        if($qry){
-            $qry2 = Wishlist::where('product_id',$request->productid)->first();
-
-            if($qry2->total_count == 0){
-                Wishlist::where('product_id',$request->productid)->delete();
+        if($qry->decrement('total_count',1)){
+            $data = $qry->first();
+            if($data->total_count == 0){
+                $qry->delete();
             }
 
             CustomerWishlist::where('customer_id', Auth::id())->where('product_id',$request->productid)->delete();
         }
 
         return back()->with('success','Successfully removed.');
+    }
+
+    public function add_to_cart($productid){
+
+        $product = Product::find($productid);
+
+        Cart::create([
+            'user_id' => Auth::id(),
+            'product_id' => $productid,
+            'qty' => 1,
+            'price' => $product->price
+        ]);
+
+        $qry = Wishlist::where('product_id',$productid);
+
+        if($qry->decrement('total_count',1)){
+            $data = $qry->first();
+            if($data->total_count == 0){
+                $qry->delete();
+            }
+        }
+
+        CustomerWishlist::where('customer_id', Auth::id())->where('product_id',$productid)->delete();
+
+        return back()->with('success','Product added to cart.');
     }
 }

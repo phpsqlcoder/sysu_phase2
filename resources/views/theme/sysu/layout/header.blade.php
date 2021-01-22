@@ -131,7 +131,7 @@
                             @if(auth()->check())
                             <li><a  href="{{route('profile.sales')}}"><i class="fa fa-user"></i> <span>My Account</span></a></li>
                                 <li><a  href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out-alt"></i> <span>Log Out</span></a></li>
-                                <form id="logout-form" action="{{ route('account.logout') }}" method="get" style="display: none;">
+                                <form id="auth-logout-form" action="{{ route('account.logout') }}" method="get" style="display: none;">
                                     @csrf
                                 </form>
                             @else

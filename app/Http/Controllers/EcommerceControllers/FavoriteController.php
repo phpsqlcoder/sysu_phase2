@@ -124,8 +124,8 @@ class FavoriteController extends Controller
         return back()->with('success','Product added to cart.');
     }
 
-    public function btn_add_to_favorites(Request $request){
-
+    public function btn_add_to_favorites(Request $request)
+    {
         $data = Favorite::where('product_id',$request->product_id);
         $product = Product::find($request->product_id);
 
@@ -199,58 +199,4 @@ class FavoriteController extends Controller
         }
     }
 
-
-
-
-
-    public function add_to_favorites(Request $request)
-    {
-        $product = Product::find($request->product_id);
-        $data = Favorite::where('product_id',$request->product_id);
-
-        if($data->count() > 0){
-            $wishlist = $data->first();
-
-            Favorite::where('product_id',$request->product_id)->update([
-                'total_count' => ($wishlist->total_count+1)
-            ]);
-
-            $qry = WishlistCustomer::where('customer_id',Auth::id())->where('product_id',$product->id)->exists();
-            if(!$qry){
-                WishlistCustomer::create([
-                    'customer_id' => Auth::id(),
-                    'product_id' => $product->id
-                ]);
-            }
-
-        } else {
-            Favorite::create([
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'total_count' => 1
-            ]);
-
-            WishlistCustomer::create([
-                'customer_id' => Auth::id(),
-                'product_id' => $product->id
-            ]);
-        }
-        
-    }
-
-    public function remove_to_wishlist(Request $request)
-    {
-        $data = Favorite::where('product_id',$request->product_id)->first();
-
-        $qry = Favorite::where('product_id',$request->product_id)->update(['total_count' => ($data->total_count-1)]);
-
-        if($qry){
-            $qry2 = Favorite::where('product_id',$request->product_id)->first();
-
-            if($qry2->total_count == 0){
-                Favorite::where('product_id',$request->product_id)->delete();
-            }
-        }
-        CustomerFavorite::where('customer_id', Auth::id())->where('product_id',$request->product_id)->delete();
-    }
 }

@@ -436,7 +436,6 @@
     }
 
     function remove_to_wishlist(product_id){
-        console.log('tre');
         $.ajax({
             data: {
                 "product_id": product_id,

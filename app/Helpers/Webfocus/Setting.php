@@ -72,14 +72,14 @@ class Setting {
         return Carbon::parse($date)->diffForHumans();
 	}
 
-	public static function date_for_news_list($date) {
+    public static function date_for_news_list($date) {
         if ($date != null && strtotime($date) > strtotime('-1 day')) {
-            return Carbon::parse($date)->diffForHumans();
+            return Carbon::parse($date)->toFormattedDateString();
         } else {
-			return 'on '.date('M d, Y h:i A', strtotime($date));
-		}
-
+            return 'on '.date('M d, Y', strtotime($date));
+        }
     }
+
 
     public function social($page,$account){
     	if($page == 'facebook')
