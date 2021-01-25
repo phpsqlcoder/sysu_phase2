@@ -3,6 +3,7 @@
 namespace App\EcommerceModel;
 
 use Illuminate\Database\Eloquent\Model;
+use App\EcommerceModel\Product;
 use Auth;
 
 class CustomerWishlist extends Model
@@ -34,5 +35,19 @@ class CustomerWishlist extends Model
     public function product_details()
     {
         return $this->belongsTo('\App\EcommerceModel\Product','product_id');
+    }
+
+    public static function wishlist_available()
+    {
+        $products = CustomerWishlist::where('customer_id',Auth::id())->get();
+
+        $counter = 0;
+        foreach($products as $prod){
+            if($prod->product_details->maxpurchase > 0){
+                $counter++;
+            }
+        }
+
+        return $counter;
     }
 }

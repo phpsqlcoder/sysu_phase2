@@ -36,7 +36,7 @@
                         </thead>
                         <tbody>
                             @forelse($products as $product)
-                                <tr>
+                                <tr class="@if($product->product_details->maxpurchase > 0) table-warning @endif">
                                     <td align="right">
                                         <a href="#" title="Remove Product" onclick="remove_product('{{$product->product_id}}');" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
 

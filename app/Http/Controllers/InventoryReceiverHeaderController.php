@@ -6,7 +6,9 @@ use App\Helpers\ListingHelper;
 use App\Helpers\ModelHelper;
 use App\InventoryReceiverHeader;
 use App\InventoryReceiverDetail;
+use App\EcommerceModel\CustomerWishlist;
 use App\EcommerceModel\Product;
+use App\User;
 use App\Permission;
 use Illuminate\Http\Request;
 use Response;
@@ -63,10 +65,27 @@ class InventoryReceiverHeaderController extends Controller
     public function post($id)
     {
         $update = InventoryReceiverHeader::whereId($id)->update([
-                'posted_at' => date('Y-m-d H:i:s'),
-                'posted_by' => Auth::id(),
-                'status' => 'POSTED'
-            ]);
+            'posted_at' => date('Y-m-d H:i:s'),
+            'posted_by' => Auth::id(),
+            'status' => 'POSTED'
+        ]);
+
+        if($update){
+            $products = InventoryReceiverDetail::where('header_id',$id)->get();
+
+            foreach($products as $prod){
+                $wishlist = CustomerWishlist::where('product_id',$prod->product_id);
+                $product = Product::find($prod->product_id);
+
+                if($wishlist->count() > 0){
+                    $data = $wishlist->first();
+
+                    $user = User::find($data->customer_id);
+                    $user->send_email_notification_on_customer_wishlist($product);
+                }
+            }
+        }
+        
         return back()->with('success','Successfully posted inventory');
     }
     public function cancel($id)

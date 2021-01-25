@@ -169,7 +169,7 @@ class WishlistController extends Controller
 
     public function remove_product(Request $request){
 
-        $qry = Wishlist::where('product_id',$productid);
+        $qry = Wishlist::where('product_id',$request->productid);
 
         if($qry->decrement('total_count',1)){
             $data = $qry->first();

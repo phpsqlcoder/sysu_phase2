@@ -7,6 +7,9 @@ use App\Notifications\UserResetPasswordNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+use App\Notifications\SendEmailNotificationCustomerWishlist;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use App\Role;
@@ -124,6 +127,11 @@ class User extends Authenticatable implements MustVerifyEmail
         $token = app('auth.password.broker')->createToken($this);
         logger($token);
         $this->notify(new NewUserResetPasswordNotification($token));
+    }
+
+    public function send_email_notification_on_customer_wishlist($product)
+    {
+        $this->notify(new SendEmailNotificationCustomerWishlist($product));
     }
 
     public function has_access_to_pages_module()
