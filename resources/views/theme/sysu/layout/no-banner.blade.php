@@ -1,4 +1,4 @@
-<section class="mt-4" style="display: @if(Route::current()->getName() == 'product.front.list') none @else block @endif;">
+<section class="mt-4" style="display: none;">
     <div class="container">
         <div class="row no-gutters">
             <div class="col-12">
