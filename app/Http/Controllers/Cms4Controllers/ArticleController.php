@@ -193,4 +193,9 @@ class ArticleController extends Controller
 
         return back()->with('success', __('standard.news.article.restore_success'));
     }
+
+    public function get_slug(Request $request)
+    {
+        return ModelHelper::convert_to_slug(Article::class, $request->url);
+    }
 }
