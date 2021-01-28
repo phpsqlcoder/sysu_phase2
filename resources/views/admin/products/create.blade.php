@@ -68,7 +68,7 @@
                     </div>
                     <div class="form-group">
                         <label class="d-block">Brand</label>
-                        <input name="brand" id="brand" value="{{ old('brand') }}" required type="text" class="form-control @error('brand') is-invalid @enderror" maxlength="250">
+                        <input name="brand" id="brand" value="{{ old('brand') }}" type="text" class="form-control @error('brand') is-invalid @enderror" maxlength="250">
                         @hasError(['inputName' => 'brand'])
                         @endhasError
                     </div>
