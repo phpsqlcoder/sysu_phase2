@@ -1,0 +1,148 @@
+Gmail
+Username: wsi.dimaapi.dunhill@gmail.com
+
+Password: ws1!G00gl3t6lk
+
+
+Outlook/Webfocus email
+Username: dimaapi.dunhill@webfocus.ph
+
+Password: [C7TnJmO$obm
+
+Github WSI
+Username: wsidimaapidunhill
+Email: wsi.dimaapi.dunhill@gmail.com
+
+Password: n6aDAnKkpXL5KcB
+
+WebFocus Prod Demo email
+Email: wsiprod.demo@gmail.com
+
+Pw: w3bf0cusd3m0pr0d2018
+
+WebFocus Prod Email
+Email account: wsiprod@webfocus.ph
+
+Password: s3cur3m61lp6ss
+
+WebFocus Paypal Account
+Email: wsiprod.demo@gmail.com
+Password: a75grcKDduGg7BE
+
+Webfocus Server
+https://192.155.86.62:2087
+Username: root
+Password: s3cur3p6ssws1
+
+WHMCS Cpanel
+Link: https://whmcs.wsiph2.com:2083
+
+Username: portalwebfocus
+
+Password: GOfI32n.d4a4
+
+Webfocus WHMCS 
+Link: https://portal.webfocus.ph/admin/
+
+Username: whmcsadmin
+
+
+Password: ws1!s3cur3!whmcsp6ss
+
+Webfocus client site
+https://admin.webfocusprod.wsiph2.com
+https://clients.webfocusprod.wsiph2.com/{project}/public
+
+Webfocus Facebook
+Email: webfocus.mktg@gmail.com
+Password: ws1-gqLYnW9sUE_FB
+
+CM3 Master admin account
+username: master-admin
+password: l3v12018
+
+https://cpanel{cpanel_number}.wsiph2.com:2087
+username: root
+password: cp!WSI-syst3m6t1c{cpanel_number}
+
+Test Facebook
+email: llihund.testhill@gmail.com
+password: E5k72tttUkGczmc
+
+Risewave
+http://projects.wsiph2.com/webdirectory/risewave/public_html
+
+http://projects.wsiph2.com/webdirectory/risewave/public_html/risewave-panel/
+
+Email: wsiprod.demo@gmail.com
+
+Pw: 4I16f46mJv
+
+
+SRBC Beta
+https://beta.srbc.com.ph/
+
+https://admin.srbc.com.ph/
+
+user: wsi.laravel.cms3
+
+pass: s3cur3p6ssws1
+
+Gentenc Live
+https://173.255.211.64:2087
+
+username: root
+
+password: s3cur3sp6ssws1g3nt3c
+
+Stpauls Admin
+https://stpauls.ph/stpauls-panel/ 
+
+
+Username: wsi_prod
+
+Password: anabevesy
+
+Stpauls Client login
+Username: wsi_dev
+E-mail Address: wsi.dimaapi.dunhill@gmail.com
+Password: W3bf0cusd3m0pr0d2018
+
+Stpauls CPanel Server
+https://ua.siteground.com/ 
+Username : rome67ad
+Password : Exorcism12212019
+
+StPauls UBIZ Merchant's test account
+
+URL : http://api.dev.ubiz.unionbank.com.ph/admin/login
+
+Username: socstpauladmin
+
+Password: P@ssw0rds
+
+
+StPauls UBIZ Developer's Guide 
+
+Url : http://api.dev.ubiz.unionbank.com.ph/guide/
+
+Username : api@useries.com
+
+Password: #usharedev
+
+
+GENTEC
+https://173.255.211.64:2087
+
+username: root
+
+password: s3cur3sp6ssws1g3nt3c
+
+GITLAB
+Email: wsi.dimaapi.dunhill@gmail.com
+Username: wsidunhill
+Password: 2CVdkhmaGG6DJwA
+
+Can:  4, 6, 
+Possible: 3, 2, 5, 7
+Can't: 1, 8

@@ -60,7 +60,7 @@
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" id="showInactive" name="showDeleted" class="custom-control-input" @if ($filter->showDeleted) checked @endif>
-                                                <label class="custom-control-label" for="showInactive">Show Inactive User</label>
+                                                <label class="custom-control-label" for="showInactive">Show Deleted Items</label>
                                             </div>
                                         </div>
                                         <div class="form-group mg-b-40">
