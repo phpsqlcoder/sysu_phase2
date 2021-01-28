@@ -100,7 +100,7 @@ label {
 .signin-hero {
     height: 100vh;
     background: #ebf7ff url(../img/logo-header.jpg) center center no-repeat;
-    background-size: 90%;
+    background-size: 70%;
 }
 
 .sign-wrapper {
@@ -409,7 +409,7 @@ table th {
 
 @media only screen and (max-width:1024px) and (orientation: portrait) {
     .signin-hero {
-        background: url(../img/logo-header.jpg) center top no-repeat;
+        background: url(../img/logo-header.jpg) center center no-repeat;
         height: 50vh;
         background-size: 75%;
     }
