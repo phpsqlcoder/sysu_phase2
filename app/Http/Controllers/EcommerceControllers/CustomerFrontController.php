@@ -118,6 +118,11 @@ class CustomerFrontController extends Controller
                 return back()->with('error', 'Administrative accounts are not allowed to login as customer.'); 
             }
 
+            if(Auth::user()->is_active <> 1){ // block inactive users from using this login form
+                Auth::logout();
+                return back()->with('error', 'Account is inactive.'); 
+            }
+
 
             foreach ($cart as $order) {
                 $product = Product::find($order['product_id']);

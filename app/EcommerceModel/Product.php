@@ -11,6 +11,8 @@ use App\InventoryReceiverDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use DB;
+
 
 class Product extends Model
 {
@@ -248,5 +250,42 @@ class Product extends Model
         }
 
         return $front;
+    }
+
+    public function getDiscountedPriceAttribute()
+    {
+        $promo = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id);
+
+        if($promo->count() > 0){
+            $discount = $promo->max('promos.discount');
+
+            $percentage = ($discount/100);
+            $discountedAmount = ($this->price * $percentage);
+
+            $price = ($this->price - $discountedAmount);
+        } else {
+            $price = $this->price;
+        }
+
+        return $price;
+    }
+
+    public static function onsale_checker($id)
+    {
+        $checkproduct = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$id)->count();
+
+        return $checkproduct;
+    }
+
+    public function on_sale()
+    {
+        return $this->belongsTo('\App\EcommerceModel\PromoProducts','id','product_id');
+    }
+
+    public function getPromoDiscountAttribute()
+    {
+        $discount = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id)->max('promos.discount');
+
+        return $discount;
     }
 }

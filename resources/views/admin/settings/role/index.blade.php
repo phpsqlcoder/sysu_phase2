@@ -91,21 +91,20 @@
             <div class="col-md-12">
                 <div class="table-list mg-b-10">
                     <div class="table-responsive-lg">
-                        <table class="table mg-b-0 table-light table-hover" style="width:100%;">
+                        <table class="table mg-b-0 table-light table-hover" style="word-break: break-all;">
                             <thead>
                             <tr>
-                                <th scope="col" width="40%">Name</th>
-                                <th scope="col" width="50%">Description</th>
-                                <th scope="col" width="10%">Options</th>
+                                <th width="40%">Name</th>
+                                <th width="50%">Description</th>
+                                <th width="10%">Options</th>
                             </tr>
                             </thead>
                             <tbody>
                             @forelse($roles as $role)
-                            @if($role->id<>'2')
                                 <tr>
-                                    <th>
+                                    <td>
                                         <strong> {{ $role->name }}</strong>
-                                    </th>
+                                    </td>
                                     <td>{{ $role->description }}</td>
 
                                     <td>
@@ -126,7 +125,6 @@
                                     </td>
 
                                 </tr>
-                            @endif
                             @empty
                                 <tr>
                                     <td colspan="3" style="text-align: center;"> <p class="text-danger">No roles found.</p></td>

@@ -23,7 +23,7 @@
                                 @php
                                     $total_product_count++;
                                     $product = $order->product;
-                                    $total += $order->itemTotalPrice;
+                                    $total += $order->product->discountedprice*$order->qty;
                                     $max = $product->Maxpurchase;
                                     if (empty($product)) {
                                         continue;
@@ -70,9 +70,9 @@
                                                         </div>
                                                     </div>
                                                     <small>Total</small>
-                                                    <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">₱ {{number_format($order->itemTotalPrice,2)}}</div>
-                                                    <input type="hidden" name="price{{$loop->iteration}}" id="price{{$loop->iteration}}" value="{{$product->price}}">
-                                                    <input type="hidden" id="sum_sub_price{{$loop->iteration}}" name="sum_sub_price{{$loop->iteration}}" value="{{$order->itemTotalPrice}}">
+                                                    <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">₱ {{number_format($order->product->discountedprice*$order->qty,2)}}</div>
+                                                    <input type="hidden" name="price{{$loop->iteration}}" id="price{{$loop->iteration}}" value="{{number_format($product->discountedprice,2,'.','')}}">
+                                                    <input type="hidden" id="sum_sub_price{{$loop->iteration}}" name="sum_sub_price{{$loop->iteration}}" value="{{number_format($order->product->discountedprice*$order->qty,2,'.','')}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -252,9 +252,9 @@
         }
 
 
-        $(document).ready(function(){
-            compute_grand_total();
-        });
+        // $(document).ready(function(){
+        //     compute_grand_total();
+        // });
 
 
         function remove_item(i){
@@ -286,8 +286,7 @@
 
             $('#total_price'+id).html('Php '+ addCommas(pr.toFixed(2)));
             $('#sum_sub_price'+id).val(pr);
-            $('#product_total_price'+id).html('₱ '+ addCommas(pr.toFixed(2)));
-            
+            $('#product_total_price'+id).html('₱ '+ addCommas(pr.toFixed(2)));  
 
         }
 

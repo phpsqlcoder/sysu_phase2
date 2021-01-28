@@ -198,4 +198,23 @@ return [
         ],
     ],
 
+    'promos' => [
+        'create_success' => 'Promo has been added.',
+        'promo_update_success' => 'Selected promo status has been changed to :STATUS',
+        'single_delete_success' => 'The promo has been deleted.',
+        'promo_update_success' => 'Selected promo status has been changed to :STATUS',
+        'multiple_delete_success' => 'Selected promos has been deleted.',
+        'restore_promo_success' => 'Successfully restored the promo.',
+        'promo_update_details_success' => 'Promo details has been updated.'
+    ],
+
+    'locations' => [
+        'create_success' => 'Promo has been added.',
+        'status_update_success' => 'Selected flat rate status has been changed to :STATUS',
+        'single_delete_success' => 'The flat rate has been deleted.',
+        'multiple_status_update_success' => 'Selected flat rates status has been changed to :STATUS',
+        'multiple_delete_success' => 'Selected flat rates has been deleted.',
+        'update_details_success' => 'Flat rate has been updated.'
+    ],
+
 ];

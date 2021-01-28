@@ -21,6 +21,7 @@ use Redirect;
 use DateTime;
 use Carbon\Carbon;
 
+use DB;
 
 
 class CartController extends Controller
@@ -28,6 +29,21 @@ class CartController extends Controller
     public function store(Request $request)
     {       
         $product = Product::whereId($request->product_id)->first();
+
+        $promo = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$request->product_id);
+
+        if($promo->count() > 0){
+            $discount = $promo->max('promos.discount');
+
+            $percentage = ($discount/100);
+            $discountedAmount = ($product->price * $percentage);
+
+            $price = number_format(($product->price - $discountedAmount),2,'.','');
+        } else {
+            $price = number_format($product->price,2,'.','');
+        }
+
+
         // logger($request);
         // return;
         if (auth()->check()) {
@@ -41,14 +57,14 @@ class CartController extends Controller
                 $newQty = $request->qty;
                 $save = $cart->update([
                     'qty' => $newQty,
-                    'price' => $product->price
+                    'price' => $price
                 ]);
             } else {
                 $save = Cart::create([
                     'product_id' => $request->product_id,
                     'user_id' => Auth::id(),
                     'qty' => $request->qty,
-                    'price' => $product->price
+                    'price' => $price
                 ]);
             }
 
@@ -61,7 +77,7 @@ class CartController extends Controller
             foreach ($cart as $key => $order) {
                 if ($order->product_id == $request->product_id) {
                     $cart[$key]->qty = $request->qty;
-                    $cart[$key]->price = $product->price;
+                    $cart[$key]->price = $price;
                     $not_exist = false;
                     break;
                 }
@@ -71,7 +87,7 @@ class CartController extends Controller
                 $order = new Cart();
                 $order->product_id = $request->product_id;
                 $order->qty = $request->qty;
-                $order->price = $product->price;
+                $order->price = $price;
 
                 array_push($cart, $order);
             }

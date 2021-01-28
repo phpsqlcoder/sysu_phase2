@@ -110,7 +110,7 @@
         <li class="nav-label mg-t-25">E-Commerce</li>
 
         @if (auth()->user()->has_access_to_module('product') || auth()->user()->has_access_to_module('product_category') || auth()->user()->has_access_to_module('product_reviews'))
-            <li class="nav-item with-sub @if (request()->routeIs('products*') || request()->routeIs('product-categories*')|| request()->routeIs('product-review*')) active show @endif">
+            <li class="nav-item with-sub @if (request()->routeIs('products*') || request()->routeIs('product-categories*') || request()->routeIs('product-review*') || request()->routeIs('product-wishlist.list*') || request()->routeIs('product-favorite.list*')) active show @endif">
                 <a href="" class="nav-link"><i data-feather="box"></i> <span>Products</span></a>
                 <ul>
                     @if (auth()->user()->has_access_to_module('product'))
@@ -132,9 +132,9 @@
                     {{--@endif--}}
 
                     @if (auth()->user()->has_access_to_module('product_category'))
-                        <li @if (\Route::current()->getName() == 'product-categories.index' || \Route::current()->getName() == 'product-categories.edit') class="active" @endif><a href="{{ route('product-categories.index') }}">Manage Categories</a></li>
+                        <li @if (\Route::current()->getName() == 'product-categories.index' || \Route::current()->getName() == 'product-categories.edit' ) class="active" @endif><a href="{{ route('product-categories.index') }}">Manage Categories</a></li>
                         @if (auth()->user()->has_access_to_route('product-categories.create'))
-                            <li><a href="{{ route('product-categories.create') }}">Create a Category</a></li>
+                            <li @if (\Route::current()->getName() == 'product-categories.create') class="active" @endif><a href="{{ route('product-categories.create') }}">Create a Category</a></li>
                         @endif
                     @endif
                 </ul>
@@ -176,6 +176,16 @@
                     @if (auth()->user()->has_access_to_route('locations.create'))
                         <li @if (\Route::current()->getName() == 'locations.create') class="active" @endif><a href="{{ route('locations.create') }}">Create New Flat Rate</a></li>
                     @endif
+                </ul>
+            </li>
+        @endif
+
+        @if (auth()->user()->has_access_to_module('promos'))
+            <li class="nav-item with-sub @if (request()->routeIs('promos*')) active show @endif">
+                <a href="" class="nav-link"><i data-feather="users"></i> <span>Promos</span></a>
+                <ul>
+                    <li @if (\Route::current()->getName() == 'promos.index') class="active" @endif><a href="{{ route('promos.index') }}">Manage Promos</a></li>
+                    <li><a href="{{ route('promos.create') }}">Create a Promo</a></li>
                 </ul>
             </li>
         @endif

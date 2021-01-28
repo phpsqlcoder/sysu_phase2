@@ -291,9 +291,15 @@
                                                 </a>
                                                 <div class="info position-relative">
                                                     <div class="row no-gutters px-3 pb-3">
-                                                        <div class="col-12"><h3 class="product-price">
-                                                            <span>₱ {{number_format($product->price,2)}}</span> | {{$product->uom}}</h3>
-                                                        </div>                                                        
+                                                        @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
+                                                            <div class="col-12"><h3 class="product-price"><span>₱ {{ number_format($product->discountedprice,2) }}</span> | {{$product->uom}}</h3></div>
+                                                            <span class="text-muted small mr-2 h6"><del>₱{{ number_format($product->price,2) }}</del></span>
+                                                            <span class="card-discount-percent small h6">-{{ $product->promodiscount }}%</span>
+                                                        @else
+                                                            <div class="col-12"><h3 class="product-price">
+                                                                <span>₱ {{number_format($product->price,2)}}</span> | {{$product->uom}}</h3>
+                                                            </div> 
+                                                        @endif                                                     
                                                     </div>
                                                 </div>
                                                 @if($product->Maxpurchase > 0)

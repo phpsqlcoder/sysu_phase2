@@ -39,13 +39,13 @@
                                 <div class="row row-sm">
                                     <div class="col-sm">
                                         <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Role Name <i class="tx-danger">*</i></label>
-                                        <input required type="text" class="form-control" name="role" placeholder="Enter role name">
+                                        <input required type="text" class="form-control" name="role" placeholder="Enter role name" maxlength="150">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="tx-10 tx-uppercase tx-medium tx-spacing-1 mg-b-5 tx-color-03">Role Description <i class="tx-danger">*</i></label>
-                                    <textarea required class="form-control" name="description" rows="2" placeholder="Enter role description"></textarea>
+                                    <textarea required class="form-control" name="description" rows="2" placeholder="Enter role description" maxlength="190"></textarea>
                                 </div>
                             </div>
                             <div class="modal-footer pd-x-20 pd-y-15">

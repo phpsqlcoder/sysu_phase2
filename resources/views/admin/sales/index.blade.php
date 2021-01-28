@@ -37,9 +37,9 @@
         <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
             <div>
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb breadcrumb-style1 mg-b-5">
+                    <ol class="breadcrumb breadcrumb-style1 mg-b-5" style="background-color:white;">
                         <li class="breadcrumb-item" aria-current="page"><a href="{{route('dashboard')}}">CMS</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><a href="{{route('sales-transaction.index')}}">Sales Transaction</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Sales Transaction</li>
                     </ol>
                 </nav>
                 <h4 class="mg-b-0 tx-spacing--1">Sales Transaction Manager</h4>
@@ -260,7 +260,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <th colspan="7" style="text-align: center;"> <p class="text-danger">No Sales Transaction found.</p></th>
+                                    <th colspan="17" style="text-align: center;"> <p class="text-danger">No Sales Transaction found.</p></th>
                                 </tr>
                             @endforelse
                             </tbody>

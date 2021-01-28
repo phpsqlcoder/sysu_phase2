@@ -30,7 +30,7 @@
                         <label class="d-block">Rate *</label>
                         <input type="number" class="form-control" name="rate" min="1" step="0.01" value="{{$rate->rate}}">                                       
                     </div>                    
-                    <button class="btn btn-primary btn-sm btn-uppercase" type="submit">Submit</button>
+                    <button class="btn btn-primary btn-sm btn-uppercase" type="submit">Update</button>
                     <a class="btn btn-outline-secondary btn-sm btn-uppercase" href="{{ route('locations.index') }}">Cancel</a>
             </form>
             </div>

@@ -170,9 +170,11 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         Route::post('/admin/product-multiple-delete','Product\ProductController@multiple_delete')->name('products.multiple.delete');
 
         Route::resource('/locations', 'DeliverablecitiesController');
-        Route::post('/locations-enable', 'DeliverablecitiesController@enable')->name('locations.enable');
-        Route::post('/locations-disable', 'DeliverablecitiesController@disable')->name('locations.disable');
-        Route::post('/locations-delete', 'DeliverablecitiesController@delete')->name('locations.delete');
+        Route::get('/admin/location/{id}/{status}', 'DeliverablecitiesController@update_status')->name('location.change-status');
+        Route::post('/admin/location-single-delete', 'DeliverablecitiesController@single_delete')->name('location.single.delete');
+        Route::post('/admin/location-multiple-change-status','DeliverablecitiesController@multiple_change_status')->name('location.multiple.change.status');
+        Route::post('/admin/location-multiple-delete','DeliverablecitiesController@multiple_delete')->name('location.multiple.delete');
+
         //Inventory
         Route::resource('/inventory','InventoryReceiverHeaderController');
         Route::get('/inventory-download-template','InventoryReceiverHeaderController@download_template')->name('inventory.download.template');
@@ -201,6 +203,14 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         // CMS
         //Route::view('/settings/cms/index', 'admin.settings.cms.index')->name('settings.cms')->middleware('checkPermission:admin/settings');
 
+        // Promos
+        Route::resource('/admin/promos', 'EcommerceControllers\PromoController');
+        Route::get('/admin/promo/{id}/{status}', 'EcommerceControllers\PromoController@update_status')->name('promo.change-status');
+        Route::post('/admin/promo-single-delete', 'EcommerceControllers\PromoController@single_delete')->name('promo.single.delete');
+        Route::post('/admin/promo-multiple-change-status','EcommerceControllers\PromoController@multiple_change_status')->name('promo.multiple.change.status');
+        Route::post('/admin/promo-multiple-delete','EcommerceControllers\PromoController@multiple_delete')->name('promo.multiple.delete');
+        Route::get('/admin/promo-restore/{id}', 'EcommerceControllers\PromoController@restore')->name('promo.restore');
+        //
 
         // Users
         Route::resource('/users', 'Settings\UserController');

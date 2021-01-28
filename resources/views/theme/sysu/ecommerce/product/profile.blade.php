@@ -48,7 +48,23 @@
                                         <div class="product-description">
 
                                             <h2>{{ucwords($product->name)}}</h2>
-                                            <div class="product-price">₱ {{number_format($product->price,2)}}</div>
+
+                                            @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
+                                                <div class="product-price">
+                                                    <input type="hidden" id="product_price" value="{{ $product->discountedprice }}">
+                                                    <span class="price-after">₱ {{ $product->discountedprice }} </span>
+                                                    <span class="price-before">
+                                                        <span class="card-discount-percent small h6">{{ $product->promodiscount }}% Off</span><br>
+                                                        <span class="text-muted small h6"><del>₱ {{ number_format($product->price,2) }}</del></span>
+                                                    </span>
+                                                </div>
+                                            @else
+                                                <div class="product-price">
+                                                    <input type="hidden" id="product_price" value="{{ $product->price }}">
+                                                    <span class="price-after">₱ {{ $product->PriceWithCurrency }} </span>
+                                                </div>
+                                            @endif
+
                                             <div class="gap-20"></div>
                                             <p>{!! $product->short_description !!}</p>
                                             <p>&nbsp;</p>

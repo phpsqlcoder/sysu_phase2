@@ -52,8 +52,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="d-block">Description</label>
-                        <textarea rows="3" class="form-control @error('description') is-invalid @enderror" name="description">{{ old('description') }}</textarea>
+                        <label class="d-block">Description *</label>
+                        <textarea required rows="3" class="form-control @error('description') is-invalid @enderror" name="description">{{ old('description') }}</textarea>
                         @hasError(['inputName' => 'description'])@endhasError
                     </div>
 
