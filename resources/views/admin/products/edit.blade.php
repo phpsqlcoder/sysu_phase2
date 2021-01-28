@@ -179,7 +179,7 @@
                             </p>
                         </div>
                         <div id="zoomimage_div" @if(empty($product->zoom_image)) style="display:none;" @endif>
-                            <img src="{{ $product->zoom_image }}" height="100" width="300" id="img_temp" alt="">  <br /><br />
+                            <img src="{{ $product->zoom_image }}" id="img_temp" alt="">  <br /><br />
                             <a href="javascript:void(0)" class="btn btn-sm btn-danger remove-upload" >Remove Image</a>
                         </div>
                     </div>

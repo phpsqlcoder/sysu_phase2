@@ -69,7 +69,7 @@
                     @hasError(['inputName' => 'news_image'])
                     @endhasError
                     <div id="image_div" @if(empty($news->image_url)) style="display:none;" @endif>
-                        <img src="{{ $news->image_url }}" height="100" width="300" id="img_temp" alt="">  <br /><br />
+                        <img src="{{ $news->image_url }}" id="img_temp" alt="">  <br /><br />
                         <a href="javascript:void(0)" class="btn btn-sm btn-danger" onclick="remove_image()">Remove Image</a>
                     </div>
                 </div>

@@ -83,11 +83,11 @@
                                     </p>
                                     @if(empty($web->company_logo))
                                         <div id="image_div" style="display:none;">
-                                            <img src="" height="100" width="300" id="img_temp" alt="Company Logo">  <br /><br />
+                                            <img src="" id="img_temp" alt="Company Logo">  <br /><br />
                                         </div>
                                     @else
                                         <div>
-                                            <img src="{{ asset('storage/logos/'.$web->company_logo) }}" id="img_temp" height="100" width="300" alt="Company Logo">  <br /><br />
+                                            <img src="{{ asset('storage/logos/'.$web->company_logo) }}" id="img_temp" alt="Company Logo">  <br /><br />
                                             <button type="button" class="btn btn-danger btn-xs btn-uppercase remove-logo" type="button" data-id=""><i data-feather="x"></i> Remove Logo</button>
                                         </div>
                                     @endif

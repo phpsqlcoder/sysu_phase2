@@ -66,7 +66,7 @@
                         <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
                     <div id="image_div" style="display:none;">
-                        <img src="" height="100" width="300" id="img_temp" alt="">  <br /><br />
+                        <img src="" id="img_temp" alt="">  <br /><br />
                         <a href="javascript:void(0)" class="btn btn-xs btn-danger" onclick="remove_image();">Remove Image</a>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                         </p>
                     @endif
                     <div id="image_div_thumbnail" style="display:none;">
-                        <img src="" height="100" width="150" id="img_temp_thumbnail" alt="">  <br /><br />
+                        <img src="" id="img_temp_thumbnail" alt="">  <br /><br />
                         <a href="javascript:void(0)" class="btn btn-xs btn-danger" onclick="remove_image_thumbnail();">Remove Image</a>
                     </div>
                 </div>

@@ -115,7 +115,7 @@
         <div class="col-md-12">
             <div class="table-list mg-b-10">
                 <div class="table-responsive-lg">
-                    <table class="table mg-b-0 table-light table-hover" style="width:100%;table-layout: fixed;word-wrap: break-word;">
+                    <table class="table mg-b-0 table-light table-hover" style="width:100%;word-wrap: break-word;">
                         <thead>
                             <tr>
                                 <th>
