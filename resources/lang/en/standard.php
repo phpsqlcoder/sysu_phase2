@@ -124,9 +124,9 @@ return [
 
     'users' => [
         'status_confirm' => 'You are about to :status this user. Do you want to continue?',
-        'status_success' => 'The user account has been :status.',
-        'update_success' => 'The user account has been updated.',
-        'create_success' => 'The user account has been created.',
+        'status_success' => 'The User Account has been :status.',
+        'update_success' => 'The User Account has been updated.',
+        'create_success' => 'The User Account has been created.',
         'exist_name' => 'The user’s name you have entered is already in the list.',
         'required_char' => 'The password must have at least 8 characters.',
         'duplicate_email' => 'The email address you have entered is already existing.',
