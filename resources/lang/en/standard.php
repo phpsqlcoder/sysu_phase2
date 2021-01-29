@@ -11,17 +11,17 @@ return [
     'pages' => [
         'create' => 'Create a Page',
         'status_confirm' => 'You are about to change the status to :STATUS on multiple pages.',
-        'status_success' => 'The page status has been changed to :STATUS.',
+        'status_success' => 'The Page status has been changed to :STATUS.',
         'delete_confirm' => 'You are about to delete page(s). Do you want to continue?',
-        'delete_success' => 'The page has been deleted.',
+        'delete_success' => 'The Page has been deleted.',
         'delete_failed' => 'Failed to delete a page. Please try again.',
-        'update_success' => 'The page has been updated.',
-        'create_success' => 'The page has been added.',
+        'update_success' => 'The Page has been updated.',
+        'create_success' => 'The Page has been added.',
         //'same_slug' => 'The title page used is already taken.',
         //'incorrect_dimension' => 'The page banner image has incorrect dimensions.',
         //'exceed_size' => 'The image has exceeded the maximum file size.',
         'invalid_dimension' => 'The image has invalid dimensions. ',
-        'restore_success' => 'The page has been restored.',
+        'restore_success' => 'The Page has been restored.',
     ],
 
     'banner' => [

@@ -34,43 +34,37 @@
 
                     <div class="product-wrap">
                         <div class="row">
-                            <div class="col-lg-4">                                    
+                            <div class="col-lg-4 col-md-6 col-12">                                    
                                 <div class="xzoom-container">
                                     <img class="xzoom" id="xzoom-default" src="{{  asset('storage/products/'.$product->photoPrimary) }}"
                                     xoriginal="{{ $product->zoom_image }}" />
                                 </div>
-
+                                <div id="product-gallery-slider" class="slick-slider">
+                                    @foreach($product->photos as $photo)
+                                        <a href="{{ asset('storage/products/'.$photo->path) }}" class="xzoom-link"><img class="xzoom-gallery" src="{{ asset('storage/products/'.$photo->path) }}" alt="{{$product->id}}"></a>
+                                    @endforeach
+                                </div>
                             </div>
                             <div class="col-lg-6">
                                 <form id="addToCart" data-source="addToCart">
                                     <div class="product-detail">
-
                                         <div class="product-description">
-
                                             <h2>{{ucwords($product->name)}}</h2>
-
-                                            @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
-                                                <div class="product-price">
+                                            <div class="product-price mb-4">
+                                                @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
                                                     <input type="hidden" id="product_price" value="{{ $product->discountedprice }}">
-                                                    <span class="price-after">₱ {{ $product->discountedprice }} </span>
+                                                    <span class="price-after">₱ {{ number_format($product->discountedprice,2) }}</span>
                                                     <span class="price-before">
-                                                        <span class="card-discount-percent small h6">{{ $product->promodiscount }}% Off</span><br>
-                                                        <span class="text-muted small h6"><del>₱ {{ number_format($product->price,2) }}</del></span>
+                                                        <div class="price-less">{{ $product->promodiscount }}% OFF</div>
+                                                        <div class="price-original">₱ {{ $product->PriceWithCurrency }}</div>
                                                     </span>
-                                                </div>
-                                            @else
-                                                <div class="product-price">
+                                                @else
                                                     <input type="hidden" id="product_price" value="{{ $product->price }}">
-                                                    <span class="price-after">₱ {{ $product->PriceWithCurrency }} </span>
-                                                </div>
-                                            @endif
-
-                                            <div class="gap-20"></div>
+                                                    <span class="price-after">₱ {{ $product->PriceWithCurrency }}</span>
+                                                @endif
+                                            </div>
                                             <p>{!! $product->short_description !!}</p>
-                                            <p>&nbsp;</p>
-
                                         </div>
-
                                     </div>
                                 </form>
                             </div>
