@@ -87,7 +87,7 @@
                                         </div>
                                     @else
                                         <div>
-                                            <img src="{{ asset('storage/logos/'.$web->company_logo) }}" id="img_temp" alt="Company Logo">  <br /><br />
+                                            <img src="{{ asset('storage/logos/'.$web->company_logo) }}" id="img_temp" alt="Company Logo" style="max-width: 100%;">  <br /><br />
                                             <button type="button" class="btn btn-danger btn-xs btn-uppercase remove-logo" type="button" data-id=""><i data-feather="x"></i> Remove Logo</button>
                                         </div>
                                     @endif
