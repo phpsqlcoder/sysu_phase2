@@ -66,9 +66,8 @@
             </div>
             <div class="rd-navbar-panel rd-navbar-n-search-wrap">
                 <div class="rd-navbar-n-search rd-navbar-n-search_not-collapsable">
-                    <form class="rd-n-search" action="{{route('product.front.list')}}" method="POST" data-search-live="rd-search-results-live">
+                    <form class="rd-n-search" action="{{route('product.front.list')}}" method="GET" data-search-live="rd-search-results-live">
                         @csrf
-                        <input type="hidden" name="_method" value="POST">
                         <input type="hidden" name="search" value="on">
                         <div class="form-wrap">
                             <input class="form-input" id="rd-navbar-n-search-form-input" type="text" name="searchtxt" autocomplete="off">
@@ -87,9 +86,8 @@
                     <div class="container">
                         <div class="row no-gutters">
                             <div class="col-lg-12">
-                                <form class="rd-search" action="{{route('product.front.list')}}" method="POST" data-search-live="rd-search-results-live">
+                                <form class="rd-search" action="{{route('product.front.list')}}" method="GET" data-search-live="rd-search-results-live">
                                     @csrf
-                                    <input type="hidden" name="_method" value="POST">
                                     <input type="hidden" name="search" value="on">
                                     <div class="form-wrap">
                                         <input class="form-input" id="rd-navbar-search-form-input" type="text" name="searchtxt" autocomplete="off">

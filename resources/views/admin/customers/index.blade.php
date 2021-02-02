@@ -108,7 +108,6 @@
                             </thead>
                             <tbody>
                                 @forelse($users as $user)
-                                @if($user->role_id==6)
                                     <tr>
                                         <th>
                                             <strong @if($user->is_active == 0) style="text-decoration:line-through;" @endif> {{$user->fullname}}</strong>
@@ -145,7 +144,6 @@
                                             </nav>
                                         </td>
                                     </tr>
-                                @endif
                                 @empty
                                     <tr>
                                         <td colspan="5" style="text-align: center;"> <p class="text-danger">No customers found.</p></td>

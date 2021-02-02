@@ -62,7 +62,7 @@ class DeliverablecitiesController extends Controller
             'user_id' => Auth::id()
         ]);
 
-        return redirect(route('locations.index'))->with('success','The location has been created.');
+        return redirect(route('locations.index'))->with('success','The Location has been created.');
     }
 
     /**
