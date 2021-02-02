@@ -85,7 +85,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public static function activeTotalUser()
     {
-        $total = User::where('role_id','<>',6)->where('is_active','=',1)->whereNotNull('email_verified_at')->count();
+        // $total = User::where('role_id','<>',6)->where('is_active','=',1)->whereNotNull('email_verified_at')->count();
+        $total = User::where('role_id','<>',6)->where('is_active','=',1)->count();
 
         return $total;
     }

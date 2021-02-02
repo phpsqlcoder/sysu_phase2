@@ -12,11 +12,11 @@ class ListingHelper
     private $defaultSearchField;
     private $requiredConditions;
 
-    public function __construct($sortBy = 'desc', $perPage = 10, $searchField = 'updated_at', $requiredConditions = [])
+    public function __construct($sortBy = 'desc', $perPage = 10, $defaultSearchField = 'updated_at', $requiredConditions = [])
     {
         $this->defaultSortBy = $sortBy;
         $this->defaultPerPage = $perPage;
-        $this->defaultSearchField = $searchField;
+        $this->defaultSearchField = $defaultSearchField;
         $this->requiredConditions = $requiredConditions;
     }
 
@@ -24,35 +24,21 @@ class ListingHelper
     // $searchFields = Fields in the table that wants to be search. The keys should same with sa database column name. Ex. ['id', 'first_name']
     // $customerQuery = We are using orWhereRaw for the query so you can use Database function. Ex. ["CONCAT(`first_name`, ' ', CONCAT(LEFT(`middle_name`,1),'.'), ' ', `last_name`, ' ', `ext_name`) LIKE ?"]
     // $customerQueryFields = Fields that in the $searchFields and used in $customQuery. Ex. ['first_name']
-    public function simple_search($model, $searchFields, $customQuery = [], $customQueryFields = [], $joinTables = [], $selectFields = [])
+    public function simple_search($model, $searchFields, $customQuery = [], $customQueryFields = [])
     {
-        $sortFields =  (empty($this->filterFields)) ? $searchFields : $this->filterFields;
-
         $perPage = $this->get_count_per_page();
-        $orderBy = $this->get_selected_order_by($sortFields);
+        $orderBy = $this->get_selected_order_by($searchFields);
         $sortBy = $this->get_selected_sort_by();
         $showDeleted = $this->show_delete_data();
         $search =  $this->get_search_string();
 
-        if (empty($selectFields)) {
-            $models = $model::orderBy($orderBy, $sortBy);
-        } else {
-            $models = $model::select($selectFields)->orderBy($orderBy, $sortBy);
-        }
-
-        foreach ($joinTables as $table) {
-            $models->leftJoin($table['name'], $table['field1'], $table['field2']);
-        }
+        $models = $model::orderBy($orderBy, $sortBy);
 
         if ($showDeleted) {
             $models->withTrashed();
         }
 
         foreach ($this->requiredConditions as $condition) {
-            if ($showDeleted && $condition['apply_to_deleted_data'] == false) {
-                continue;
-            }
-
             $models->where($condition['field'], $condition['operator'], $condition['value']);
         }
 

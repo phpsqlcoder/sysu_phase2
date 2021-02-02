@@ -209,12 +209,12 @@ return [
     ],
 
     'locations' => [
-        'create_success' => 'Promo has been added.',
-        'status_update_success' => 'Selected flat rate status has been changed to :STATUS',
-        'single_delete_success' => 'The flat rate has been deleted.',
-        'multiple_status_update_success' => 'Selected flat rates status has been changed to :STATUS',
-        'multiple_delete_success' => 'Selected flat rates has been deleted.',
-        'update_details_success' => 'Flat rate has been updated.'
+        'create_success' => 'The Location has been created.',
+        'status_update_success' => 'The Location status has been changed to :STATUS',
+        'single_delete_success' => 'The Location has been deleted.',
+        'multiple_status_update_success' => 'Selected Location(s) status has been changed to :STATUS',
+        'multiple_delete_success' => 'Selected Location(s) has been deleted.',
+        'update_details_success' => 'The Location has been updated.'
     ],
 
 ];

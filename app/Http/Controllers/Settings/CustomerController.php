@@ -32,19 +32,19 @@ class CustomerController extends Controller
     }
 
     public function index($param = null)
-    {
+    {   
         $customConditions = [
-            [
-                'field' => 'role_id',
-                'operator' => '=',
-                'value' => '6',
-                'apply_to_deleted_data' => true
-            ],
             [
                 'field' => 'is_active',
                 'operator' => '=',
                 'value' => 1,
                 'apply_to_deleted_data' => false
+            ],
+            [
+                'field' => 'role_id',
+                'operator' => '=',
+                'value' => 6,
+                'apply_to_deleted_data' => true
             ]
         ];
 
