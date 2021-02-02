@@ -91,7 +91,7 @@
                         <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
                         <div id="image_div" @if($page->has_slider()) style="display:none;" @endif>
-                            <img src="{{ old('image_url', $page->image_url) }}" id="img_temp" alt="">  <br /><br />
+                            <img src="{{ old('image_url', $page->image_url) }}" height="100" width="300" id="img_temp" alt="">  <br /><br />
                             <a href="javascript:void(0)" class="btn btn-sm btn-danger remove-upload" >Remove Image</a>
                         </div>
                         @endif

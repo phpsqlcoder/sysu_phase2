@@ -56,8 +56,8 @@
                         @endhasError
                     </div>
                     <div class="form-group">
-                        <label class="d-block">Brand *</label>
-                        <input name="brand" id="brand" value="{{ old('brand',$product->brand) }}" required type="text" class="form-control @error('brand') is-invalid @enderror" maxlength="250">
+                        <label class="d-block">Brand</label>
+                        <input name="brand" id="brand" value="{{ old('brand',$product->brand) }}" type="text" class="form-control @error('brand') is-invalid @enderror" maxlength="250">
                         
                         @hasError(['inputName' => 'brand'])
                         @endhasError
@@ -80,10 +80,13 @@
                         @endhasError
                     </div>
                     <div class="form-group">
-                        <label class="d-block">Short Description</label>
-                        <textarea name="short_description" rows="3" class="form-control">{{ old('short_description',$product->short_description) }}</textarea>
+                        <label class="d-block">Short Description *</label>
+                        <textarea name="short_description" rows="5" cols="80" class="form-control">{{ old('short_description',$product->short_description) }}</textarea>
                         @hasError(['inputName' => 'short_description'])
                         @endhasError
+                        <span class="invalid-feedback" role="alert" id="short_descriptionRequired" style="display: none;">
+                            <strong>The short description field is required</strong>
+                        </span>
                     </div>
                 </div>
                 <div class="col-lg-12">
@@ -179,7 +182,7 @@
                             </p>
                         </div>
                         <div id="zoomimage_div" @if(empty($product->zoom_image)) style="display:none;" @endif>
-                            <img src="{{ $product->zoom_image }}" id="img_temp" alt="">  <br /><br />
+                            <img src="{{ $product->zoom_image }}" height="100" width="300" id="img_temp" alt="">  <br /><br />
                             <a href="javascript:void(0)" class="btn btn-sm btn-danger remove-upload" >Remove Image</a>
                         </div>
                     </div>
