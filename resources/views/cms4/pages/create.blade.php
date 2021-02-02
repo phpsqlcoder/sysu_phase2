@@ -84,7 +84,7 @@
 					</p>
 
 					<div id="image_div" style="display:none;">
-                        <img src="" id="img_temp" alt="">  <br /><br />
+                        <img src="" height="100" width="300" id="img_temp" alt="">  <br /><br />
                         <a href="javascript:void(0)" class="btn btn-xs btn-danger" onclick="remove_image();">Remove Image</a>
                     </div>
 				</div>
