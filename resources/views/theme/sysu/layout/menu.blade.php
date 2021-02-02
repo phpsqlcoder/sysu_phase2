@@ -22,13 +22,13 @@
                     <button class="rd-navbar-search__toggle rd-navbar-search__toggle_additional toggle-original"
                     data-rd-navbar-toggle=".rd-navbar-search-wrap"></button>
                 </div> -->
-                <form class="search-form" action="{{route('product.front.list')}}" method="POST" data-search-live="rd-search-results-live">
-                        @csrf
-                        <input type="hidden" name="_method" value="POST">
-                        <input type="hidden" name="search" value="on">
+                <form class="search-form" action="{{route('product.front.list')}}" method="GET" data-search-live="rd-search-results-live">
+                    @csrf
+                    <input type="hidden" name="_method" value="POST">
+                    <input type="hidden" name="search" value="on">
                     <div class="input-group search-group">
                         <input type="text" name="searchtxt" class="form-control search-control" placeholder="Enter your search term...">
-                    </div><!-- /.input-group -->
+                    </div>
                 </form>
             </div>
         </div>
