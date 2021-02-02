@@ -42,7 +42,8 @@ class UserController extends Controller
             [
                 'field' => 'role_id',
                 'operator' => '!=',
-                'value' => '6'
+                'value' => '6',
+                'apply_to_deleted_data' => false
             ]
         ];
         $listing = new ListingHelper('desc', 10, 'updated_at', $condition);
