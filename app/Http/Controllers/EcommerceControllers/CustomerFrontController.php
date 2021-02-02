@@ -120,7 +120,7 @@ class CustomerFrontController extends Controller
 
             if(Auth::user()->is_active <> 1){ // block inactive users from using this login form
                 Auth::logout();
-                return back()->with('error', 'Account is inactive.'); 
+                return back()->with('error', 'Account is Inactive.'); 
             }
 
 
