@@ -26,10 +26,12 @@ class ProductRequest extends FormRequest
         return [
             'code' => 'max:250',
             'name' => 'required|max:250',
+            'brand' => 'max:250',
             'category_id' => 'nullable|exists:product_categories',
+            'price' => 'required',
             'short_description' => '',
             'long_description' => '', 
-            'uom' => '',
+            'uom' => 'required',
             'meta_title' => 'max:60',
             'meta_keyword' => 'max:160',
             'meta_description' => 'max:160',

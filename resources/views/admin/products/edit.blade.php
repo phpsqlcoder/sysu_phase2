@@ -50,7 +50,7 @@
                     </div>
                     <div class="form-group">
                         <label class="d-block">Name *</label>
-                        <input name="name" id="name" value="{{ old('name',$product->name) }}" required type="text" class="form-control @error('name') is-invalid @enderror" maxlength="250">
+                        <input required name="name" id="name" value="{{ old('name',$product->name) }}" type="text" class="form-control @error('name') is-invalid @enderror" maxlength="250">
                         <small id="product_slug"><a target="_blank" href="{{ $product->get_url() }}">{{ $product->get_url() }}</a></small>
                         @hasError(['inputName' => 'name'])
                         @endhasError
@@ -58,7 +58,6 @@
                     <div class="form-group">
                         <label class="d-block">Brand</label>
                         <input name="brand" id="brand" value="{{ old('brand',$product->brand) }}" type="text" class="form-control @error('brand') is-invalid @enderror" maxlength="250">
-                        
                         @hasError(['inputName' => 'brand'])
                         @endhasError
                     </div>
@@ -75,26 +74,19 @@
                     </div>
                     <div class="form-group">
                         <label class="d-block">Price (in Php) *</label>
-                        <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="price" value="{{ old('price', number_format($product->price,2,'.','')) }}" required min="0.00" step="0.01">
+                        <input required type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="price" value="{{ old('price', number_format($product->price,2,'.','')) }}" min="0.00" step="0.01">
                         @hasError(['inputName' => 'price'])
                         @endhasError
                     </div>
                     <div class="form-group">
-                        <label class="d-block">Short Description *</label>
-                        <textarea name="short_description" rows="5" cols="80" class="form-control">{{ old('short_description',$product->short_description) }}</textarea>
-                        @hasError(['inputName' => 'short_description'])
-                        @endhasError
-                        <span class="invalid-feedback" role="alert" id="short_descriptionRequired" style="display: none;">
-                            <strong>The short description field is required</strong>
-                        </span>
+                        <label class="d-block">Short Description</label>
+                        <textarea name="short_description" rows="6" class="form-control">{{ old('short_description',$product->short_description) }}</textarea>
                     </div>
                 </div>
                 <div class="col-lg-12">
                     <div class="form-group">
-                        <label class="d-block" id="long_descriptionLabel">Description</label>
-                        <textarea name="long_description" id="editor1" rows="10" cols="80">
-                             {{ old('long_description', $product->description) }}
-                        </textarea>
+                        <label class="d-block" id="long_descriptionLabel">Description *</label>
+                        <textarea name="long_description" id="editor1" rows="10" cols="80">{{ old('long_description', $product->description) }}</textarea>
                         @hasError(['inputName' => 'long_description'])
                         @endhasError
                         <span class="invalid-feedback" role="alert" id="long_descriptionRequired" style="display: none;">
@@ -122,8 +114,8 @@
                         @endhasError
                     </div>
                     <div class="form-group">
-                        <label class="d-block">Unit of Measurement</label>
-                        <input type="text" class="form-control @error('uom') is-invalid @enderror" name="uom" id="uom" value="{{ old('uom', $product->uom) }}" min="0" step="1">
+                        <label class="d-block">Unit of Measurement *</label>
+                        <input required type="text" class="form-control @error('uom') is-invalid @enderror" name="uom" id="uom" value="{{ old('uom', $product->uom) }}" min="0" step="1">
                         @hasError(['inputName' => 'uom'])
                         @endhasError
                     </div>                   

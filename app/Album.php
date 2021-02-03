@@ -11,7 +11,7 @@ class Album extends Model
     use SoftDeletes;
 
     protected $table = 'albums';
-    protected $fillable = ['name', 'transition_in', 'transition_out', 'transition', 'type', 'user_id'];
+    protected $fillable = ['name', 'transition_in', 'transition_out', 'transition', 'type', 'banner_type', 'user_id'];
 
     public function pages()
     {
@@ -49,14 +49,17 @@ class Album extends Model
 
     private static function validator()
     {
+        $minBanner = (request()->has('banner_type') && request()->banner_type == 'video') ? 1 : 1;
+
         return Validator::make(request()->all(), [
             'name' => 'required|max:150',
             'transition_in' => 'required',
             'transition_out' => 'required',
             'transition' => 'required|numeric|min:2|max:10',
-            'banners' => 'required|array'
+            'banner_type' => '',
+            'banners' => 'required|array|min:'.$minBanner
         ], [
-            'banners.required' => 'Please upload at least one banner.',
+            'banners.required' => 'Please upload at least '. $minBanner .' banner.',
         ], [
             'name' => 'Album name'
         ]);
@@ -99,7 +102,7 @@ class Album extends Model
 
     public static function totalAlbums()
     {
-        $total = Album::where('type','sub_banner')->count();
+        $total = Album::where('type','sub_banner')->withTrashed()->get()->count();
 
         return $total;
     }
