@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Cms4Controllers;
 
-use Facades\App\Helpers\CMS4ListingHelper;
+use Facades\App\Helpers\ListingHelper;
 use App\Http\Controllers\Controller;
 use App\Album;
 use App\Banner;
@@ -24,9 +24,9 @@ class AlbumController extends Controller
     {
         $animations = Option::where('type', 'animation')->get();
 
-        $albums = CMS4ListingHelper::simple_search(Album::class, $this->searchFields);
+        $albums = ListingHelper::simple_search(Album::class, $this->searchFields);
 
-        $filter = CMS4ListingHelper::get_filter($this->searchFields);
+        $filter = ListingHelper::get_filter($this->searchFields);
 
         $searchType = 'simple_search';
 
@@ -216,6 +216,35 @@ class AlbumController extends Controller
         }
 
         return back()->with('error', 'Failed to delete an album.');
+
+//        $albumIds = explode(',', request('ids'));
+//        if (sizeof($albumIds) > 0 ) {
+//            $deleteAlbumIds = [];
+//            $linkedAlbumNames = '';
+//            foreach($albumIds as $id) {
+//                $album = Album::find($id);
+//
+//                if ($album) {
+//                    if ($album->pages->count() > 0) {
+//                        $errorMessage = 'Album '.$album->name.' is linked to page/s.';
+//                        $linkedAlbumNames .= $errorMessage;
+//                    } else {
+//                        array_push($deleteAlbumIds, $album->id);
+//                    }
+//                }
+//
+//            }
+//            $delete = Album::whereIn('id', $deleteAlbumIds)->delete();
+//
+//            if ($delete) {
+//                if ($linkedAlbumNames == '') {
+//                    return back()->with('success', 'Album deleted successfully!');
+//                } else {
+//                    return back()->with('succewess', 'Album deleted successfully!')
+//                        ->with('error', $linkedAlbumNames);
+//                }
+//            }
+//        }
     }
 
     public function restore($album)

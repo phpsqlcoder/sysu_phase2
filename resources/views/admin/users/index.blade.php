@@ -127,7 +127,7 @@
                                         @if($user->is_active == 1)
                                             <span class="badge badge-success">Active</span>
                                         @else
-                                            <span class="badge badge-danger">Inactive</span>
+                                            <span class="badge badge-danger">Deactivated</span>
                                         @endif
                                     </td>
                                     <td>

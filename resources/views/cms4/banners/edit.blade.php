@@ -255,7 +255,7 @@
                     contentType: false,
                     processData: false,
                     success: function(returnData) {
-                        console.log(returnData);
+                        $('#upload_image').val('');
                         if (returnData.status == "success") {
                             while ($('input[name="banners['+image_count+'][image_path]"]').length) {
                                 image_count += 1;

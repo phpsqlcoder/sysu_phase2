@@ -23,12 +23,10 @@ class Banner extends Model
         return Validator::make(request()->all(), [
             'banners.*.alt' => 'max:125',
             'banners.*.title' => 'max:65',
-            'banners.*.description' => 'max:200',
             'banners.*.button_text' => 'max:30',
             'banners.*.url' => 'nullable|url'
         ], [
             'banners.*.title.max' => 'The banner title should not be greater than 65 characters.',
-            'banners.*.description.max' => 'The banner description should not be greater than 200 characters.',
             'banners.*.button_text.max' => 'The banner button text should not be greater than 30 characters.',
             'banners.*.alt.max' => 'The banner alt should not be greater than 125 characters.'
         ]);

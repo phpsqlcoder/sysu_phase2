@@ -59,6 +59,7 @@ class DeliverablecitiesController extends Controller
         $save = Deliverablecities::create([
             'name' => $request->name,
             'rate' => $request->rate,
+            'status' => (isset($request->visibility) ? 'PUBLISHED' : 'PRIVATE'),
             'user_id' => Auth::id()
         ]);
 
@@ -100,6 +101,7 @@ class DeliverablecitiesController extends Controller
         $save = Deliverablecities::findOrFail($id)->update([
             'name' => $request->name,
             'rate' => $request->rate,
+            'status' => (isset($request->visibility) ? 'PUBLISHED' : 'PRIVATE'),
             'user_id' => Auth::id()
         ]);
 

@@ -62,7 +62,7 @@
                     </div>
                     <div class="form-group">
                         <label class="d-block">Name *</label>
-                        <input name="name" id="name" value="{{ old('name') }}" required type="text" class="form-control @error('name') is-invalid @enderror" maxlength="250">
+                        <input required name="name" id="name" value="{{ old('name') }}" type="text" class="form-control @error('name') is-invalid @enderror" maxlength="250">
                         @hasError(['inputName' => 'name'])
                         @endhasError
                     </div>
@@ -87,28 +87,22 @@
                         <label>Price (in Php) *</label>
                         <input required class="form-control" type="number" step="0.01" min="0.00" value="0.00" name="price" id="price">
                     </div>
-                    
-                </div>
-                <div class="col-lg-12">
+
                     <div class="form-group">
-                        <label class="d-block" id="short_descriptionLabel">Short Description *</label>
-                        <textarea name="short_description" rows="5" cols="80" class="form-control">{{ old('short_description') }}</textarea>
-                        @hasError(['inputName' => 'short_description'])
-                        @endhasError
-                        <span class="invalid-feedback" role="alert" id="short_descriptionRequired" style="display: none;">
-                            <strong>The short description field is required</strong>
-                        </span>
+                        <label class="d-block" id="short_descriptionLabel">Short Description</label>
+                        <textarea name="short_description" rows="6" class="form-control">{{ old('short_description') }}</textarea>
                     </div>
                 </div>
+
                 <div class="col-lg-12">
                     <div class="form-group">
-                        <label class="d-block" id="long_descriptionLabel">Description</label>
+                        <label class="d-block" id="long_descriptionLabel">Description *</label>
                         <textarea name="long_description" id="editor1" rows="10" cols="80">{{ old('long_description') }}</textarea>
                         @hasError(['inputName' => 'long_description'])
                         @endhasError
-                        <!-- <span class="invalid-feedback" role="alert" id="long_descriptionRequired" style="display: none;">
+                        <span class="invalid-feedback" role="alert" id="long_descriptionRequired" style="display: none;">
                             <strong>The description field is required</strong>
-                        </span> -->
+                        </span>
                     </div>
                 </div>
 
@@ -133,7 +127,7 @@
 
                     <div class="form-group">
                         <label>Unit of Measurement *</label>
-                        <input class="form-control" type="text" name="uom" id="uom" required="required">
+                        <input required class="form-control" type="text" name="uom" id="uom">
                     </div>
 
                     <div class="form-group">
@@ -305,7 +299,7 @@
         let editor = CKEDITOR.replace('long_description', options);
         editor.on('required', function (evt) {
             if ($('.invalid-feedback').length == 1) {
-                $('#short_descriptionRequired').show();
+                $('#long_descriptionRequired').show();
             }
             $('#cke_editor1').addClass('is-invalid');
             evt.cancel();
