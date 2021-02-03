@@ -172,7 +172,7 @@ class CustomerController extends Controller
 
         ]);
 
-        return back()->with('success', 'Record successfully updated');
+        return back()->with('success', 'The Customer details has been updated.');
     }
 
     public function deactivate(Request $request)
