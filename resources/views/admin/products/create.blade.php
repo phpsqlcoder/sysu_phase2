@@ -98,6 +98,11 @@
                     <div class="form-group">
                         <label class="d-block" id="long_descriptionLabel">Description *</label>
                         <textarea name="long_description" id="editor1" rows="10" cols="80">{{ old('long_description') }}</textarea>
+                        @hasError(['inputName' => 'long_description'])
+                        @endhasError
+                        <span class="invalid-feedback" role="alert" id="long_descriptionRequired" style="display: none;">
+                            <strong>The description field is required</strong>
+                        </span>
                     </div>
                 </div>
 
@@ -292,13 +297,13 @@
 
         };
         let editor = CKEDITOR.replace('long_description', options);
-        // editor.on('required', function (evt) {
-        //     if ($('.invalid-feedback').length == 1) {
-        //         $('#long_descriptionRequired').show();
-        //     }
-        //     $('#cke_editor1').addClass('is-invalid');
-        //     evt.cancel();
-        // });
+        editor.on('required', function (evt) {
+            if ($('.invalid-feedback').length == 1) {
+                $('#long_descriptionRequired').show();
+            }
+            $('#cke_editor1').addClass('is-invalid');
+            evt.cancel();
+        });
 
         
 
