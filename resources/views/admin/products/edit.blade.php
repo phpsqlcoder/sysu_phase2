@@ -74,7 +74,7 @@
                     </div>
                     <div class="form-group">
                         <label class="d-block">Price (in Php) *</label>
-                        <input required type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="price" value="{{ old('price', number_format($product->price,2,'.','')) }}" min="0.00" step="0.01">
+                        <input required type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="price" value="{{ old('price', number_format($product->price,2,'.','')) }}" min="0.01" step="0.01">
                         @hasError(['inputName' => 'price'])
                         @endhasError
                     </div>
@@ -87,11 +87,6 @@
                     <div class="form-group">
                         <label class="d-block" id="long_descriptionLabel">Description *</label>
                         <textarea name="long_description" id="editor1" rows="10" cols="80">{{ old('long_description', $product->description) }}</textarea>
-                        @hasError(['inputName' => 'long_description'])
-                        @endhasError
-                        <span class="invalid-feedback" role="alert" id="long_descriptionRequired" style="display: none;">
-                            <strong>The description field is required</strong>
-                        </span>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -343,13 +338,13 @@
 
         };
         let editor = CKEDITOR.replace('long_description', options);
-        editor.on('required', function (evt) {
-            if ($('.invalid-feedback').length == 1) {
-                $('#long_descriptionRequired').show();
-            }
-            $('#cke_editor1').addClass('is-invalid');
-            evt.cancel();
-        });
+        // editor.on('required', function (evt) {
+        //     if ($('.invalid-feedback').length == 1) {
+        //         $('#long_descriptionRequired').show();
+        //     }
+        //     $('#cke_editor1').addClass('is-invalid');
+        //     evt.cancel();
+        // });
 
         $(function() {
             let image_count = 1;

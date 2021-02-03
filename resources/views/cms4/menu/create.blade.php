@@ -24,6 +24,10 @@
             border-top: 1px solid #ecedf1;
             border-bottom: 1px solid #ecedf1;
         }
+
+        @media screen and (max-width:480px) {
+            .dd-handle {display: block;}
+        }
     </style>
 @endsection
 
