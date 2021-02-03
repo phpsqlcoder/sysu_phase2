@@ -29,24 +29,26 @@ class UserController extends Controller
     public function __construct()
     {
         Permission::module_init($this, 'user');
-
-//        $this->middleware('checkPermission:admin/users', ['only' => ['index']]);
-//        $this->middleware('checkPermission:admin/user/create', ['only' => ['create','store']]);
-//        $this->middleware('checkPermission:admin/user/edit', ['only' => ['edit','update']]);
-//        $this->middleware('checkPermission:admin/user/delete', ['only' => ['destroy']]);
     }
 
     public function index($param = null)
     {
-        $condition = [
+        $customConditions = [
+            [
+                'field' => 'is_active',
+                'operator' => '=',
+                'value' => 1,
+                'apply_to_deleted_data' => false
+            ],
             [
                 'field' => 'role_id',
-                'operator' => '!=',
+                'operator' => '<>',
                 'value' => '6',
-                'apply_to_deleted_data' => false
+                'apply_to_deleted_data' => true
             ]
         ];
-        $listing = new ListingHelper('desc', 10, 'updated_at', $condition);
+
+        $listing = new ListingHelper('desc', 10, 'updated_at', $customConditions);
 
         $users = $listing->simple_search(User::class, $this->searchFields);
 
