@@ -32,7 +32,7 @@ class RoleController extends Controller
                 'field' => 'id',
                 'operator' => '>',
                 'value' => 1,
-                'apply_to_deleted_data' => false
+                'apply_to_deleted_data' => true
             ]
         ];
 
