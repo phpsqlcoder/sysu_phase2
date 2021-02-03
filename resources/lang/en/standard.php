@@ -217,4 +217,8 @@ return [
         'update_details_success' => 'The Location has been updated.'
     ],
 
+    'customers' => [
+        'status_success' => 'The Customer has been :status' 
+    ],
+
 ];
