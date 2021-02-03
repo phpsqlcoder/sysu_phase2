@@ -103,7 +103,7 @@
                             @forelse($roles as $role)
                                 <tr>
                                     <td>
-                                        <strong> {{ $role->name }}</strong>
+                                        <strong @if($role->trashed()) style="text-decoration:line-through;" @endif> {{ $role->name }}</strong>
                                     </td>
                                     <td>{{ $role->description }}</td>
 
