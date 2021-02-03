@@ -112,11 +112,6 @@
                             </thead>
                             <tbody>
                             @forelse($users as $user)
-                                @if (!$filter->showDeleted)
-                                    @if (!$user->is_active)
-                                        @continue
-                                    @endif
-                                @endif
                                 <tr>
                                     <th>
                                         <strong @if($user->is_active == 0) style="text-decoration:line-through;" @endif> {{$user->fullname}}</strong>
