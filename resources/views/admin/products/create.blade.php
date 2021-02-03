@@ -85,7 +85,7 @@
                     </div>
                     <div class="form-group">
                         <label>Price (in Php) *</label>
-                        <input required class="form-control" type="number" step="0.01" min="0.00" value="0.00" name="price" id="price">
+                        <input required class="form-control" type="number" step="0.01" min="0.01" value="0.00" name="price" id="price">
                     </div>
 
                     <div class="form-group">
