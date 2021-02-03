@@ -8,7 +8,6 @@
     <link href="{{ asset('lib/ion-rangeslider/css/ion.rangeSlider.min.css') }}" rel="stylesheet">
     <style>
         .table {
-            table-layout: fixed;
             word-wrap: break-word;
             /*border-collapse: separate;*/
             /*border-spacing:0 12px;*/
@@ -123,7 +122,7 @@
             <div class="col-md-12">
                 <div class="table-list mg-b-10">
                     <div class="table-responsive-lg">
-                        <table class="table mg-b-0 table-light table-hover" style="width:100%;">
+                        <table class="table mg-b-0 table-light table-hover">
                             <thead>
                             <tr>
                                 <th>
