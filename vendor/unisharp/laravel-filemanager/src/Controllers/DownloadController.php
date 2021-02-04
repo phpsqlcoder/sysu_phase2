@@ -14,6 +14,8 @@ class DownloadController extends LfmController
      */
     public function getDownload()
     {
+        ob_end_clean();
+
         return response()->download(parent::getCurrentPath(request('file')));
     }
 }
