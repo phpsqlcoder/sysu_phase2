@@ -219,6 +219,14 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         Route::get('/user-search/', 'Settings\UserController@search')->name('user.search');
         Route::get('/profile-log-search/', 'Settings\UserController@filter')->name('user.activity.search');
 
+        // Coupon
+        Route::resource('/coupons','EcommerceControllers\CouponController');
+        Route::get('/coupon/{id}/{status}', 'EcommerceControllers\CouponController@update_status')->name('coupon.change-status');
+        Route::post('/coupon-single-delete', 'EcommerceControllers\CouponController@single_delete')->name('coupon.single.delete');
+        Route::get('/coupon-restore/{id}', 'EcommerceControllers\CouponController@restore')->name('coupon.restore');
+        Route::post('/coupon-multiple-change-status','EcommerceControllers\CouponController@multiple_change_status')->name('coupon.multiple.change.status');
+        Route::post('/coupon-multiple-delete','EcommerceControllers\CouponController@multiple_delete')->name('coupon.multiple.delete');
+
         //Reports
         Route::get('/report/customer_list', 'EcommerceControllers\ReportsController@customer_list')->name('report.customer.list');
         Route::get('/report/product_list', 'EcommerceControllers\ReportsController@product_list')->name('report.product.list');

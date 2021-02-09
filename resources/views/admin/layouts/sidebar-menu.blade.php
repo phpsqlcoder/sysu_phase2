@@ -184,11 +184,21 @@
             <li class="nav-item with-sub @if (request()->routeIs('promos*')) active show @endif">
                 <a href="" class="nav-link"><i data-feather="users"></i> <span>Promos</span></a>
                 <ul>
-                    <li @if (\Route::current()->getName() == 'promos.index') class="active" @endif><a href="{{ route('promos.index') }}">Manage Promos</a></li>
-                    <li><a href="{{ route('promos.create') }}">Create a Promo</a></li>
+                    <li @if (\Route::current()->getName() == 'promos.index'|| \Route::current()->getName() == 'promos.edit') class="active" @endif><a href="{{ route('promos.index') }}">Manage Promos</a></li>
+                    <li>@if (\Route::current()->getName() == 'promos.create') class="active" @endif<a href="{{ route('promos.create') }}">Create a Promo</a></li>
                 </ul>
             </li>
         @endif
+
+        {{--@if (auth()->user()->has_access_to_module('promos'))--}}
+            <li class="nav-item with-sub @if (request()->routeIs('coupons*')) active show @endif">
+                <a href="" class="nav-link"><i data-feather="users"></i> <span>Coupons</span></a>
+                <ul>
+                    <li @if (\Route::current()->getName() == 'coupons.index' || \Route::current()->getName() == 'coupons.edit') class="active" @endif><a href="{{ route('coupons.index') }}">Manage Coupons</a></li>
+                    <li @if (\Route::current()->getName() == 'coupons.create') class="active" @endif><a href="{{ route('coupons.create') }}">Create a Coupon</a></li>
+                </ul>
+            </li>
+        {{--@endif--}}
 
         @if (auth()->user()->has_access_to_module('product') || auth()->user()->has_access_to_module('customer') ||
             auth()->user()->has_access_to_module('sales_transaction') || auth()->user()->has_access_to_module('inventory'))
