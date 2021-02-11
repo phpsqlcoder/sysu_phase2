@@ -15,12 +15,13 @@ class CreateCouponsTable extends Migration
     {
         Schema::create('coupons', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('coupon_code',150);
             $table->string('name',150);
             $table->text('description');
             $table->text('terms_and_conditions')->nullable();
             $table->string('activation_type',150)->nullable();
             $table->string('customer_scope')->nullable();
-            $table->string('scope_customer_name',150)->nullable();
+            $table->string('scope_customer_id',150)->nullable();
             $table->string('location',150)->nullable();
             $table->decimal('amount',16,2)->nullable();
             $table->integer('percentage')->nullable();

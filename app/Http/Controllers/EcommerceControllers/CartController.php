@@ -10,6 +10,10 @@ use App\EcommerceModel\SalesHeader;
 use App\EcommerceModel\SalesDetail;
 use App\Helpers\Webfocus\Setting;
 use App\EcommerceModel\Product;
+use App\EcommerceModel\Coupon;
+use App\EcommerceModel\CustomerCoupon;
+use App\EcommerceModel\CouponCart;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -119,15 +123,18 @@ class CartController extends Controller
         if (auth()->check()) {
             $cart = Cart::where('user_id',Auth::id())->get();
             $totalProducts = $cart->count();
+
+            $coupon = CouponCart::where('customer_id',Auth::id())->first();
         } else {
             $cart = session('cart', []);
             $totalProducts = count(session('cart', []));
+            $coupon = '';
         }
 
         $page = new Page();
         $page->name = 'Cart';
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.cart', compact('cart', 'totalProducts','page'));
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.cart', compact('cart', 'totalProducts','coupon','page'));
     }
 
     public function remove_product(Request $request)
@@ -252,6 +259,7 @@ class CartController extends Controller
     }
 
     public function save_sales(Request $request) { 
+
         $total_cart_items = Cart::where('user_id',Auth::id())->count();
         if($total_cart_items == 0){
             return redirect()->route('profile.sales');
@@ -260,8 +268,12 @@ class CartController extends Controller
         $customer_name = Auth::user()->fullName;
         $customer_contact_number =  $request->mobile ?? Auth::user()->mobile;
            
-      
-        $totalPrice = $request->total_amount;
+        if(isset($request->deductedAmount)){
+            $totalPrice = ($request->total_amount-$request->deductedAmount);
+        } else {
+            $totalPrice = $request->total_amount;
+        }
+        
         // $ran = microtime();
         // $today = getdate();
         //$requestId = $today[0].substr($ran, 2,6);  
@@ -340,6 +352,8 @@ class CartController extends Controller
         $base64Code = PaynamicsHelper::payNow($requestId, Auth::user(), $carts, $totalPrice, $urls, false ,$request->delivery_fee);
 
         Cart::where('user_id', Auth::id())->delete();
+
+        $this->get_coupons();
         return view('theme.paynamics.sender', compact('base64Code'));
        
     }
@@ -357,7 +371,7 @@ class CartController extends Controller
 
 
         
-$body = str_replace(" ", "+", $paymentResponse);
+        $body = str_replace(" ", "+", $paymentResponse);
 
         try {
             $Decodebody = base64_decode($body);
@@ -422,6 +436,8 @@ $body = str_replace(" ", "+", $paymentResponse);
                         'response_id' => $application->response_id,
                         'response_code' => $responseStatus->response_code
                     ]);
+
+                    $this->get_coupons();
                     
                 } else if ($responseStatus->response_code == "GR053") {
                     $log['response_title'] = 'Cancelled';
@@ -463,4 +479,38 @@ $body = str_replace(" ", "+", $paymentResponse);
                 'signature' => $sign
             ]);
     }  
+
+    public function get_coupons()
+    {
+        // Time Setting : Date and Time only 
+        // get all active coupons that is not yet expired.
+        $coupons = \App\EcommerceModel\Coupon::where('end_date','>=',today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->where('status','ACTIVE')->get();
+
+        foreach($coupons as $coupon){
+            // check for customer limit per coupon
+            $customerLimit = CustomerCoupon::where('coupon_id',$coupon->id)->count();
+            // if has set customer limit
+            if(isset($coupon->customer_limt)){
+                // check if customer limit reach
+                if($customerLimit <= $coupon->customer_limt){
+                    $this->grant_coupon($coupon->id);
+                }
+            } else {
+                $this->grant_coupon($coupon->id);
+            }
+        }
+    }
+
+    public function grant_coupon($couponID)
+    {
+        $coupon = CustomerCoupon::where('coupon_id',$couponID)->exists();
+
+        if(!$coupon){
+            CustomerCoupon::create([
+                'coupon_id' => $couponID,
+                'customer_id' => Auth::id()
+            ]);    
+        }
+        
+    }
 }

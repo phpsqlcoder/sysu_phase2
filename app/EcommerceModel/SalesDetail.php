@@ -36,7 +36,7 @@ class SalesDetail extends Model
 
     public function getItemTotalPriceAttribute()
     {
-        return $this->product->price;
+        return $this->product->discountedprice;
     }
 
 }

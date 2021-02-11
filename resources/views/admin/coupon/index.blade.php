@@ -92,7 +92,7 @@
                         <div class="ml-auto bd-highlight mg-t-10 mg-r-10">
                             <form class="form-inline" id="searchForm">
                                 <div class="search-form mg-r-10">
-                                    <input name="search" type="search" id="search" class="form-control"  placeholder="Search by Name" value="{{ $filter->search }}">
+                                    <input name="search" type="search" id="search" class="form-control"  placeholder="Search by Name" value="{{ $filter->search }}" autocomplete="off">
                                     <button class="btn filter" type="button" id="btnSearch"><i data-feather="search"></i></button>
                                 </div>
                             </form>
@@ -119,6 +119,7 @@
                                             <label class="custom-control-label" for="checkbox_all"></label>
                                         </div>
                                     </th>
+                                    <th scope="col">Code</th>
                                     <th scope="col" width="20%">Name</th>
                                     <th scope="col">Date Start</th>
                                     <th scope="col">Date End</th>
@@ -137,9 +138,10 @@
 	                                            <label class="custom-control-label" for="cb{{ $coupon->id }}"></label>
 	                                        </div>
 	                                    </th>
-	                                    <td>
-	                                        <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->name }}</strong>
-	                                    </td>
+                                        <td>
+                                            <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->coupon_code }}</strong>
+                                        </td>
+	                                    <td>{{ $coupon->name }}</td>
 	                                    <td>{{ $coupon->start_date }} {{ $coupon->start_time }}</td>
 	                                    <td>{{ $coupon->end_date }} {{ $coupon->end_time }}</td>
 	                                    <td class="text-center">0/20</td>
@@ -192,7 +194,7 @@
 	                                    </td>
 	                                </tr>
                             	@empty
-                            		<tr><th colspan="8"><center>No coupons found.</center></th></tr>
+                            		<tr><th colspan="9"><center>No coupons found.</center></th></tr>
                             	@endforelse
                             </tbody>
                         </table>

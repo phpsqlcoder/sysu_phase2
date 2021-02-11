@@ -91,16 +91,26 @@
 					<div class="row">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" checked>
+								<input type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" checked onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-all">All</label>
 							</div>
 						</div>
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-scope-specific" name="coupon_scope" class="custom-control-input" value="specific">
+								<input type="radio" id="coupon-scope-specific" name="coupon_scope" class="custom-control-input" value="specific" onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-specific">Specific</label>
 							</div>
 						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="mb-3 reward-option" id="customer-optn" style="display:none">
+						<select class="form-control select2" name="customer">
+							<option label="Choose one"></option>
+							@foreach($customers as $customer)
+								<option value="{{$customer->id}}">{{ $customer->name }}</option>
+							@endforeach
+						</select>
 					</div>
 				</div>
 				<div class="form-group">
@@ -112,9 +122,6 @@
 						<option value="discount-percentage-optn">Discount Percentage</option>
 						<option value="free-gift-optn">Free Gift</option>
 						<option value="free-product-optn">Free Product</option>
-						<!-- <option value="product-upgrade-optn">Product upgrade</option> -->
-						<!-- <option value="points-earned-optn">Points Earned</option>
-						<option value="upgrade-optn">Upgrade</option> -->
 					</select>
 					@hasError(['inputName' => 'reward'])
                     @endhasError
@@ -156,38 +163,6 @@
 							@endforeach
 						</select>
 					</div>
-
-					<!-- <div class="mb-3 reward-option" id="product-upgrade-optn" style="display:none">
-						<label class="d-block">Product upgrade</label>
-						<select class="form-control select2" name="update_product_id" style="min-height: 32px;">
-							<option label="Choose one"></option>
-							@foreach($products as $product)
-								<option value="{{$product->id}}">{{ $product->name }}</option>
-							@endforeach
-						</select>
-					</div> -->
-
-					<!-- <div class="mb-3 reward-option" id="points-earned-optn" style="display:none">
-						<label class="d-block">Points earned</label>
-						<div class="input-group border rounded">
-							<span class="input-group-btn">
-								<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-									<span class="fa fa-minus"></span>
-								</button>
-							</span>
-							<input type="text" name="quant[1]" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="10">
-							<span class="input-group-btn">
-								<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
-									<span class="fa fa-plus"></span>
-								</button>
-							</span>
-						</div>
-					</div>
-
-					<div class="mb-3 reward-option" id="upgrade-optn" style="display:none">
-						<label class="d-block">Rebate Amount</label>
-						<input type="text" class="form-control" placeholder="Input box">
-					</div> -->
 					<hr>
 				</div>
 
@@ -211,18 +186,6 @@
 							<label class="custom-control-label" for="coupon-date-time">Date and Time</label>
 						</div>
 					</div>
-					<!-- <div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-calendar" name="coupon-time" class="custom-control-input" onclick="ShowHideDiv()">
-							<label class="custom-control-label" for="coupon-calendar">Calendar</label>
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-holiday" name="coupon-time" class="custom-control-input" onclick="ShowHideDiv()">
-							<label class="custom-control-label" for="coupon-holiday">Holiday</label>
-						</div>
-					</div> -->
 					<div class="col-md-3">
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-custom" name="coupon_time[]" class="custom-control-input" onclick="ShowHideDiv()" value="custom" @if(is_array(old('coupon_time')) && in_array('custom', old('coupon_time'))) checked @endif>
@@ -265,83 +228,6 @@
 						</div>
 					</div>
 
-					<!-- <div class="col-12" id="coupon-calendar-form" style="display:none;">
-						<div class="row mt-3">
-							<div class="col-md-4">
-								<label class="d-block">Day</label>
-								<select class="custom-select">
-									<option selected disabled class="text-secondary">Select Day</option>
-									<option value="1">Sunday</option>
-									<option value="2">Monday</option>
-									<option value="3">Tuesday</option>
-									<option value="3">Wednesday</option>
-									<option value="3">Thursday</option>
-									<option value="3">Friday</option>
-									<option value="3">Saturday</option>
-								</select>
-							</div>
-
-							<div class="col-md-4">
-								<label class="d-block">Week</label>
-								<select class="custom-select">
-									<option selected disabled class="text-secondary">Select Week</option>
-									<option value="1">1st</option>
-									<option value="2">2nd</option>
-									<option value="3">3rd</option>
-									<option value="3">4th</option>
-								</select>
-							</div>
-
-							<div class="col-md-4">
-								<label class="d-block">Month</label>
-								<select class="custom-select">
-									<option selected disabled class="text-secondary">Select Month</option>
-									<option value="1">January</option>
-									<option value="2">February</option>
-									<option value="3">March</option>
-									<option value="3">April</option>
-									<option value="3">May</option>
-									<option value="3">June</option>
-									<option value="3">July</option>
-									<option value="3">August</option>
-									<option value="3">September</option>
-									<option value="3">October</option>
-									<option value="3">November</option>
-									<option value="3">December</option>
-								</select>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-12" id="coupon-holiday-form" style="display:none;">
-						<div class="row mt-3">
-							<div class="col-md-6">
-								<label class="d-block">Holiday Name</label>
-								<select class="custom-select">
-									<option selected disabled class="text-secondary">Select Holiday</option>
-									<option value="1">New Year's Day</option>
-									<option value="2">Lunar New Year</option>
-									<option value="3">Maundy Thursday</option>
-									<option value="3">Good Friday</option>
-									<option value="3">Bataan Day</option>
-									<option value="3">Labour Day</option>
-									<option value="3">Eid al-Fitr</option>
-									<option value="3">Philippines Independence Day</option>
-									<option value="3">Eid al-Adha</option>
-									<option value="3">National Heroes' Day</option>
-									<option value="3">Bonifacio Day</option>
-									<option value="3">Feast of the Immaculate Conception</option>
-									<option value="3">Christmas Day</option>
-									<option value="3">Rizal Day</option>
-								</select>
-							</div>
-							<div class="col-md-6">
-								<label class="d-block">Date</label>
-								<input type="text" class="form-control singlecalendar" placeholder="Choose date">
-							</div>
-						</div>
-					</div> -->
-
 					<div class="col-12" id="coupon-custom-form" style="display:@if(is_array(old('coupon_time')) && in_array('custom', old('coupon_time'))) block @else none @endif;">
 						<div class="row mt-3">
 							<div class="col-md-6">
@@ -372,12 +258,6 @@
 				</div>
 
 				<div class="form-row border rounded p-3 mb-4" id="coupon-purchase-option" style="display:@if(is_array(old('coupon_setting')) && in_array('purchase', old('coupon_setting'))) flex @else none @endif;">
-					<!-- <div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-frequency" name="coupon-purchase" class="custom-control-input" onclick="ShowHideDiv()">
-							<label class="custom-control-label" for="coupon-frequency">Frequency</label>
-						</div>
-					</div> -->
 					<div class="col-md-3">
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-product" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="product" @if(is_array(old('coupon_purchase')) && in_array('product', old('coupon_purchase'))) checked @endif>
@@ -394,43 +274,6 @@
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-quantity" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="qty" @if(is_array(old('coupon_purchase')) && in_array('qty', old('coupon_purchase'))) checked @endif>
 							<label class="custom-control-label" for="coupon-quantity">Quantity</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-3" id="coupon-frequency-form" style="display:none;">
-						<div class="row">
-							<div class="col-md-6">
-								<label class="d-block">No. of Purchases</label>
-								<div class="input-group border rounded">
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-											<span class="fa fa-minus"></span>
-										</button>
-									</span>
-									<input type="text" name="quant[1]" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="10">
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
-											<span class="fa fa-plus"></span>
-										</button>
-									</span>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<label class="d-block">No. of Reorders</label>
-								<div class="input-group border rounded">
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-											<span class="fa fa-minus"></span>
-										</button>
-									</span>
-									<input type="text" name="quant[1]" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="10">
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
-											<span class="fa fa-plus"></span>
-										</button>
-									</span>
-								</div>
-							</div>
 						</div>
 					</div>
 
@@ -512,154 +355,13 @@
 
 				<div class="form-group">
 					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="coupon-activity" onclick="myFunction()" name="coupon_setting[]" value="activity" @if(is_array(old('coupon_setting')) && in_array('activity', old('coupon_setting'))) checked @endif>
-						<label class="custom-control-label" for="coupon-activity">Activity</label>
-					</div>
-				</div>
-
-				<div class="form-row border rounded p-3 mb-4" id="coupon-activity-option" style="display:@if(is_array(old('coupon_setting')) && in_array('activity', old('coupon_setting'))) flex @else none @endif;">
-					<div class="col-12">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-product-review" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="product_review" @if(is_array(old('coupon_activity')) && in_array('product_review', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-product-review">Product Review</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-cart-abandonment" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="cart_abandonment" @if(is_array(old('coupon_activity')) && in_array('cart_abandonment', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-cart-abandonment">Cart Abandonment</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-returning-customer" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="returning_customer" @if(is_array(old('coupon_activity')) && in_array('returning_customer', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-returning-customer">Returning Customer</label>
-						</div>
-
-						<div class="mt-3" id="coupon-returning-form" style="display:@if(is_array(old('coupon_activity')) && in_array('returning_customer', old('coupon_activity'))) block @else none @endif;">
-							<div class="row">
-								<div class="col-md-4">
-									<label class="d-block">Minimum inactive time</label>
-								</div>
-								<div class="col-md-8">
-									<div class="input-group border rounded">
-										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-												<span class="fa fa-minus"></span>
-											</button>
-										</span>
-										<input type="text" name="inactive_no" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('inactive_no',1) }}" min="1" max="10">
-										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
-												<span class="fa fa-plus"></span>
-											</button>
-										</span>
-									</div>
-								</div>
-								<div class="col-md-3 col-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-returning-customer-days" name="coupon_return_customer[]" class="custom-control-input" onclick="ShowHideDiv()" value="days" @if(is_array(old('coupon_return_customer')) && in_array('days', old('coupon_return_customer'))) checked @else checked @endif>
-										<label class="custom-control-label" for="coupon-returning-customer-days">Days</label>
-									</div>
-								</div>
-								<div class="col-md-3 col-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-returning-customer-weeks" name="coupon_return_customer[]" class="custom-control-input" onclick="ShowHideDiv()" value="weeks" @if(is_array(old('coupon_return_customer')) && in_array('weeks', old('coupon_return_customer'))) checked @endif>
-										<label class="custom-control-label" for="coupon-returning-customer-weeks">Weeks</label>
-									</div>
-								</div>
-								<div class="col-md-3 col-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-returning-customer-months" name="coupon_return_customer[]" class="custom-control-input" onclick="ShowHideDiv()" value="months" @if(is_array(old('coupon_return_customer')) && in_array('months', old('coupon_return_customer'))) checked @endif>
-										<label class="custom-control-label" for="coupon-returning-customer-months">Months</label>
-									</div>
-								</div>
-								<div class="col-md-3 col-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-returning-customer-years" name="coupon_return_customer[]" class="custom-control-input" onclick="ShowHideDiv()" value="years" @if(is_array(old('coupon_return_customer')) && in_array('years', old('coupon_return_customer'))) checked @endif>
-										<label class="custom-control-label" for="coupon-returning-customer-years">Years</label>
-									</div>
-								</div>
-							</div>
-
-							<hr>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-featured-organization" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="feat_organization" @if(is_array(old('coupon_activity')) && in_array('feat_organization', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-featured-organization">Featured Organization</label>
-						</div>
-
-						<div class="mt-3" id="coupon-featured-form" style="display:@if(is_array(old('coupon_activity')) && in_array('feat_organization', old('coupon_activity'))) block @else none @endif;">
-							<label class="d-block">Organization Name *</label>
-							<input type="text" class="form-control" name="org_name" id="org_name" value="{{ old('org_name') }}">
-							<small id="spanOrgName" class="text-danger" style="display: none;"></small>
-							<hr>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-share-social" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="share_via_social" @if(is_array(old('coupon_activity')) && in_array('share_via_social', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-share-social">Share Via Social</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-wishlist-item" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="purchase_wishlist_item" @if(is_array(old('coupon_activity')) && in_array('purchase_wishlist_item', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-wishlist-item">Purchase Wishlist Item</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-survey" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="survey" @if(is_array(old('coupon_activity')) && in_array('survey', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-survey">Survey</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-subscribe-mailing-list" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="subscribe_to_milling_list" @if(is_array(old('coupon_activity')) && in_array('subscribe_to_milling_list', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-subscribe-mailing-list">Subscribe to Mailing List</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-refer-friend" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="refer_a_friend" @if(is_array(old('coupon_activity')) && in_array('refer_a_friend', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-refer-friend">Refer a Friend</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-purchase-points" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="purhcase_via_points" @if(is_array(old('coupon_activity')) && in_array('purhcase_via_points', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-purchase-points">Purchase via Points</label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-1">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-senior-discounts" name="coupon_activity[]" class="custom-control-input" onclick="ShowHideDiv()" value="senior_pwd_discount" @if(is_array(old('coupon_activity')) && in_array('senior_pwd_discount', old('coupon_activity'))) checked @endif>
-							<label class="custom-control-label" for="coupon-senior-discounts">Senior/PWD Discount</label>
-						</div>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<div class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="coupon-rules" onclick="myFunction()" name="coupon_setting[]" value="rule" @if(is_array(old('coupon_setting')) && in_array('rule', old('coupon_setting'))) checked @endif>
 						<label class="custom-control-label" for="coupon-rules">Rules</label>
 					</div>
 				</div>
 
 				<div class="form-row border rounded p-3" id="coupon-rules-option" style="display:@if(is_array(old('coupon_setting')) && in_array('rule', old('coupon_setting'))) flex @else none @endif;">
+
 					<div class="col-12">
 						<div class="custom-control custom-checkbox">
 							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="coupon_rule[]" onclick="myFunction()" value="customer_limit" @if(is_array(old('coupon_rule')) && in_array('customer_limit', old('coupon_rule'))) checked @endif>
@@ -754,30 +456,6 @@
 							</div>
 						</div>
 					</div>
-
-					<!-- <div class="col-12 mt-3">
-						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-amount" onclick="myFunction()">
-							<label class="custom-control-label" for="coupon-customer-amount">Amount Limit</label>
-						</div>
-
-						<div class="mt3" id="coupon-customer-amount-form" style="display:none;">
-							<div class="row">
-								<div class="col-12 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-cust-1" name="coupon-cust-amount" class="custom-control-input" onclick="ShowHideDiv()">
-										<label class="custom-control-label" for="coupon-cust-1">Remaining coupon value is disregarded/void.</label>
-									</div>
-								</div>
-								<div class="col-12 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-cust-2" name="coupon-cust-amount" class="custom-control-input" onclick="ShowHideDiv()">
-										<label class="custom-control-label" for="coupon-cust-2">Remaining coupon value is credited and can be used in next purchase.</label>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div> -->
 				</div>
 
 				<hr>
@@ -966,33 +644,6 @@
 				   		}
 				   	}
 
-				   	if(this.value == 'activity') {
-				   		if(!$("input[name='coupon_activity[]']:checked").val()) {
-				   			$('#coupon-activity-option').addClass('is-invalid');
-				   			$('#no_selected_title').html('Please select at least one (1) activity.');      
-                			$('#prompt-no-selected').modal('show');
-                			rs = false;
-                			return false;
-				   		} else {
-				   			$('#coupon-activity-option').removeClass('is-invalid');
-				   			var selectedActivity = $('input[name="coupon_activity[]"]:checked').val();
-
-				   			if(selectedActivity == 'feat_organization'){
-				   				var org = $('#org_name').val();
-
-				   				if(org.length === 0){
-					   				$('#org_name').addClass('is-invalid');
-						   			$('#spanOrgName').css('display','block');
-						   			$('#spanOrgName').html('Organization name field is required.');	
-						   			rs = false;
-						   			return false;
-				   				}
-				   			}
-
-				   			rs = true;
-				   		}
-				   	}
-
 				   	if(this.value == 'rule') {
 				   		if(!$("input[name='coupon_rule[]']:checked").val()) {
 				   			$('#coupon-rules-option').addClass('is-invalid');
@@ -1064,14 +715,6 @@
 			fieldCouponOption.style.display = "none";
 		};
 
-		var couponActivity = document.getElementById("coupon-activity");
-		var fieldActivityOption = document.getElementById("coupon-activity-option");
-		if (couponActivity.checked == true){
-			fieldActivityOption.style.display = "flex";
-		} else {
-			fieldActivityOption.style.display = "none";
-		};
-
 		var couponRules = document.getElementById("coupon-rules");
 		var fieldRulesOption = document.getElementById("coupon-rules-option");
 		if (couponRules.checked == true){
@@ -1095,7 +738,7 @@
 		} else {
 			fieldCustomerUsageOption.style.display = "none";
 		};
-
+		
 		var couponCustomerTransaction = document.getElementById("coupon-customer-transaction");
 		var fieldCustomerTransactionOption = document.getElementById("coupon-customer-transaction-form");
 		if (couponCustomerTransaction.checked == true){
@@ -1118,21 +761,17 @@
 		var couponDateTimeForm = document.getElementById("coupon-date-time-form");
 		couponDateTimeForm.style.display = couponDateTime.checked ? "block" : "none";
 
-		// var couponCalendar = document.getElementById("coupon-calendar");
-		// var couponCalendarForm = document.getElementById("coupon-calendar-form");
-		// couponCalendarForm.style.display = couponCalendar.checked ? "block" : "none";
+		var scopeSpecific = document.getElementById("coupon-scope-specific");
+		var customerOption = document.getElementById("customer-optn");
+		customerOption.style.display = scopeSpecific.checked ? "block" : "none";
 
-		// var couponHoliday = document.getElementById("coupon-holiday");
-		// var couponHolidayForm = document.getElementById("coupon-holiday-form");
-		// couponHolidayForm.style.display = couponHoliday.checked ? "block" : "none";
+		var scopeAll= document.getElementById("coupon-scope-all");
+		var customerOptionAll = document.getElementById("customer-optn");
+		customerOptionAll.style.display = scopeAll.checked ? "none" : "block";
 
 		var couponCustom = document.getElementById("coupon-custom");
 		var couponCustomForm = document.getElementById("coupon-custom-form");
 		couponCustomForm.style.display = couponCustom.checked ? "block" : "none";
-
-		// var couponFrequency = document.getElementById("coupon-frequency");
-		// var couponFrequencyForm = document.getElementById("coupon-frequency-form");
-		// couponFrequencyForm.style.display = couponFrequency.checked ? "block" : "none";
 
 		var couponProduct = document.getElementById("coupon-product");
 		var couponProductForm = document.getElementById("coupon-product-form");
@@ -1146,49 +785,19 @@
 		var couponQuantityForm = document.getElementById("coupon-quantity-form");
 		couponQuantityForm.style.display = couponQuantity.checked ? "block" : "none";
 
-		var couponReturningCustomer = document.getElementById("coupon-returning-customer");
-		var couponReturningCustomerForm = document.getElementById("coupon-returning-form");
-		couponReturningCustomerForm.style.display = couponReturningCustomer.checked ? "block" : "none";
+		// var couponReturningCustomer = document.getElementById("coupon-returning-customer");
+		// var couponReturningCustomerForm = document.getElementById("coupon-returning-form");
+		// couponReturningCustomerForm.style.display = couponReturningCustomer.checked ? "block" : "none";
 
-		var couponFeaturedOrganization = document.getElementById("coupon-featured-organization");
-		var couponFeaturedOrganizationForm = document.getElementById("coupon-featured-form");
-		couponFeaturedOrganizationForm.style.display = couponFeaturedOrganization.checked ? "block" : "none";
+		// var couponFeaturedOrganization = document.getElementById("coupon-featured-organization");
+		// var couponFeaturedOrganizationForm = document.getElementById("coupon-featured-form");
+		// couponFeaturedOrganizationForm.style.display = couponFeaturedOrganization.checked ? "block" : "none";
 
 		var couponMultiUse = document.getElementById("coupon-multi-use");
 		var couponMultiUseForm = document.getElementById("coupon-multi-use-form");
 		couponMultiUseForm.style.display = couponMultiUse.checked ? "block" : "none";
 	};
 
-
-// Date Picker start --------------------->
-// var dateFormat = 'yy-mm-dd',
-// from = $('#dateFrom')
-// .datepicker({
-// 	defaultDate: '+1w',
-// 	numberOfMonths: 1
-// })
-// .on('change', function() {
-// 	to.datepicker('option','minDate', getDate( this ) );
-// }),
-// to = $('#dateTo').datepicker({
-// 	defaultDate: '+1w',
-// 	numberOfMonths: 1
-// })
-// .on('change', function() {
-// 	from.datepicker('option','maxDate', getDate( this ) );
-// });
-
-// function getDate( element ) {
-// 	var date;
-// 	try {
-// 		date = $.datepicker.parseDate( dateFormat, element.value );
-// 	} catch( error ) {
-// 		date = null;
-// 	}
-
-// 	return date;
-// }
-// Date Picker end --------------------->
 
 // Points Earned start --------------------->
 $('.btn-number').click(function(e){

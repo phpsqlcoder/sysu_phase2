@@ -14,6 +14,8 @@ use App\Page;
 use Auth;
 use App\Deliverablecities;
 
+use App\EcommerceModel\CouponCart;
+
 class CheckoutController extends Controller
 {
 
@@ -33,7 +35,9 @@ class CheckoutController extends Controller
             return redirect()->route('product.front.list');
         }
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page'));
+        $coupon = CouponCart::where('customer_id',Auth::id())->count();
+
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupon'));
     }
 
     public function payment_completed() {
