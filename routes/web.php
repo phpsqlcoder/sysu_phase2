@@ -84,6 +84,8 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::get('/account/coupons','EcommerceControllers\CouponFrontController@available')->name('coupons-available');
     Route::get('/checkout-use-coupon/{id}','EcommerceControllers\CouponFrontController@use_coupon')->name('use-coupon');
 
+    Route::post('/add-manual-coupon','EcommerceControllers\CouponFrontController@add_manual_coupon')->name('add-manual-coupon');
+
 
 });
 ##############################################################

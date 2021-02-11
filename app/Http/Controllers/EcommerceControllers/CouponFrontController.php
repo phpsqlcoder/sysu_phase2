@@ -111,4 +111,39 @@ class CouponFrontController extends Controller
         return redirect(route('cart.front.show'))->with('success','Coupon successfully place.');
     }
 
+    public function add_manual_coupon(Request $request)
+    {
+
+        $coupon = Coupon::where('coupon_code',$request->couponcode)->where('activation_type','manual');
+
+        if($coupon->exists()){
+            $c = $coupon->first();
+
+            if($c->status == 'EXPIRED' || $c->status == 'INACTIVE'){
+                return response()->json([
+                    'expired' => true,               
+                ]);
+            } else {
+                
+                CouponCart::create([
+                    'customer_id' => Auth::id(),
+                    'coupon_id' => $c->id
+                ]);
+
+                return response()->json([
+                    'success' => true, 
+                    'coupon_details' => $c              
+                ]);
+            }
+        } else {
+            return response()->json([
+                'not_exist' => true,               
+            ]);
+        }
+
+        
+        
+
+    }
+
 }

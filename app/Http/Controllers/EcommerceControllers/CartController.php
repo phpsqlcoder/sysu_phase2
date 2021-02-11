@@ -354,6 +354,7 @@ class CartController extends Controller
         Cart::where('user_id', Auth::id())->delete();
 
         $this->get_coupons();
+        $this->remove_cart_coupon();
         return view('theme.paynamics.sender', compact('base64Code'));
        
     }
@@ -511,6 +512,10 @@ class CartController extends Controller
                 'customer_id' => Auth::id()
             ]);    
         }
-        
+    }
+
+    public function remove_cart_coupon()
+    {
+        CouponCart::where('customer_id',Auth::id())->delete();
     }
 }

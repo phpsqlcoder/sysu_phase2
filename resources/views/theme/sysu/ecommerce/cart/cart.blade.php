@@ -94,7 +94,10 @@
                                         <div style="width:100%;">
                                             <div class="form-group row mb-2">
                                                 <div class="col-md-10">
-                                                    <input class="form-control" type="text" placeholder="Enter Coupon Code">
+                                                    <input class="form-control" type="text" id="coupon_code" placeholder="Enter Coupon Code">
+                                                </div>
+                                                <div class="col-2">
+                                                    <button type="button" class="remove_button_coupon btn btn-success" id="couponManualBtn"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </div>
                                             <div class="field_wrapper_coupon"></div>
@@ -119,6 +122,8 @@
                                     </div>
                                 </div>
                             @endif
+
+                            <div id="couponList"></div>
                             
                             <div class="mb-5">
                                 <h3 class="catalog-title">Summary</h3>
@@ -320,8 +325,54 @@
             $('#total_price'+id).html('Php '+ addCommas(pr.toFixed(2)));
             $('#sum_sub_price'+id).val(pr);
             $('#product_total_price'+id).html('₱ '+ addCommas(pr.toFixed(2)));  
-
         }
+
+        $('#couponManualBtn').click(function(){
+            var couponCode = $('#coupon_code').val()
+
+            $.ajax({
+                data: {
+                    "couponcode": couponCode,
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: "post",
+                url: "{{route('add-manual-coupon')}}",
+                success: function(returnData) {
+                    
+                    if(returnData['not_exist']){
+                        swal({
+                            title: '',
+                            text: "Coupon not found.",         
+                        }); 
+                    } else {
+                        if(returnData['expired']){
+                            swal({
+                                title: '',
+                                text: "Coupon is already expired.",         
+                            }); 
+                        } else {
+                            if (returnData['success']) {
+
+                                $('#couponList').append(
+                                    '<div class="cart-table-2 coupons-list mb-5 border rounded">'+
+                                        '<div class="p-3 border-bottom">'+
+                                            '<p class="float-right"><a href="#"><i class="fa fa-times"></i></a></p>'+
+                                            '<p><span class="h5 float-left"><strong>'+returnData.coupon_details['coupon_code']+'</strong></span></p>'+
+                                            '<div class="clearfix"></div>'+
+                                            '<p>'+returnData.coupon_details['name']+'</p>'+
+                                        '</div>'+
+                                    '</div>'
+                                );
+                                swal({
+                                    title: '',
+                                    text: "Coupon is pwede.",         
+                                });
+                            }  
+                        }
+                    }
+                }
+            });
+        });
 
        
 
