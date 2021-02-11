@@ -83,37 +83,70 @@
                                     Your shopping cart is <strong>empty</strong>.
                                 </div>
                             @endforelse
-
-                            
-
-                           
                         </div>
 
                         <div class="col-lg-4">
-                            <h3 class="catalog-title">Summary</h3>
+                            <div class="coupon mb-2">
+                                <h3 class="catalog-title">Coupon</h3>
+                            
+                                <div class="cart-table-2 pt-3">
+                                    <div class="cart-table-row px-3">
+                                        <div style="width:100%;">
+                                            <div class="form-group row mb-2">
+                                                <div class="col-md-10">
+                                                    <input class="form-control" type="text" placeholder="Enter Coupon Code">
+                                                </div>
+                                            </div>
+                                            <div class="field_wrapper_coupon"></div>
+                                            <a href="{{ route('coupons-available') }}" class="small mb-2"> or click here to  Select from My Coupons</a>
+                                        </div>
+                                    </div>
+                                    <div class="cart-table-row">
+                                        <div class="cart-table-1-col">
+                                            <p class="small font-italic pb-3">Coupon(s) will apply upon checkout</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <div class="cart-table-2">
-                                <div class="cart-table-row">
-                                    <div class="cart-table-2-col">
-                                        <div class="cart-table-2-title">Subtotal</div>                                  
-                                    </div>
-                                    <div class="cart-table-2-col">
-                                        <div class="cart-table-2-title text-right" id="total_sub">₱ {{number_format($total,2)}}</div>                                   
-                                    </div>
-                                </div>
-                                <div class="cart-table-row">
-                                    <div class="cart-table-2-col">
-                                        <div class="cart-table-2-title"><strong>Grand Total</strong></div>
-                                    </div>
-                                    <div class="cart-table-2-col">
-                                        <div class="cart-table-2-title text-right" id="total_grand" style="font-weight:bold">₱ {{number_format($total,2)}}</div>
+                            @if(isset($coupon))
+                                <div class="cart-table-2 coupons-list mb-5 border rounded">
+                                    <div class="p-3 border-bottom">
+                                        <p class="float-right"><a href="#"><i class="fa fa-times"></i></a></p>
+                                        <p><span class="h5 float-left"><strong>{{ $coupon->details->coupon_code }}</strong></span></p>
+                                        <div class="clearfix"></div>
+                                        <p>{{ $coupon->details->name }}</p>
                                     </div>
                                 </div>
-                                <div class="cart-table-row">
-                                    <div class="cart-table-1-col">
-                                        <p class="small font-italic pb-3">Shipping fees will apply upon checkout</p>
-                                        <input type="hidden" name="total_products" value="{{$total_product_count}}">
-                                        <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-check"></i> Proceed to Checkout</button>
+                            @endif
+                            
+                            <div class="mb-5">
+                                <h3 class="catalog-title">Summary</h3>
+
+                                <div class="cart-table-2">
+                                    <div class="cart-table-row">
+                                        <div class="cart-table-2-col">
+                                            <div class="cart-table-2-title">Subtotal</div>                                  
+                                        </div>
+                                        <div class="cart-table-2-col">
+                                            <div class="cart-table-2-title text-right" id="total_sub">₱ {{number_format($total,2)}}</div>                                   
+                                        </div>
+                                    </div>
+
+                                    <div class="cart-table-row">
+                                        <div class="cart-table-2-col">
+                                            <div class="cart-table-2-title"><strong>Grand Total</strong></div>
+                                        </div>
+                                        <div class="cart-table-2-col">
+                                            <div class="cart-table-2-title text-right" id="total_grand" style="font-weight:bold">₱ {{number_format($total,2)}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="cart-table-row">
+                                        <div class="cart-table-1-col">
+                                            <p class="small font-italic pb-3">Shipping fees will apply upon checkout</p>
+                                            <input type="hidden" name="total_products" value="{{$total_product_count}}">
+                                            <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-check"></i> Proceed to Checkout</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -110,7 +110,7 @@ class WishlistController extends Controller
     }
 
     public function add_to_wishlist(Request $request){
-        \Log::info($request);
+
         $data = Wishlist::where('product_id',$request->product_id);
         $product = Product::find($request->product_id);
 

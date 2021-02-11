@@ -19,7 +19,7 @@
             <div class="col-lg-3">                          
                 <div class="desk-cat d-none d-lg-block">
                     <div class="quick-nav">
-                        <h3 class="catalog-title">{{ $page->name }}</h3>
+                        <h3 class="catalog-title">My Account</h3>
                         @include('theme.sysu.layout.sidebar-menu')
                     </div>
                 </div>

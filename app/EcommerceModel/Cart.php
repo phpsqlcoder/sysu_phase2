@@ -23,7 +23,7 @@ class Cart extends Model
 
     public function getItemTotalPriceAttribute()
     {
-        return ($this->product->price * $this->qty);
+        return ($this->product->discountedprice * $this->qty);
     }
 
     public static function total_cart()

@@ -18,7 +18,7 @@ class PaynamicsHelper
 
         $itemXml = "";
         foreach ($cart as $product) {
-            $price = number_format($product->product->price, 2, '.', '');
+            $price = number_format($product->product->discountedprice, 2, '.', '');
             $pqty = (int)$product->qty;
             $itemXml = $itemXml . "<Items><itemname>{$product->product->name}</itemname><quantity>{$pqty}</quantity><amount>{$price}</amount></Items>";
         }

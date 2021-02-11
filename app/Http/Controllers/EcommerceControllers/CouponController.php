@@ -9,13 +9,9 @@ use App\Helpers\ListingHelper;
 
 
 use App\EcommerceModel\Coupon;
-use App\EcommerceModel\CouponTimeSetting;
-use App\EcommerceModel\CouponPurchaseSetting;
-use App\EcommerceModel\CouponActivitySetting;
-use App\EcommerceModel\CouponRuleSetting;
-
 use App\EcommerceModel\Product;
 use App\EcommerceModel\ProductCategory;
+use App\User;
 
 
 use Auth;
@@ -51,8 +47,9 @@ class CouponController extends Controller
         $products = Product::where('status','PUBLISHED')->get();
         $categories =  ProductCategory::where('status','PUBLISHED')->get();
         $brands = Product::distinct()->get(['brand']);
+        $customers = User::where('role_id',6)->where('is_active',1)->get();
 
-        return view('admin.coupon.create',compact('products','categories','brands'));
+        return view('admin.coupon.create',compact('products','categories','brands','customers'));
     }
 
     /**
@@ -70,12 +67,13 @@ class CouponController extends Controller
         ])->validate();
 
         $coupon = Coupon::create([
+            'coupon_code' => Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
-            'scope_customer_name' => $request->coupon_scope == 'specific' ? 'customer name' : NULL,
+            'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
@@ -90,7 +88,7 @@ class CouponController extends Controller
 
             $this->update_coupon_time_settings($coupon->id,$request);            
             $this->update_coupon_purchase_settings($coupon->id,$request);
-            $this->update_coupon_activity_settings($coupon->id,$request);
+            // $this->update_coupon_activity_settings($coupon->id,$request);
             $this->update_coupon_rule_settings($coupon->id,$request);
         }
         
@@ -120,8 +118,9 @@ class CouponController extends Controller
         $products = Product::where('status','PUBLISHED')->get();
         $categories =  ProductCategory::where('status','PUBLISHED')->get();
         $brands = Product::distinct()->get(['brand']);
+        $customers = User::where('role_id',6)->where('is_active',1)->get();
 
-        return view('admin.coupon.edit',compact('coupon','products','categories','brands'));
+        return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers'));
     }
 
     /**
@@ -139,7 +138,7 @@ class CouponController extends Controller
             'terms_and_conditions' => $request->terms,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
-            'scope_customer_name' => $request->coupon_scope == 'specific' ? 'customer name' : NULL,
+            'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
@@ -154,7 +153,7 @@ class CouponController extends Controller
             
             $this->update_coupon_time_settings($coupon->id,$request);            
             $this->update_coupon_purchase_settings($coupon->id,$request);
-            $this->update_coupon_activity_settings($coupon->id,$request);
+            // $this->update_coupon_activity_settings($coupon->id,$request);
             $this->update_coupon_rule_settings($coupon->id,$request);
         }
 
@@ -215,19 +214,18 @@ class CouponController extends Controller
         ]);
     }
 
-    public function update_coupon_activity_settings($couponID,$request)
-    {
-        Coupon::find($couponID)->update([
-            'activity_type' => $request->coupon_activity[0],
-            'org_name' => $request->coupon_activity[0] == 'feat_organization' ? $request->org_name : NULL,
-            'inactive_no' => $request->coupon_activity[0] == 'returning_customer' ? $request->inactive_no : NULL,
-            'inactive_type' => $request->coupon_activity[0] == 'returning_customer' ? $request->coupon_return_customer : NULL,
-        ]);
-    }
+    // public function update_coupon_activity_settings($couponID,$request)
+    // {
+    //     Coupon::find($couponID)->update([
+    //         'activity_type' => $request->coupon_activity[0],
+    //         'org_name' => $request->coupon_activity[0] == 'feat_organization' ? $request->org_name : NULL,
+    //         'inactive_no' => $request->coupon_activity[0] == 'returning_customer' ? $request->inactive_no : NULL,
+    //         'inactive_type' => $request->coupon_activity[0] == 'returning_customer' ? $request->coupon_return_customer : NULL,
+    //     ]);
+    // }
 
     public function update_coupon_rule_settings($couponID,$request)
     {
-        //dd($request);
         Coupon::find($couponID)->update([
             'customer_limit' => $request->coupon_rule[0] == 'customer_limit' ? $request->coupon_customer_limit_qty : NULL,
             'usage_limit' => isset($request->usage_limit[0]) ? $request->usage_limit[0] : NULL,

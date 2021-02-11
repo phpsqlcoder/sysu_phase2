@@ -203,19 +203,19 @@ class Setting {
     {
         if (env('APP_ENV') == 'production') {
         
-           return [
+            return [
                 'id' => '0000000806200B898D54',
                 'key' => 'E40BE25D0BAA86AD45A046ADB00CB9CE',
                 'url' => 'https://ptiapps.paynamics.net/webpayment/Default.aspx'
             ];
         
-          /* 
-            return [
-                'id' => '00000019121943FC3BD7',
-                'key' => '6B1198B811715D83148DB4E7FC981A54',
-                'url' => 'https://testpti.payserv.net/webpayment/Default.aspx'
-            ];
-            */
+           
+            // return [
+            //     'id' => '00000019121943FC3BD7',
+            //     'key' => '6B1198B811715D83148DB4E7FC981A54',
+            //     'url' => 'https://testpti.payserv.net/webpayment/Default.aspx'
+            // ];
+            
             
         } else {
             return [

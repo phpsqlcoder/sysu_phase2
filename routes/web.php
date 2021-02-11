@@ -80,6 +80,10 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::post('/remove-to-wishlist','EcommerceControllers\WishlistController@remove_to_wishlist')->name('remove-to-wishlist');
     Route::post('/wishlist/remove-product','EcommerceControllers\WishlistController@remove_product')->name('wishlist.remove-product');
 
+    // Coupons
+    Route::get('/account/coupons','EcommerceControllers\CouponFrontController@available')->name('coupons-available');
+    Route::get('/checkout-use-coupon/{id}','EcommerceControllers\CouponFrontController@use_coupon')->name('use-coupon');
+
 
 });
 ##############################################################

@@ -161,21 +161,40 @@
                     <div class="col-md-6">
                         <h3 style="font-family:serif;">Payment Summary</h3>
                         <table class="table">
+                            @php
+                                if($coupon > 0){
+                                    $c = \App\EcommerceModel\CouponCart::where('customer_id',Auth::id())->first();
+                                    $reward = \App\EcommerceModel\Coupon::coupon_reward($c->coupon_id);
+                                } else {
+                                    $reward = 0;
+                                }
+                                
+                            @endphp
                             <tr>
                                 <td>Order:</td>
                                 <td align="right">
+                                    <input type="hidden" name="deductedAmount" value="{{number_format($reward,2,'.','')}}">
                                     <input type="hidden" id="order_amount" name="order_amount" value="{{$products->sum('itemTotalPrice')}}">
                                     <input type="hidden" id="delivery_fee" name="delivery_fee" value="0">
                                     <input type="hidden" id="total_amount" name="total_amount" value="{{$products->sum('itemTotalPrice')}}">
                                     &#8369; {{number_format($products->sum('itemTotalPrice'),2)}}</td>
                             </tr>
+                            @if($coupon > 0)
+                                @php
+                                $c = \App\EcommerceModel\CouponCart::where('customer_id',Auth::id())->first();
+                                @endphp
+                            <tr>
+                                {!! \App\EcommerceModel\Coupon::rewards_desc($c->coupon_id) !!}
+                            </tr>
+                            @endif
+
                             <tr id="delivery_fee_row" style="@if($delivery_fee_text=='0.00') display:none @endif;">
                                 <td>Delivery Fee:</td>
                                 <td align="right"><span id="delivery_fee_div">{{$delivery_fee_text}}</span></td>
                             </tr>
                             <tr style="font-size:20px;font-weight:bold;">
                                 <td>Total:</td>
-                                <td align="right">&#8369; <span id="total_amount_div">{{number_format($products->sum('itemTotalPrice'),2)}}</span></td>
+                                <td align="right">&#8369; <span id="total_amount_div">{{number_format($products->sum('itemTotalPrice')-$reward,2)}}</span></td>
                             </tr>
                         </table>                   
                         <div class="gap-20"></div>
@@ -339,7 +358,7 @@
     function compute_total(){
         var total_a = parseFloat($('#order_amount').val()) + parseFloat($('#delivery_fee').val());
         $('#total_amount_div').html(addCommas(parseFloat(total_a).toFixed(2)));
-        $('#total_amount').val(total_a);
+        $('#total_amount').val(total_a.toFixed(2));
         $('#deposit').val(total_a);
         $('#dep50').html('(&#8369; '+parseFloat(total_a)/2+')');
     }
