@@ -26,26 +26,23 @@
                     <table class="table table-hover small text-left overflow-auto">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" class="align-middle" width="10%">Actions</th>
-                                <th scope="col" class="align-middle text-nowrap" width="10%">Code</th>
                                 <th scope="col" class="align-middle text-nowrap" width="25%">Coupon</th>
-                                <th scope="col" class="align-middle" width="35%">Description</th>
-                                <th scope="col" class="text-right" width="20%">Terms and Conditions</th>
-
+                                <th scope="col" class="align-middle" width="40%">Description</th>
+                                <th scope="col" class="align-middle" width="20%">Terms and Conditions</th>
+                                <th scope="col" class="align-middle" width="15%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($coupons as $coupon)
                                 <tr>
-                                    <td>
-                                        <a href="{{ route('use-coupon',$coupon->coupon_id) }}" title="Use Coupon" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>
-                                    </td>
                                     <td class="align-middle">
-                                        <p><strong>{{ $coupon->details->coupon_code }}</strong></p>
+                                        <p><strong>{{ $coupon->details->name }}</strong></p>
                                     </td>
-                                    <td>{{ $coupon->details->name }}</td>
                                     <td class="align-middle"><p>{{ $coupon->details->description }}</p></td>
-                                    <td class="align-middle text-right"><a href="#" data-toggle="modal" data-target="#terms{{$coupon->id}}">View Details</a></td>
+                                    <td class="align-middle"><a href="#" data-toggle="modal" data-target="#terms{{$coupon->id}}">View Details</a></td>
+                                    <td>
+                                        <a href="{{ route('use-coupon',$coupon->coupon_id) }}" title="Use Coupon" class="btn btn-success btn-sm mb-1">Use Now</a>
+                                    </td>
                                 </tr>
 
                                 <!-- Modal -->

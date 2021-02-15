@@ -63,11 +63,14 @@ class CouponController extends Controller
         Validator::make($request->all(), [
             'name' => 'required|max:150',
             'description' => 'required',
-            'reward' => 'required'
+            'reward' => 'required',
+            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
+            'discount_type' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
         ])->validate();
 
         $coupon = Coupon::create([
-            'coupon_code' => Coupon::generate_unique_code(),
+            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms,
@@ -75,12 +78,13 @@ class CouponController extends Controller
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
+            'location_discount_type' => $request->discount_type,
+            'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
-            'gift_name' => $request->reward == 'free-gift-optn' ? $request->gift_name : NULL,
             'free_product_id' => $request->free_product_id,
-            // 'upgrade_product_id' => $request->update_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
+            'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -132,7 +136,17 @@ class CouponController extends Controller
      */
     public function update(Request $request, Coupon $coupon)
     {
+        Validator::make($request->all(), [
+            'name' => 'required|max:150',
+            'description' => 'required',
+            'reward' => 'required',
+            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
+            'discount_type' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
+        ])->validate();
+
         Coupon::find($coupon->id)->update([
+            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms,
@@ -140,12 +154,13 @@ class CouponController extends Controller
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
+            'location_discount_type' => $request->discount_type,
+            'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
-            'gift_name' => $request->reward == 'free-gift-optn' ? $request->gift_name : NULL,
             'free_product_id' => $request->free_product_id,
-            // 'upgrade_product_id' => $request->update_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
+            'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -227,10 +242,10 @@ class CouponController extends Controller
     public function update_coupon_rule_settings($couponID,$request)
     {
         Coupon::find($couponID)->update([
-            'customer_limit' => $request->coupon_rule[0] == 'customer_limit' ? $request->coupon_customer_limit_qty : NULL,
-            'usage_limit' => isset($request->usage_limit[0]) ? $request->usage_limit[0] : NULL,
+            'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : NULL,
+            'usage_limit' => isset($request->usage_limit) ? $request->usage_limit[0] : NULL,
             'usage_limit_no' => $request->usage_limit[0] == 'multiple_use' ? $request->multi_usage_limit_qty : NULL,
-            'transaction_limit' => isset($request->coupon_rule[2]) && $request->coupon_rule[2] == 'transaction_limit' ? $request->coupon_transac_limit[0] : NULL,
+            'combination' => ($request->has('combination')) ? 1 : 0,
         ]);
     }
 

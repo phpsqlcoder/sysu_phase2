@@ -119,7 +119,6 @@
                                             <label class="custom-control-label" for="checkbox_all"></label>
                                         </div>
                                     </th>
-                                    <th scope="col">Code</th>
                                     <th scope="col" width="20%">Name</th>
                                     <th scope="col">Date Start</th>
                                     <th scope="col">Date End</th>
@@ -139,9 +138,9 @@
 	                                        </div>
 	                                    </th>
                                         <td>
-                                            <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->coupon_code }}</strong>
+                                            <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->coupon_code }}</strong><br>
+                                            {{ $coupon->name }}
                                         </td>
-	                                    <td>{{ $coupon->name }}</td>
 	                                    <td>{{ $coupon->start_date }} {{ $coupon->start_time }}</td>
 	                                    <td>{{ $coupon->end_date }} {{ $coupon->end_time }}</td>
 	                                    <td class="text-center">0/20</td>
