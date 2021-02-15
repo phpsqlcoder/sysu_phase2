@@ -41,7 +41,7 @@
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb breadcrumb-style1 mg-b-10">
 					<li class="breadcrumb-item" aria-current="page">CMS</li>
-					<li class="breadcrumb-item" aria-current="page">Coupons</li>
+					<li class="breadcrumb-item" aria-current="page"><a href="{{ route('coupons.index') }}">Coupons</a></li>
 					<li class="breadcrumb-item active" aria-current="page">Edit Coupon</li>
 				</ol>
 			</nav>
@@ -71,20 +71,26 @@
 					<textarea name="terms" rows="3" class="form-control">{{ old('terms',$coupon->terms_and_conditions) }}</textarea>
 				</div>
 				<div class="form-group">
-					<label class="d-block">Activation Type</label>
+					<label class="d-block">Distribution Type</label>
 					<div class="row">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation')) || $coupon->activation_type == 'manual') checked @else checked @endif>
+								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation')) || $coupon->activation_type == 'manual') checked @else checked @endif>
 								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
 							</div>
 						</div>
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto"  @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation')) || $coupon->activation_type == 'auto') checked @endif>
+								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation')) || $coupon->activation_type == 'auto') checked @endif>
 								<label class="custom-control-label" for="coupon-activate-auto">Automatic</label>
 							</div>
 						</div>
+					</div>
+					<div class="mb-3" id="coupon-code" style="display: @if($coupon->activation_type == 'manual') block @else none @endif">
+						<label class="d-block">Coupon Code</label>
+						<input type="text" name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code',$coupon->coupon_code) }}" placeholder="Coupon Code">
+						@hasError(['inputName' => 'code'])
+                    	@endhasError
 					</div>
 				</div>
 				<div class="form-group">
@@ -120,8 +126,7 @@
 						<option @if(isset($coupon->location)) selected @endif value="free-shipping-optn">Free Shipping</option>
 						<option @if(isset($coupon->amount) )selected @endif value="discount-amount-optn">Discount Amount</option>
 						<option @if(isset($coupon->percentage)) selected @endif value="discount-percentage-optn">Discount Percentage</option>
-						<option @if(isset($coupon->gift_name)) selected @endif value="free-gift-optn">Free Gift</option>
-						<option @if(isset($coupon->free_product_id)) selected @endif value="free-product-optn">Free Product</option>
+						<option @if(isset($coupon->free_product_id)) selected @endif value="free-product-optn">Free Product/Gift</option>
 					</select>
 					@hasError(['inputName' => 'reward'])
                     @endhasError
@@ -137,25 +142,34 @@
 							<option @if($coupon->location == 'local') selected @endif  value="local">Local</option>
 							<option @if($coupon->location == 'intl') selected @endif  value="intl">International</option>
 						</select>
+
+						<label class="d-block mg-t-10">Discount Type</label>
+						<select class="custom-select @error('discount_type') is-invalid @enderror" name="discount_type" id="discount_type">
+							<option @if($coupon->location_discount_type == 'partial') selected @endif value="partial">Partial</option>
+							<option @if($coupon->location_discount_type == 'full') selected @endif value="full">Full</option>
+						</select>
+						@hasError(['inputName' => 'discount_type'])
+                    	@endhasError
+
+						<label class="mg-t-10" id="discount_amount_label" style="display: @if($coupon->location_discount_amount > 0) block @else none @endif">Discount Amount</label>
+						<input type="number" name="sf_discount_amount" class="form-control @error('sf_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('sf_discount_amount',$coupon->location_discount_amount) }}" style="display: @if($coupon->location_discount_amount > 0) block @else none @endif">
+						@hasError(['inputName' => 'sf_discount_amount'])
+                    	@endhasError
+
 					</div>
 
 					<div class="mb-3 reward-option" id="discount-amount-optn" style="display:@if(isset($coupon->amount)) block @else none @endif">
-						<label class="d-block">Discount amount</label>
-						<input name="discount_amount" type="number" class="form-control" value="{{ $coupon->amount }}">
+						<label class="d-block">Discount Amount</label>
+						<input name="discount_amount" type="number" class="form-control" value="{{ $coupon->amount }}" placeholder="Php">
 					</div>
 
 					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if(isset($coupon->percentage)) block @else none @endif">
-						<label class="d-block">Discount percentage</label>
-						<input name="discount_percentage" type="number" class="form-control" value="{{ $coupon->percentage }}">
-					</div>
-
-					<div class="mb-3 reward-option" id="free-gift-optn" style="display:@if(isset($coupon->gift_name)) block @else none @endif">
-						<label class="d-block">Free gift</label>
-						<input name="gift_name" type="text" class="form-control" placeholder="Input box">
+						<label class="d-block">Discount Percentage</label>
+						<input name="discount_percentage" type="number" class="form-control" value="{{ $coupon->percentage }}" placeholder="%">
 					</div>
 
 					<div class="mb-3 reward-option" id="free-product-optn" style="display:@if(isset($coupon->free_product_id)) block @else none @endif">
-						<label class="d-block">Free product</label>
+						<label class="d-block">Free Product</label>
 						<select class="form-control select2" name="free_product_id" style="min-height: 32px;">
 							<option label="Choose one"></option>
 							@foreach($products as $product)
@@ -373,28 +387,29 @@
 					</div>
 				</div>
 
-				<div class="form-group">
-					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="coupon-rules" onclick="myFunction()" name="coupon_setting[]" value="rule" @if(is_array(old('coupon_setting')) && in_array('rule', old('coupon_setting')) || isset($coupon->customer_limit) || isset($coupon->usage_limit) || isset($coupon->transaction_limit)) checked @endif>
-						<label class="custom-control-label" for="coupon-rules">Rules</label>
-					</div>
-				</div>
-
-				<div class="form-row border rounded p-3" id="coupon-rules-option" style="display:@if(is_array(old('coupon_setting')) && in_array('rule', old('coupon_setting')) || isset($coupon->customer_limit) || isset($coupon->usage_limit) || isset($coupon->transaction_limit)) flex @else none @endif;">
+				<div class="form-row border rounded p-3">
 					<div class="col-12">
+						<label><strong>Rules</strong></label>
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="coupon_rule[]" onclick="myFunction()" value="customer_limit" @if(is_array(old('coupon_rule')) && in_array('customer_limit', old('coupon_rule')) || isset($coupon->customer_limit)) checked @endif>
+							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit" onclick="myFunction()" @if(isset($coupon->customer_limit)) checked @endif>
 							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit</label>
 						</div>
 
-						<div class="mt-3" id="coupon-customer-limit-form" style="display:@if(is_array(old('coupon_rule')) && in_array('customer_limit', old('coupon_rule')) || isset($coupon->customer_limit)) flex @else none @endif;">
+						<div class="mt-3" id="coupon-customer-limit-form" style="display:@if(isset($coupon->customer_limit)) block @else none @endif;">
 							<div class="input-group border rounded">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
 										<span class="fa fa-minus"></span>
 									</button>
 								</span>
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$coupon->customer_limit)}}" min="1" max="10">
+								@php
+									if(isset($coupon->customer_limit)){
+										$customerLimit = $coupon->customer_limit;
+									} else {
+										$customerLimit = 1; 
+									}
+								@endphp
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$customerLimit)}}" min="1">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
 										<span class="fa fa-plus"></span>
@@ -407,18 +422,12 @@
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-usage" name="coupon_rule[]" onclick="myFunction()" value="usage_limit" @if(is_array(old('coupon_rule')) && in_array('usage_limit', old('coupon_rule')) || isset($coupon->usage_limit)) checked @endif>
+							<input type="checkbox" class="custom-control-input" id="coupon-customer-usage" name="usage_limit" onclick="myFunction()" @if(isset($coupon->usage_limit)) checked @endif>
 							<label class="custom-control-label" for="coupon-customer-usage">Usage Limit</label>
 						</div>
 
 						<div class="mt3" id="coupon-customer-usage-form" style="display:@if(is_array(old('coupon_rule')) && in_array('usage_limit', old('coupon_rule')) || isset($coupon->usage_limit)) block @else none @endif;">
 							<div class="row">
-								<div class="col-md-4 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-no-limit" name="usage_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="no_limit" @if(is_array(old('usage_limit')) && in_array('no_limit', old('usage_limit')) || $coupon->usage_limit == 'no_limit') checked @else checked @endif>
-										<label class="custom-control-label" for="coupon-no-limit">No Limit</label>
-									</div>
-								</div>
 								<div class="col-md-4 mt-3">
 									<div class="custom-control custom-radio">
 										<input type="radio" id="coupon-single-use" name="usage_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="single_use" @if(is_array(old('usage_limit')) && in_array('single_use', old('usage_limit')) || $coupon->usage_limit == 'single_use') checked @endif>
@@ -453,26 +462,15 @@
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="coupon_rule[]" onclick="myFunction()" value="transaction_limit" @if(is_array(old('coupon_rule')) && in_array('transaction_limit', old('coupon_rule')) || isset($coupon->transaction_limit)) checked @endif>
-							<label class="custom-control-label" for="coupon-customer-transaction">Transaction Limit</label>
+							<input type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination" {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }}>
+							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination (Can be combined by other coupons)</label>
 						</div>
+					</div>
 
-						<div class="mt3" id="coupon-customer-transaction-form" style="display:@if(is_array(old('coupon_rule')) && in_array('transaction_limit', old('coupon_rule')) || isset($coupon->transaction_limit)) block @else none @endif;">
-							<div class="row">
-								<div class="col-md-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-trans-yes" name="coupon_transac_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="1" @if(is_array(old('coupon_transac_limit')) && in_array(1, old('coupon_transac_limit')) || $coupon->transaction_limit == 1) checked @else checked @endif>
-										<label class="custom-control-label" for="coupon-trans-yes">Yes</label>
-									</div>
-								</div>
-								<div class="col-md-6 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-trans-no" name="coupon_transac_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="0" @if(is_array(old('coupon_transac_limit')) && in_array(0, old('coupon_transac_limit')) || $coupon->transaction_limit == 0) checked @endif>
-										<label class="custom-control-label" for="coupon-trans-no">No</label>
-									</div>
-								</div>
-								<div class="col-12"><hr></div>
-							</div>
+					<div class="col-12 mt-3">
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" id="coupon-availability" name="availability" {{ (old("availability") == "ON" || $coupon->availability == 1 ? "checked":"") }}>
+							<label class="custom-control-label" for="coupon-availability">Availability ( Optional : Can be use upon checkout )</label>
 						</div>
 					</div>
 				</div>
@@ -661,19 +659,6 @@
 
 				   			rs = true;
 				   		}
-				   	}
-
-				   	if(this.value == 'rule') {
-				   		if(!$("input[name='coupon_rule[]']:checked").val()) {
-				   			$('#coupon-rules-option').addClass('is-invalid');
-				   			$('#no_selected_title').html('Please select at least one (1) rule.');      
-                			$('#prompt-no-selected').modal('show');
-                			rs = false;
-                			return false;
-				   		} else{
-				   			$('#coupon-rules-option').removeClass('is-invalid');
-				   			rs = true;
-				   		}
 				   	}	
 				});
 				
@@ -681,6 +666,65 @@
 					$('#couponForm').submit();
 				}
             }
+	});
+	
+	$('#discount_type').change(function(){
+		var val = $(this).val();
+		if(val == 'full'){
+			$('#discount_amount_label').css('display','none');
+			$('#discount_amount_input').css('display','none');
+		} else {
+			$('#discount_amount_label').css('display','block');
+			$('#discount_amount_input').css('display','block');
+		}
+	});
+
+	$('#product_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#category_opt').attr("disabled", true);
+			$('#brand_opt').attr("disabled", true);
+		} else {
+			$('#category_opt').removeAttr("disabled");
+			$('#brand_opt').removeAttr("disabled");
+		}
+	});
+
+	$('#category_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#product_opt').attr("disabled", true);
+		} else {
+			$('#product_opt').removeAttr("disabled");
+		}
+	});
+
+	$('#brand_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#product_opt').attr("disabled", true);
+		} else {
+			$('#product_opt').removeAttr("disabled");
+		}
+	});
+
+	$('#coupon-purchase').click(function(){
+		if(this.checked){
+			$('#coupon-availability').attr("disabled", true);
+		} else {
+			$('#coupon-availability').removeAttr("disabled");
+		}
+	});
+
+	$('#coupon-availability').click(function(){
+		if(this.checked){
+			$('#coupon-purchase').attr("disabled", true);
+		} else {
+			$('#coupon-purchase').removeAttr("disabled");
+		}
 	});
 
 	$("#enableSwitch1").change(function() {
@@ -734,13 +778,13 @@
 			fieldCouponOption.style.display = "none";
 		};
 
-		var couponRules = document.getElementById("coupon-rules");
-		var fieldRulesOption = document.getElementById("coupon-rules-option");
-		if (couponRules.checked == true){
-			fieldRulesOption.style.display = "flex";
-		} else {
-			fieldRulesOption.style.display = "none";
-		};
+		// var couponRules = document.getElementById("coupon-rules");
+		// var fieldRulesOption = document.getElementById("coupon-rules-option");
+		// if (couponRules.checked == true){
+		// 	fieldRulesOption.style.display = "flex";
+		// } else {
+		// 	fieldRulesOption.style.display = "none";
+		// };
 
 		var couponCustomerLimit = document.getElementById("coupon-customer-limit");
 		var fieldCustomerLimitOption = document.getElementById("coupon-customer-limit-form");
@@ -758,13 +802,13 @@
 			fieldCustomerUsageOption.style.display = "none";
 		};
 		
-		var couponCustomerTransaction = document.getElementById("coupon-customer-transaction");
-		var fieldCustomerTransactionOption = document.getElementById("coupon-customer-transaction-form");
-		if (couponCustomerTransaction.checked == true){
-			fieldCustomerTransactionOption.style.display = "block";
-		} else {
-			fieldCustomerTransactionOption.style.display = "none";
-		};
+		// var couponCustomerTransaction = document.getElementById("coupon-customer-transaction");
+		// var fieldCustomerTransactionOption = document.getElementById("coupon-customer-transaction-form");
+		// if (couponCustomerTransaction.checked == true){
+		// 	fieldCustomerTransactionOption.style.display = "block";
+		// } else {
+		// 	fieldCustomerTransactionOption.style.display = "none";
+		// };
 
 		var couponCustomerAmount = document.getElementById("coupon-customer-amount");
 		var fieldCustomerAmountOption = document.getElementById("coupon-customer-amount-form");
@@ -787,6 +831,14 @@
 		var scopeAll= document.getElementById("coupon-scope-all");
 		var customerOptionAll = document.getElementById("customer-optn");
 		customerOptionAll.style.display = scopeAll.checked ? "none" : "block";
+
+		var activateManual= document.getElementById("coupon-activate-manual");
+		var couponCodeManual = document.getElementById("coupon-code");
+		couponCodeManual.style.display = activateManual.checked ? "none" : "block";
+
+		var autoManual= document.getElementById("coupon-activate-auto");
+		var couponCodeAuto = document.getElementById("coupon-code");
+		couponCodeAuto.style.display = autoManual.checked ? "none" : "block";
 
 		var couponCustom = document.getElementById("coupon-custom");
 		var couponCustomForm = document.getElementById("coupon-custom-form");
