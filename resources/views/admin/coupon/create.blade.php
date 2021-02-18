@@ -135,25 +135,34 @@
 
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="free-shipping-optn" style="display:@error('sf_discount_amount') block @else none @enderror">
-						<label class="d-block">Free Shipping</label>
-						<select class="custom-select" name="location">
-							<option selected disabled class="text-secondary">Select Areas</option>
-							<option value="1">All Areas</option>
-							<option value="2">NCR</option>
-							<option value="3">Local</option>
-							<option value="4">International</option>
+						<label class="d-block">Location</label>
+						<select class="form-control select2" name="location[]" multiple="multiple" style="min-height: 32px;">
+							<option label="Select Area"></option>
+							<option value="all">All Area</option>
+							@foreach($locations as $location)
+								<option value="{{$location->name}}">{{ $location->name }}</option>
+							@endforeach
 						</select>
-
-						<label class="d-block mg-t-10">Discount Type</label>
-						<select class="custom-select @error('discount_type') is-invalid @enderror" name="discount_type" id="discount_type">
-							<option value="" disabled selected>Choose One</option>
-							<option value="partial">Partial</option>
-							<option value="full">Full</option>
-						</select>
+						<br><br>
+						<label class="d-block">Discount Type</label>
+						<div class="row">
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="coupon-discount-type-partial" name="discount_type" class="custom-control-input" value="partial" checked onchange="sf_discount_type()">
+									<label class="custom-control-label" for="coupon-discount-type-partial">Partial</label>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="coupon-discount-type-full" name="discount_type" class="custom-control-input" value="full" onchange="sf_discount_type()">
+									<label class="custom-control-label" for="coupon-discount-type-full">Full</label>
+								</div>
+							</div>
+						</div>
 						@hasError(['inputName' => 'discount_type'])
                     	@endhasError
 
-						<label class="mg-t-10" id="discount_amount_label">Discount Amount</label>
+						<label id="discount_amount_label">Discount Amount</label>
 						<input type="number" name="sf_discount_amount" class="form-control @error('sf_discount_amount') is-invalid @enderror" id="discount_amount_input">
 						@hasError(['inputName' => 'sf_discount_amount'])
                     	@endhasError
@@ -279,12 +288,14 @@
 							<label class="custom-control-label" for="coupon-product">Product</label>
 						</div>
 					</div>
+
 					<div class="col-md-3">
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-amount" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="amount" @if(is_array(old('coupon_purchase')) && in_array('amount', old('coupon_purchase'))) checked @endif>
 							<label class="custom-control-label" for="coupon-amount">Total Amount</label>
 						</div>
 					</div>
+
 					<div class="col-md-3">
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-quantity" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="qty" @if(is_array(old('coupon_purchase')) && in_array('qty', old('coupon_purchase'))) checked @endif>
@@ -336,12 +347,24 @@
 							</div>
 							<div class="col-md-6">
 								<select class="custom-select" name="amount_opt" id="amount_opt">
-									<option selected value="">Open this select menu</option>
+									<option selected value="">Choose One</option>
 									<option @if(old('amount_opt') == 'min') selected @endif value="min">Minimum</option>
 									<option @if(old('amount_opt') == 'max') selected @endif value="max">Maximum</option>
 									<option @if(old('amount_opt') == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanAmountOpt" style="display: none;" class="text-danger"></small>
+							</div>
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="amount-total-amount" name="amount_discount" class="custom-control-input" onclick="ShowHideDiv()" value="1" checked>
+									<label class="custom-control-label" for="amount-total-amount">Total Amount</label>
+								</div>
+							</div>
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="amount-product-price" name="amount_discount" class="custom-control-input" onclick="ShowHideDiv()" value="2" >
+									<label class="custom-control-label" for="amount-product-price">Product Price</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -363,6 +386,18 @@
 									<option @if(old('qty_opt') == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
+							</div>
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="qty-total-amount" name="qty_discount" class="custom-control-input" onclick="ShowHideDiv()" value="1" checked>
+									<label class="custom-control-label" for="qty-total-amount">Total Amount</label>
+								</div>
+							</div>
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="qty-product-price" name="qty_discount" class="custom-control-input" onclick="ShowHideDiv()" value="2" >
+									<label class="custom-control-label" for="qty-product-price">Product Price</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -644,16 +679,17 @@
             }
 	});
 	
-	$('#discount_type').change(function(){
-		var val = $(this).val();
-		if(val == 'full'){
+	function sf_discount_type(){
+		var option = $('input[name="discount_type"]:checked').val();
+
+		if(option == 'full'){
 			$('#discount_amount_label').css('display','none');
 			$('#discount_amount_input').css('display','none');
 		} else {
 			$('#discount_amount_label').css('display','block');
 			$('#discount_amount_input').css('display','block');
 		}
-	});
+	}
 
 	$('#product_opt').change(function(){
 		var value = $(this).val();
@@ -687,21 +723,21 @@
 		}
 	});
 
-	$('#coupon-purchase').click(function(){
-		if(this.checked){
-			$('#coupon-availability').attr("disabled", true);
-		} else {
-			$('#coupon-availability').removeAttr("disabled");
-		}
-	});
+	// $('#coupon-purchase').click(function(){
+	// 	if(this.checked){
+	// 		$('#coupon-availability').attr("disabled", true);
+	// 	} else {
+	// 		$('#coupon-availability').removeAttr("disabled");
+	// 	}
+	// });
 
-	$('#coupon-availability').click(function(){
-		if(this.checked){
-			$('#coupon-purchase').attr("disabled", true);
-		} else {
-			$('#coupon-purchase').removeAttr("disabled");
-		}
-	});
+	// $('#coupon-availability').click(function(){
+	// 	if(this.checked){
+	// 		$('#coupon-purchase').attr("disabled", true);
+	// 	} else {
+	// 		$('#coupon-purchase').removeAttr("disabled");
+	// 	}
+	// });
 
 	$("#enableSwitch1").change(function() {
         if(this.checked) {
@@ -884,26 +920,26 @@ $('.input-number').focusin(function(){
 	$(this).data('oldValue', $(this).val());
 });
 
-$('.input-number').change(function() {
+// $('.input-number').change(function() {
 
-	minValue =  parseInt($(this).attr('min'));
-	maxValue =  parseInt($(this).attr('max'));
-	valueCurrent = parseInt($(this).val());
+// 	minValue =  parseInt($(this).attr('min'));
+// 	maxValue =  parseInt($(this).attr('max'));
+// 	valueCurrent = parseInt($(this).val());
 
-	name = $(this).attr('name');
-	if(valueCurrent >= minValue) {
-		$(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
-	} else {
-		alert('Sorry, the minimum value was reached');
-		$(this).val($(this).data('oldValue'));
-	}
-	if(valueCurrent <= maxValue) {
-		$(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
-	} else {
-		alert('Sorry, the maximum value was reached');
-		$(this).val($(this).data('oldValue'));
-	}
-});
+// 	name = $(this).attr('name');
+// 	if(valueCurrent >= minValue) {
+// 		$(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
+// 	} else {
+// 		alert('Sorry, the minimum value was reached');
+// 		$(this).val($(this).data('oldValue'));
+// 	}
+// 	if(valueCurrent <= maxValue) {
+// 		$(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
+// 	} else {
+// 		alert('Sorry, the maximum value was reached');
+// 		$(this).val($(this).data('oldValue'));
+// 	}
+// });
 
 $(".input-number").keydown(function (e) {
 // Allow: backspace, delete, tab, escape, enter and .

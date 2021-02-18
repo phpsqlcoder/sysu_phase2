@@ -132,22 +132,40 @@
                     @endhasError
 				</div>
 
+				@php
+					$arr_loc = [];
+					$locs = explode('|',$coupon->location);
+					foreach($locs as $l){
+						array_push($arr_loc,$l);
+					}
+				@endphp
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="free-shipping-optn" style="display:@if(isset($coupon->location)) block @else none @endif">
-						<label class="d-block">Free Shipping</label>
-						<select class="custom-select" name="location">
-							<option selected disabled class="text-secondary">Select Areas</option>
-							<option @if($coupon->location == 'all') selected @endif value="all">All Areas</option>
-							<option @if($coupon->location == 'ncr') selected @endif  value="ncr">NCR</option>
-							<option @if($coupon->location == 'local') selected @endif  value="local">Local</option>
-							<option @if($coupon->location == 'intl') selected @endif  value="intl">International</option>
+						<label class="d-block">Location</label>
+						<select class="form-control select2" name="location[]" multiple="multiple" style="min-height: 32px;">
+							<option label="Select Area"></option>
+							<option value="all">All Area</option>
+							@foreach($locations as $location)
+								<option @if(in_array($location->name,$arr_loc)) selected @endif value="{{$location->name}}">{{ $location->name }}</option>
+							@endforeach
 						</select>
 
-						<label class="d-block mg-t-10">Discount Type</label>
-						<select class="custom-select @error('discount_type') is-invalid @enderror" name="discount_type" id="discount_type">
-							<option @if($coupon->location_discount_type == 'partial') selected @endif value="partial">Partial</option>
-							<option @if($coupon->location_discount_type == 'full') selected @endif value="full">Full</option>
-						</select>
+						<br><br>
+						<label class="d-block">Discount Type</label>
+						<div class="row">
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="coupon-discount-type-partial" name="discount_type" class="custom-control-input" value="partial" onchange="sf_discount_type()" @if($coupon->location_discount_type == 'partial') checked @endif>
+									<label class="custom-control-label" for="coupon-discount-type-partial">Partial</label>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="coupon-discount-type-full" name="discount_type" class="custom-control-input" value="full" onchange="sf_discount_type()" @if($coupon->location_discount_type == 'full') checked @endif>
+									<label class="custom-control-label" for="coupon-discount-type-full">Full</label>
+								</div>
+							</div>
+						</div>
 						@hasError(['inputName' => 'discount_type'])
                     	@endhasError
 
@@ -668,16 +686,18 @@
             }
 	});
 	
-	$('#discount_type').change(function(){
-		var val = $(this).val();
-		if(val == 'full'){
+	function sf_discount_type(){
+		var option = $('input[name="discount_type"]:checked').val();
+
+		if(option == 'full'){
 			$('#discount_amount_label').css('display','none');
 			$('#discount_amount_input').css('display','none');
 		} else {
 			$('#discount_amount_label').css('display','block');
 			$('#discount_amount_input').css('display','block');
 		}
-	});
+	}
+
 
 	$('#product_opt').change(function(){
 		var value = $(this).val();

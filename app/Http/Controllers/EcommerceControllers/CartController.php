@@ -13,6 +13,7 @@ use App\EcommerceModel\Product;
 use App\EcommerceModel\Coupon;
 use App\EcommerceModel\CustomerCoupon;
 use App\EcommerceModel\CouponCart;
+use App\EcommerceModel\CouponSale;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -119,19 +120,31 @@ class CartController extends Controller
 
     public function view()
     {
-
         if (auth()->check()) {
             $cart = Cart::where('user_id',Auth::id())->get();
             $totalProducts = $cart->count();
 
-            $coupon = CouponCart::where('customer_id',Auth::id())->first();
+            $customerCoupons = 
+                CustomerCoupon::join('coupons','customer_coupons.coupon_id','=','coupons.id')
+                ->select('customer_coupons.*','coupons.amount','coupons.percentage','coupons.amount_discount_type')
+                ->where(function ($query){
+                    $query->orwhereNotNull('coupons.amount')
+                    ->orwhereNotNull('coupons.percentage');
+                })->where('customer_id',Auth::id())->where('customer_coupons.coupon_status','ACTIVE')->get();
 
-            $customerCoupons = CustomerCoupon::where('customer_id',Auth::id())->get();
+            // OrderTotal Amount and Quantity 
+            $totalAmount = 0;
+            $totalQty = 0;
+            foreach($cart as $c){
+                $totalAmount += $c->product->discountedprice*$c->qty;
+                $totalQty += $c->qty;
+            }
+
+
         } else {
             $cart = session('cart', []);
             $totalProducts = count(session('cart', []));
             
-            $coupon = '';
             $customerCoupons = '';
         }
 
@@ -140,7 +153,7 @@ class CartController extends Controller
 
 
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.cart', compact('cart', 'totalProducts','coupon','customerCoupons','page'));
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.cart', compact('cart', 'totalProducts','customerCoupons','page'));
     }
 
     public function remove_product(Request $request)
@@ -163,44 +176,31 @@ class CartController extends Controller
 
     public function ajax_update(Request $request)
     {
-        //logger($request);
         if (auth()->check()) {            
             if (Cart::where('user_id', auth()->id())->count() == 0) {
                 return;
             }
-
-                $upd = Cart::where('product_id',$request->record_id)->where('user_id', auth()->id())->update([
-                    'qty' => $request->quantity
-                ]);
-                //logger($upd);
-           
-           
-          
+            $upd = Cart::where('product_id',$request->record_id)->where('user_id', auth()->id())->update([
+                'qty' => $request->quantity
+            ]);
         } else {
             $cart = session('cart', []);
-
-         
                 foreach ($cart as $key => $order) {
                     if ($order->product_id == $request->record_id) {
                         $cart[$key]->qty = $request->quantity;
                         break;
                     }
                 }
-       
-
             session(['cart' => $cart]);
-
-           
         }
 
         return response()->json([
-                'success' => true               
-            ]);
+            'success' => true               
+        ]);
     }
 
     public function batch_update(Request $request)
     {
-
         if (auth()->check()) {            
             if (Cart::where('user_id', auth()->id())->count() == 0) {
                 return redirect()->route('product.front.list');
@@ -212,7 +212,22 @@ class CartController extends Controller
                 ]);
               
             }
-           
+
+            $refreshCustomerCouponCart = CouponCart::where('customer_id',Auth::id())->delete();
+            if($request->coupon_counter > 0){
+                $data = $request->all();
+                $coupons = $data['couponid'];
+                $product = $data['coupon_productid'];
+
+                foreach($coupons as $key => $coupon){
+                    CouponCart::create([
+                        'coupon_id' => $coupon,
+                        'product_id' => $product[$key] == 0 ? NULL : $product[$key],
+                        'customer_id' => Auth::id()
+                    ]);
+                }
+            }
+            
             return redirect()->route('cart.front.checkout');
         } else {
             $cart = session('cart', []);
@@ -362,8 +377,14 @@ class CartController extends Controller
 
         Cart::where('user_id', Auth::id())->delete();
 
+
         $this->get_coupons($totalPrice,$totalQty,$carts);
         $this->remove_cart_coupon();
+
+        if($request->coupon_counter > 0){
+            $this->update_coupon_status($request);    
+        }
+        
         return view('theme.paynamics.sender', compact('base64Code'));
        
     }
@@ -510,45 +531,45 @@ class CartController extends Controller
             }
 
             // get all active coupons with purchase product rule
-            $counter = 0;
+            $counter = 1;
             $couponProducts = Coupon::whereNotNull('purchase_product_id')->where('status','ACTIVE')->get();
             foreach($couponProducts as $coupon){
                 $products = explode('|',$coupon->purchase_product_id);
                 foreach($products as $productid){
                     // check if this product id exist in the array
                     if(in_array($productid,$cart_products)){
-                        $counter++;
                         if($counter == 1){
                             $this->check_coupon_rule($coupon->id);
                         }
+                        $counter++;
                     }
                 }
             }
         //
 
-        // // Purchase Setting : Total Amount Only
-        //     $couponTotalAmount = Coupon::whereNotNull('purchase_amount')->where('status','ACTIVE')->get();
+        // Purchase Setting : Total Amount Only
+            $couponTotalAmount = Coupon::whereNotNull('purchase_amount')->where('status','ACTIVE')->where('availability',0)->get();
 
-        //     foreach($couponTotalAmount as $coupon){
-        //         if($coupon->purchase_amount_type == 'min'){
-        //             if($totalPrice >= $coupon->purchase_amount){
-        //                 $this->check_coupon_rule($coupon->id);
-        //             }
-        //         }
+            foreach($couponTotalAmount as $coupon){
+                if($coupon->purchase_amount_type == 'min'){
+                    if($totalPrice >= $coupon->purchase_amount){
+                        $this->check_coupon_rule($coupon->id);
+                    }
+                }
 
-        //         if($coupon->purchase_amount_type == 'max'){
-        //             if($totalPrice <= $coupon->purchase_amount){
-        //                 $this->check_coupon_rule($coupon->id);
-        //             }
-        //         }
+                if($coupon->purchase_amount_type == 'max'){
+                    if($totalPrice <= $coupon->purchase_amount){
+                        $this->check_coupon_rule($coupon->id);
+                    }
+                }
 
-        //         if($coupon->purchase_amount_type == 'exact'){
-        //             if($totalPrice == $coupon->purchase_amount){
-        //                 $this->check_coupon_rule($coupon->id);
-        //             }
-        //         }
-        //     }
-        // //
+                if($coupon->purchase_amount_type == 'exact'){
+                    if($totalPrice == $coupon->purchase_amount){
+                        $this->check_coupon_rule($coupon->id);
+                    }
+                }
+            }
+        //
 
         // Purchase Setting : Total Quantity Only
             $couponTotalQty = Coupon::whereNotNull('purchase_qty')->where('status','ACTIVE')->get();
@@ -608,5 +629,42 @@ class CartController extends Controller
     public function remove_cart_coupon()
     {
         CouponCart::where('customer_id',Auth::id())->delete();
+    }
+
+    public function update_coupon_status($request)
+    {
+        $data = $request->all();
+        $coupons = $data['couponid'];
+
+        foreach($coupons as $key => $c){
+            $customerCoupon = CustomerCoupon::where('customer_id',Auth::id())->where('coupon_id',$c);
+
+
+            // if coupon not exist in customers coupon
+            if($customerCoupon->count() == 0){
+                CustomerCoupon::create([
+                    'coupon_id' => $c,
+                    'usage_status' => 1,
+                    'coupon_status' => 'INACTIVE',
+                    'customer_id' => Auth::id()
+                ]);
+            } else {
+                $coupon = Coupon::find($c);
+
+                if(isset($coupon->usage_limit)){
+                    if($coupon->usage_limit == 'single_use'){
+                        $customerCoupon->update(['usage_status' => 1, 'coupon_status' => 'INACTIVE']);
+                    }
+
+                    if($coupon->usage_limit == 'multiple_use'){
+                        $couponUsage = CouponSale::where('customer_id',Auth::id())->where('coupon_id',$c)->count();
+                        if($couponUsage == $coupon->usage_limit_no){
+                            $customerCoupon->update(['usage_status' => 1, 'coupon_status' => 'INACTIVE']);
+                        }
+                    }
+                }
+
+            }
+        }
     }
 }
