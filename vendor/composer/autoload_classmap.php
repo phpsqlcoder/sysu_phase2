@@ -16,6 +16,7 @@ return array(
     'App\\Deliverablecities' => $baseDir . '/app/Deliverablecities.php',
     'App\\EcommerceModel\\Cart' => $baseDir . '/app/EcommerceModel/Cart.php',
     'App\\EcommerceModel\\Coupon' => $baseDir . '/app/EcommerceModel/Coupon.php',
+    'App\\EcommerceModel\\CouponCart' => $baseDir . '/app/EcommerceModel/CouponCart.php',
     'App\\EcommerceModel\\Customer' => $baseDir . '/app/EcommerceModel/Customer.php',
     'App\\EcommerceModel\\CustomerCoupon' => $baseDir . '/app/EcommerceModel/CustomerCoupon.php',
     'App\\EcommerceModel\\CustomerFavorite' => $baseDir . '/app/EcommerceModel/CustomerFavorite.php',

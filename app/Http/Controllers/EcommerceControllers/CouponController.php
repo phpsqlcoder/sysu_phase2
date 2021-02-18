@@ -12,7 +12,7 @@ use App\EcommerceModel\Coupon;
 use App\EcommerceModel\Product;
 use App\EcommerceModel\ProductCategory;
 use App\User;
-
+use App\Deliverablecities;
 
 use Auth;
 
@@ -49,7 +49,9 @@ class CouponController extends Controller
         $brands = Product::distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
-        return view('admin.coupon.create',compact('products','categories','brands','customers'));
+        $locations = Deliverablecities::where('status','PUBLISHED')->get();
+
+        return view('admin.coupon.create',compact('products','categories','brands','customers','locations'));
     }
 
     /**
@@ -69,6 +71,19 @@ class CouponController extends Controller
             'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
         ])->validate();
 
+        $loc = '';
+        if($request->reward == 'free-shipping-optn'){
+          $data = $request->all();
+            $locations = $data['location'];
+
+            foreach($locations as $l){
+                $loc .= $l.'|';
+            }  
+        } else {
+            $loc = NULL;
+        }
+        
+
         $coupon = Coupon::create([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
@@ -77,7 +92,7 @@ class CouponController extends Controller
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
-            'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
+            'location' => $loc,
             'location_discount_type' => $request->discount_type,
             'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
@@ -85,6 +100,8 @@ class CouponController extends Controller
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
             'availability' => ($request->has('availability')) ? 1 : 0,
+            'amount_discount_type' => $request->coupon_purchase[0] == 'amount' ? $request->amount_discount : 0,
+            'qty_discount_type' => $request->coupon_purchase[0] == 'qty' ? $request->qty_discount : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -124,7 +141,9 @@ class CouponController extends Controller
         $brands = Product::distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
-        return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers'));
+        $locations = Deliverablecities::where('status','PUBLISHED')->get();
+
+        return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers','locations'));
     }
 
     /**
@@ -145,6 +164,18 @@ class CouponController extends Controller
             'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
         ])->validate();
 
+        $loc = '';
+        if($request->reward == 'free-shipping-optn'){
+          $data = $request->all();
+            $locations = $data['location'];
+
+            foreach($locations as $l){
+                $loc .= $l.'|';
+            }  
+        } else {
+            $loc = NULL;
+        }
+
         Coupon::find($coupon->id)->update([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
@@ -153,7 +184,7 @@ class CouponController extends Controller
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
-            'location' => $request->reward == 'free-shipping-optn' ? $request->location : NULL,
+            'location' => $loc,
             'location_discount_type' => $request->discount_type,
             'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
@@ -225,7 +256,7 @@ class CouponController extends Controller
             'purchase_amount' => $request->coupon_purchase[0] == 'amount' ? $request->purchase_amount : NULL,
             'purchase_amount_type' => $request->coupon_purchase[0] == 'amount' ? $request->amount_opt : NULL,
             'purchase_qty' =>  $request->coupon_purchase[0] == 'qty' ? $request->purchase_qty : NULL,
-            'purchase_qty_type' =>  $request->coupon_purchase[0] == 'qty' ? $request->qty_opt : NULL
+            'purchase_qty_type' =>  $request->coupon_purchase[0] == 'qty' ? $request->qty_opt : NULL,
         ]);
     }
 

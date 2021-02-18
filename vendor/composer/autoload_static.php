@@ -449,6 +449,7 @@ class ComposerStaticInit68580dd66ca868f9e4453579cea1fb47
         'App\\Deliverablecities' => __DIR__ . '/../..' . '/app/Deliverablecities.php',
         'App\\EcommerceModel\\Cart' => __DIR__ . '/../..' . '/app/EcommerceModel/Cart.php',
         'App\\EcommerceModel\\Coupon' => __DIR__ . '/../..' . '/app/EcommerceModel/Coupon.php',
+        'App\\EcommerceModel\\CouponCart' => __DIR__ . '/../..' . '/app/EcommerceModel/CouponCart.php',
         'App\\EcommerceModel\\Customer' => __DIR__ . '/../..' . '/app/EcommerceModel/Customer.php',
         'App\\EcommerceModel\\CustomerCoupon' => __DIR__ . '/../..' . '/app/EcommerceModel/CustomerCoupon.php',
         'App\\EcommerceModel\\CustomerFavorite' => __DIR__ . '/../..' . '/app/EcommerceModel/CustomerFavorite.php',

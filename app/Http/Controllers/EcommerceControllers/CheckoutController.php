@@ -15,6 +15,8 @@ use Auth;
 use App\Deliverablecities;
 
 use App\EcommerceModel\CouponCart;
+use App\EcommerceModel\CustomerCoupon;
+use App\EcommerceModel\Coupon;
 
 class CheckoutController extends Controller
 {
@@ -27,7 +29,9 @@ class CheckoutController extends Controller
         $page = new Page();
         $page->name = 'Checkout';
         
-        $products = Cart::where('user_id',Auth::id())->get();        
+        $products = Cart::where('user_id',Auth::id())->get(); 
+        $totalProducts = $products->count();     
+
         $locations = Deliverablecities::where('status','PUBLISHED')->orderBy('name')->get();
         $user = Auth::user();
         
@@ -35,9 +39,69 @@ class CheckoutController extends Controller
             return redirect()->route('product.front.list');
         }
 
-        $coupon = CouponCart::where('customer_id',Auth::id())->count();
+        $coupons = CouponCart::where('customer_id',Auth::id())->get();
+        
+        $totalAmountCouponCounter = 0;
+        foreach($coupons as $coupon){
+            $c = Coupon::find($coupon->coupon_id);
+            if(isset($c->amount) || isset($c->percentage)){
+                $totalAmountCouponCounter++;
+            }
+        }
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupon'));
+        $couponUsed = $coupons->count();
+        $couponLimit = 3;
+
+        $sfeeCoupon = 
+            CustomerCoupon::join('coupons','customer_coupons.coupon_id','=','coupons.id')->select('customer_coupons.*','coupons.location')
+            ->whereNotNull('coupons.location')
+            ->where('customer_coupons.coupon_status','ACTIVE')
+            ->get();
+
+
+        $discountAmountCoupon = 
+            CustomerCoupon::join('coupons','customer_coupons.coupon_id','=','coupons.id')->select('customer_coupons.*','coupons.amount','coupons.percentage','coupons.amount_discount_type')
+            ->where(function ($query){
+                $query->orwhereNotNull('coupons.amount')
+                ->orwhereNotNull('coupons.percentage');
+            })->where('customer_coupons.coupon_status','ACTIVE')->where('coupons.amount_discount_type',1)->get();
+
+        $customerCoupons = collect($sfeeCoupon)->merge($discountAmountCoupon);
+
+        
+        // Coupon Rules
+        // OrderTotal Amount and Quantity 
+        $totalAmount = 0;
+        $totalQty = 0;
+        foreach($products as $c){
+            $totalQty += $c->qty;
+            $product_sub = $c->product->discountedprice*$c->qty;
+
+            $coupon = CouponCart::where('customer_id',Auth::id())->where('product_id',$c->product_id);
+            if($coupon->count()){
+                $c = $coupon->first();
+
+                // get coupon reward
+                if(isset($c->details->amount)){
+
+                    $total_prod_sub = $product_sub-$c->details->amount;
+                    $totalAmount += $total_prod_sub;
+
+                } elseif(isset($c->details->percentage)){
+
+                    $percent = $c->details->percentage/100;
+                    $discount = $product_sub*$percent;
+
+                    $total_prod_sub = $product_sub-$discount;
+                    $totalAmount += $total_prod_sub;
+
+                }   
+            } else {
+                $totalAmount += $c->product->discountedprice*$c->qty;
+            }
+        }
+
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','customerCoupons','totalAmount','totalProducts','couponUsed','couponLimit'));
     }
 
     public function payment_completed() {

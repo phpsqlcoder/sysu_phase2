@@ -140,10 +140,46 @@ class CouponFrontController extends Controller
                 'not_exist' => true,               
             ]);
         }
+    }
+
+    public function collectibles(Request $request){
+        // Total Purchase Amount
+        $couponsMinTotalAmount = Coupon::purchaseMinValue('purchase_amount','purchase_amount_type',$request->total_amount);
+        $couponsMaxTotalAmount = Coupon::purchaseMaxValue('purchase_amount','purchase_amount_type',$request->total_amount);
+        $couponsExactTotalAmount = Coupon::purchaseExactValue('purchase_amount','purchase_amount_type',$request->total_amount);
+
+        //Total Purchase Quantity
+        $couponsMinTotalQty = Coupon::purchaseMinValue('purchase_qty','purchase_qty_type',$request->total_qty);
+        $couponsMaxTotalQty = Coupon::purchaseMaxValue('purchase_qty','purchase_qty_type',$request->total_qty);
+        $couponsExactTotalQty = Coupon::purchaseExactValue('purchase_qty','purchase_qty_type',$request->total_qty);
+
+        // Purchase within daterange
+        $couponsDateTimePurchase = Coupon::purchaseWithinDateRange();
+
+        $collectibles = 
+            collect($couponsMinTotalAmount)
+            ->merge($couponsMaxTotalAmount)
+            ->merge($couponsExactTotalAmount)
+            ->merge($couponsMinTotalQty)
+            ->merge($couponsMaxTotalQty)
+            ->merge($couponsExactTotalQty)
+            ->merge($couponsDateTimePurchase);
+
+
+        $arr_collectibles = [];
+        foreach($collectibles as $collect){
+            $availability = Coupon::collectible_usage($collect->id);
+            array_push($arr_collectibles,$availability);
+        }
 
         
-        
 
+
+        $totalCollectibles = count($collectibles);
+
+        return response()->json(['collectibles' => $collectibles, 'total_collectibles' => $totalCollectibles, 'availability' => $arr_collectibles]);
+
+        // return view('theme.sysu.ecommerce.cart.collectible-coupons',compact('collectibles','totalCollectibles'));
     }
 
 }
