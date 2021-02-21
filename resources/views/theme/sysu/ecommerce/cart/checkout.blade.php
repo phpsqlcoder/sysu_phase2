@@ -166,7 +166,9 @@
                                 
                                 <div class="cart-table-2 coupons-list mb-5 border rounded bg-white" id="couponList">
                                     @php $discountAmount = 0; $discountPercentage = 0; $counter = 0; $totalDeduction = 0; @endphp
+
                                     @foreach($coupons as $coupon)
+
                                         @php $counter++; @endphp
                                         @php
                                             if(isset($coupon->details->amount) && $coupon->details->amount_discount_type == 1){
@@ -177,8 +179,12 @@
                                                 $discountPercentage = $coupon->details->discount;
                                             }
                                         @endphp
+
                                     <div class="p-3 border-bottom" id="couponDiv{{$coupon->coupon_id}}">
                                         <input type="hidden" name="couponid[]" value="{{$coupon->coupon_id}}">
+                                        @if(isset($coupon->details->free_product_id))
+                                        <input type="hidden" name="freeproductid[]" value="{{$coupon->details->free_product_id}}">
+                                        @endif
                                         <p class="float-right couponRemove" id="{{$coupon->coupon_id}}"><a href="#"><i class="fa fa-times"></i></a></p>
                                         <p><span class="h5 float-left"><strong>{{ $coupon->details->name }}</strong></span></p>
                                         <div class="clearfix"></div>
@@ -189,7 +195,7 @@
 
                                     </div>
                                     @endforeach
-                                    <input type="hidden" id="coupon_counter" value="{{$counter}}">
+                                    <input type="hidden" name="coupon_counter" id="coupon_counter" value="{{$counter}}">
                                 </div>
                             </div>
 
@@ -221,7 +227,7 @@
                                         <tr>
                                             <td>Order:</td>
                                             <td align="right">
-                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$total}}">
+                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$totalAmount}}">
                                                 <input type="hidden" id="delivery_fee" name="delivery_fee" value="0">
                                                 <input type="hidden" id="total_amount" name="total_amount" value="{{$total}}">
                                                 &#8369; {{number_format($totalAmount,2)}}</td>
@@ -656,7 +662,7 @@
                 }
 
                 $('#promotion').css('display','table-row');
-                $('#total_deduction').html('₱ '+addCommas(amountDiscount));
+                $('#total_deduction').html('₱ '+addCommas(amountDiscount.toFixed(2)));
             } else {
                 var total = total_a;
                 var gtotal = total;

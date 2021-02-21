@@ -18,6 +18,7 @@
                             @php
                                 $total = 0;
                                 $total_product_count=0;
+                                $cproducts  = '';
                             @endphp
                             @forelse($cart as $key => $order)
                                 @php
@@ -28,6 +29,8 @@
                                     if (empty($product)) {
                                         continue;
                                     }
+
+                                    $cproducts .= $order->product_id.'|';
                                 @endphp
                                 
                                 <input type="hidden" id="record_id{{$loop->iteration}}" name="record_id[{{$loop->iteration}}]" value="{{$order->id}}">
@@ -74,7 +77,6 @@
                                                     <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">₱ {{number_format($order->product->discountedprice*$order->qty,2)}}</div>
                                                     <div class="prod-total" id="product_new_price{{$loop->iteration}}" style="font-weight:bold;"></div>
                                                     
-
                                                     <input type="hidden" class="loop-iteration" id="cart_product_{{$loop->iteration}}" value="{{$loop->iteration}}">
                                                     <input type="hidden" id="cart_product_reward{{$loop->iteration}}" value="0">
                                                     <input type="hidden" id="cart_product_discount{{$loop->iteration}}" value="0">
@@ -93,6 +95,7 @@
                                     Your shopping cart is <strong>empty</strong>.
                                 </div>
                             @endforelse
+                            <input type="hidden" id="cproducts" value="{{$cproducts}}">
                         </div>
 
                         <div class="col-lg-4">
@@ -144,7 +147,7 @@
                                     <div class="cart-table-row promotionDiv" style="display: none;">
                                         <div class="cart-table-row">
                                             <div class="cart-table-2-col">
-                                                <div class="cart-table-2-title text-danger">LESS : Promotion</div>                                  
+                                                <div class="cart-table-2-title text-danger">Order Discount</div>                                  
                                             </div>
                                             <div class="cart-table-2-col">
                                                 <div class="cart-table-2-title text-right text-danger" id="total_deduction"></div>                                   
@@ -331,6 +334,16 @@
         });
 
         function collectibles(){
+            var hasProduct = $('#cproducts').val();
+            if(hasProduct == ''){
+                swal({
+                    title: '',
+                    text: "Your shopping cart is empty. Please add at least one (1) product.",         
+                });
+                return false;
+            }
+
+            var products = $('#cproducts').val();
 
             let totalAmount = 0;  
             for(x=1;x<={{ $totalProducts }};x++){          
@@ -346,32 +359,48 @@
                 type: "GET",
                 url: "{{ route('display.collectibles') }}",
                 data: { 
+                    'cproducts' : products.slice(0,-1),
                     'total_amount' : totalAmount,
                     'total_qty' : totalQty
                 },
                 success: function( response ) {
                     $('#collectibles').empty();
+
+                    var arr_selected_coupons = [];
+                    $("input[name='couponid[]']").each(function() {
+                        arr_selected_coupons.push(parseInt($(this).val()));
+                    });
+
                     $.each(response.collectibles, function(key, coupon) {
-                        if(response.availability[key] == 0){
-                            if(coupon.availability == 1){
-                                var btn = '<button type="button" id="couponBtn'+coupon.id+'" class="btn btn-sm btn-primary" onclick="use_coupon('+coupon.id+')">Use Now</button>';
+                        if(coupon.availability == 1){
+                            if(jQuery.inArray(coupon.id, arr_selected_coupons) !== -1){
+                                var btn  = '<span class="text-success" id="couponSpan'+coupon.id+'">Already Use</span>';
                             } else {
-                                var btn = '';
+                                if(coupon.free_product_id != null){
+                                    var btn = '<button type="button" id="couponBtn'+coupon.id+'" class="btn btn-sm btn-primary" onclick="free_product_coupon('+coupon.id+')">Use Now</button>';
+                                } else {
+                                    var btn = '<button type="button" id="couponBtn'+coupon.id+'" class="btn btn-sm btn-primary" onclick="use_coupon('+coupon.id+')">Use Now</button>';
+                                }
                             }
-                            $('#collectibles').append(
-                                '<tr>'+
-                                    '<input type="hidden" id="discountpercentage'+coupon.id+'" value="'+coupon.percentage+'">'+
-                                    '<input type="hidden" id="discountamount'+coupon.id+'" value="'+coupon.amount+'">'+
-                                    '<input type="hidden" id="couponcode'+coupon.id+'" value="'+coupon.coupon_code+'">'+
-                                    '<input type="hidden" id="couponterms'+coupon.id+'" value="'+coupon.terms_and_conditions+'">'+
-                                    '<td>'+
-                                        '<strong>'+coupon.name+'</strong>'+
-                                    '</td>'+
-                                    '<td class="align-middle" width="30%">'+coupon.terms_and_conditions+'</td>'+
-                                    '<td>'+btn+'</td>'+
-                                '</tr>'
-                            );
+                            
+                        } else {
+                            var btn = '';
                         }
+                        $('#collectibles').append(
+                            '<tr>'+
+                                '<input type="hidden" id="discountpercentage'+coupon.id+'" value="'+coupon.percentage+'">'+
+                                '<input type="hidden" id="discountamount'+coupon.id+'" value="'+coupon.amount+'">'+
+                                '<input type="hidden" id="couponname'+coupon.id+'" value="'+coupon.name+'">'+
+                                '<input type="hidden" id="couponcode'+coupon.id+'" value="'+coupon.coupon_code+'">'+
+                                '<input type="hidden" id="couponterms'+coupon.id+'" value="'+coupon.terms_and_conditions+'">'+
+                                '<input type="hidden" id="couponfreeproductid'+coupon.id+'" value="'+coupon.free_product_id+'">'+
+                                '<td>'+
+                                    '<strong>'+coupon.name+'</strong>'+
+                                '</td>'+
+                                '<td class="align-middle" width="30%">'+coupon.terms_and_conditions+'</td>'+
+                                '<td>'+btn+'<span class="text-success" id="couponSpan'+coupon.id+'" style="display: none;">Already Use</span></td>'+
+                            '</tr>'
+                        );
                     });
 
                     $('#total_collectibles').html(response.total_collectibles);
@@ -398,6 +427,41 @@
                 return false;
             }
         }
+
+        function free_product_coupon(cid){
+            if(coupon_counter()){
+                var name  = $('#couponname'+cid).val();
+                var terms = $('#couponterms'+cid).val();
+                var freeproductid = $('#couponfreeproductid'+cid).val();
+
+                $('#couponList').append(
+                    '<div class="p-3 border-bottom" id="couponDiv'+cid+'">'+
+                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                        '<p class="float-right cRmvFreeProduct" id="'+cid+'"><a href="#"><i class="fa fa-times"></i></a></p>'+
+                        '<p><span class="h5 float-left"><strong>'+name+'</strong></span></p>'+
+                        '<div class="clearfix"></div>'+
+                        '<input type="hidden" name="coupon_productid[]" value="0">'+
+                        '<input type="hidden" name="coupon_freeproductid[]" value="'+freeproductid+'">'+
+                        '<p>'+terms+'</p>'+
+                    '</div>'
+                );
+
+                $('#couponBtn'+cid).css('display','none');
+                $('#couponSpan'+cid).css('display','block');
+            }
+        }
+
+        $(document).on('click', '.cRmvFreeProduct', function(){  
+            var id = $(this).attr("id");  
+            
+            $('#couponBtn'+id).css('display','block');
+            $('#couponSpan'+id).css('display','none');
+
+            var counter = $('#coupon_counter').val();
+            $('#coupon_counter').val(parseInt(counter)-1);
+
+            $('#couponDiv'+id+'').remove();   
+        });
         
         function use_coupon(cid){
             var totalAmountDiscountCounter = $('#total_amount_discount_counter').val();
@@ -457,12 +521,15 @@
             var id = $(this).attr("id");  
             
             $('#couponBtn'+id).css('display','block');
-            $('#couponSpan'+cid).css('display','none');
+            $('#couponSpan'+id).css('display','none');
 
             $('#total_amount_discount').val(0);
 
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
+
+            var total_amount_counter = $('#total_amount_discount_counter').val();
+            $('#total_amount_discount_counter').val(parseInt(total_amount_counter)-1);
 
             $('#couponDiv'+id+'').remove();   
 
@@ -672,18 +739,18 @@
 
         function compute_grand_total(){
             let summary_sub_price = 0;  
-            var amountDiscount = $('#total_amount_discount').val();
+            var amountDiscount = parseFloat($('#total_amount_discount').val());
 
             for(x=1;x<={{ $totalProducts }};x++){          
                 summary_sub_price+=parseFloat($('#sum_sub_price'+x).val());
             }
 
             // total amount discount
-            if(parseFloat(amountDiscount) > 0){
-                var total = parseFloat(summary_sub_price)-parseFloat(amountDiscount);
+            if(amountDiscount > 0){
+                var total = parseFloat(summary_sub_price)-amountDiscount;
 
                 $('.promotionDiv').css('display','block');
-                $('#total_deduction').html('₱ '+addCommas(amountDiscount));
+                $('#total_deduction').html('₱ '+addCommas(amountDiscount.toFixed(2)));
             } else {
                 var total = summary_sub_price;
                 $('.promotionDiv').css('display','none');

@@ -122,7 +122,7 @@
                                     <th scope="col" width="20%">Name</th>
                                     <th scope="col">Date Start</th>
                                     <th scope="col">Date End</th>
-                                    <th class="text-center" scope="col">Total Usage Count</th>
+                                    <th class="text-center" scope="col">Total Usage</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Last Date Modified</th>
                                     <th scope="col">Options</th>
@@ -143,7 +143,13 @@
                                         </td>
 	                                    <td>{{ $coupon->start_date }} {{ $coupon->start_time }}</td>
 	                                    <td>{{ $coupon->end_date }} {{ $coupon->end_time }}</td>
-	                                    <td class="text-center">0/20</td>
+	                                    <td class="text-center">
+                                            @if(\App\EcommerceModel\Coupon::coupon_total_usage($coupon->id) > 0)
+                                                <a target="_blank" href="{{ route('report.coupon.list') }}?coupon_code={{$coupon->coupon_code}}">{{ \App\EcommerceModel\Coupon::coupon_total_usage($coupon->id) }}</a>
+                                            @else
+                                                0
+                                            @endif
+                                        </td>
 	                                    <td>
 	                                    	@if($coupon->status == 'ACTIVE')
 	                                    		<span class="badge badge-success">Active</span>

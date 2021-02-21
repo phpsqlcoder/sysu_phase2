@@ -50,8 +50,9 @@ class CouponController extends Controller
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
+        $free_products = Product::where('category_id',5)->where('status','PUBLISHED')->get();
 
-        return view('admin.coupon.create',compact('products','categories','brands','customers','locations'));
+        return view('admin.coupon.create',compact('products','categories','brands','customers','locations','free_products'));
     }
 
     /**
@@ -67,23 +68,31 @@ class CouponController extends Controller
             'description' => 'required',
             'reward' => 'required',
             'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
-            'discount_type' => $request->reward == 'free-shipping-optn' ? 'required' : '',
-            'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
+            'reward' => 'required',
+            'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'sf_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
+            'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
+            'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
+
         ])->validate();
 
         $loc = '';
         if($request->reward == 'free-shipping-optn'){
           $data = $request->all();
             $locations = $data['location'];
+            $loc_discount_type = $request->discount_type;
+            $loc_discount_amount = $request->sf_discount_amount;
 
             foreach($locations as $l){
                 $loc .= $l.'|';
             }  
         } else {
             $loc = NULL;
+            $loc_discount_type = NULL;
+            $loc_discount_amount = 0;
         }
         
-
         $coupon = Coupon::create([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
@@ -93,15 +102,13 @@ class CouponController extends Controller
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $loc,
-            'location_discount_type' => $request->discount_type,
-            'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
+            'location_discount_type' => $loc_discount_type,
+            'location_discount_amount' => $loc_discount_amount,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
             'availability' => ($request->has('availability')) ? 1 : 0,
-            'amount_discount_type' => $request->coupon_purchase[0] == 'amount' ? $request->amount_discount : 0,
-            'qty_discount_type' => $request->coupon_purchase[0] == 'qty' ? $request->qty_discount : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -142,8 +149,9 @@ class CouponController extends Controller
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
+        $free_products = Product::where('category_id',5)->where('status','PUBLISHED')->get();
 
-        return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers','locations'));
+        return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers','locations','free_products'));
     }
 
     /**
@@ -160,24 +168,33 @@ class CouponController extends Controller
             'description' => 'required',
             'reward' => 'required',
             'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
-            'discount_type' => $request->reward == 'free-shipping-optn' ? 'required' : '',
-            'sf_discount_amount' => $request->discount_type == 'partial' ? 'required' : ''
+            'reward' => 'required',
+            'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'sf_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
+            'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
+            'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
+
         ])->validate();
 
         $loc = '';
         if($request->reward == 'free-shipping-optn'){
           $data = $request->all();
             $locations = $data['location'];
+            $loc_discount_type = $request->discount_type;
+            $loc_discount_amount = $request->sf_discount_amount;
 
             foreach($locations as $l){
                 $loc .= $l.'|';
             }  
         } else {
             $loc = NULL;
+            $loc_discount_type = NULL;
+            $loc_discount_amount = 0;
         }
 
         Coupon::find($coupon->id)->update([
-            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
+            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : $coupon->coupon_code,
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms,
@@ -222,41 +239,70 @@ class CouponController extends Controller
     public function update_coupon_purchase_settings($couponID,$request)
     {   
         $data = $request->all();
+        $productnames = NULL;
+        $productcategories = NULL;
+        $productbrand = NULL;
+        $totalamount = NULL;
+        $totalqty = NULL;
+        $amounttype = NULL;
+        $qtytype = NULL;
 
-        $productnames = '';
-        if(isset($request->product_name)){
-            $prodname = $data['product_name'];
-            foreach($prodname as $prod){
-                $productnames .= $prod.'|';
+        $coupon_combination_counter = 0;
+        $coupon_combination = '';
+
+        if($request->has('purchase_product')){
+            $coupon_combination_counter++;
+            $coupon_combination .= 'product|';
+            if(isset($request->product_name)){
+                $prodname = $data['product_name'];
+                foreach($prodname as $prod){
+                    $productnames .= $prod.'|';
+                }
             }
-        }
 
-        $productcategories = '';
-        if(isset($request->product_category)){
-            $prodcat = $data['product_category'];
-
+            if(isset($request->product_brand)){
+                $prodbrand = $data['product_brand'];
+                $coupon_combination .= 'product|';
+                foreach($prodbrand as $brand){
+                    $productbrand .= $brand.'|';
+                }
+            } else{
+               if(isset($request->product_category)){
+                    $prodcat = $data['product_category'];
+                    $coupon_combination .= 'product|';
+                    foreach($prodcat as $cat){
+                        $productcategories .= $cat.'|';
+                    }
+                } 
+            }
             
-            foreach($prodcat as $cat){
-                $productcategories .= $cat.'|';
-            }
         }
 
-        $productbrand = '';
-        if(isset($request->product_brand)){
-            $prodbrand = $data['product_brand'];
-            foreach($prodbrand as $brand){
-                $productbrand .= $brand.'|';
-            }
+        if($request->has('purchase_total_amount')){
+            $coupon_combination .= 'amount|';
+            $coupon_combination_counter++;
+            $totalamount = $request->purchase_amount;
+            $amounttype = $request->amount_opt;
+        }
+
+        if($request->has('purchase_total_qty')){
+            $coupon_combination .= 'qty|';
+            $coupon_combination_counter++;
+            $totalqty = $request->purchase_qty;
+            $qtytype = $request->qty_opt;
         }
 
         Coupon::find($couponID)->update([
-            'purchase_product_id' => $request->coupon_purchase[0] == 'product' ? $productnames : NULL,
-            'purchase_product_cat_id' => $request->coupon_purchase[0] == 'product' ? $productcategories : NULL,
-            'purchase_product_brand' => $request->coupon_purchase[0] == 'product' ? $productbrand : NULL,
-            'purchase_amount' => $request->coupon_purchase[0] == 'amount' ? $request->purchase_amount : NULL,
-            'purchase_amount_type' => $request->coupon_purchase[0] == 'amount' ? $request->amount_opt : NULL,
-            'purchase_qty' =>  $request->coupon_purchase[0] == 'qty' ? $request->purchase_qty : NULL,
-            'purchase_qty_type' =>  $request->coupon_purchase[0] == 'qty' ? $request->qty_opt : NULL,
+            'purchase_product_id' => $productnames,
+            'purchase_product_cat_id' => $productcategories,
+            'purchase_product_brand' => $productbrand,
+            'purchase_amount' => $totalamount,
+            'purchase_qty' =>  $totalqty,
+            'purchase_amount_type' => $amounttype,
+            'purchase_qty_type' =>  $qtytype,
+            'amount_discount_type' => $request->amount_discount,
+            'purchase_combination_counter' => $coupon_combination_counter,
+            'purchase_combination' => $coupon_combination
         ]);
     }
 

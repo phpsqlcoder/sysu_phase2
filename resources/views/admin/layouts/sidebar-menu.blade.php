@@ -247,6 +247,13 @@
                     </ul>
                 </li>
             @endif
+
+            <li class="nav-item with-sub @if (request()->routeIs('report.inventory*')) active show @endif">
+                <a href="#" class="nav-link"><i data-feather="credit-card"></i> <span>Coupons</span></a>
+                <ul>
+                    <li><a href="{{ route('report.coupon.list') }}" target="_blank">Coupon Report</a></li>
+                </ul>
+            </li>
         @endif
     @endif
 </ul>

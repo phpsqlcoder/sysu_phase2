@@ -12,6 +12,8 @@ use App\EcommerceModel\SalesHeader;
 use App\EcommerceModel\Product;
 use App\EcommerceModel\ProductCategory;
 use App\EcommerceModel\SalesPayment;
+use App\EcommerceModel\CouponSale;
+
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ListingHelper;
 use DB;
@@ -253,6 +255,29 @@ class ReportsController extends Controller
         $rs = $sales->merge($inventory)->sortBy('created');
        
         return view('admin.reports.product.stockcard',compact('rs','id'));
+
+    }
+
+    public function coupon_list(Request $request)
+    {
+        $qry = "SELECT h.*,c.*, cs.coupon_code, cs.customer_id FROM `coupon_sales` cs 
+            left join ecommerce_sales_headers h on h.id = cs.sales_header_id 
+            left join coupons c on c.id = cs.coupon_id
+            where cs.id > 0";
+
+       
+        if(isset($_GET['coupon_code']) && $_GET['coupon_code']<>''){
+            $qry.= " and cs.coupon_code = '".$_GET['coupon_code']."' ";
+        }
+
+        if(isset($_GET['customer']) && strlen($_GET['customer'])>=1){
+            $qry.= " and cs.customer_id = '".$_GET['customer']."' ";
+        }
+   
+      
+        $rs = DB::select($qry);
+
+        return view('admin.reports.coupon.list',compact('rs'));
 
     }
 

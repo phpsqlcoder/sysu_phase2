@@ -28,7 +28,6 @@
                             <tr>
                                 <th scope="col" class="align-middle text-nowrap" width="25%">Coupon</th>
                                 <th scope="col" class="align-middle" width="40%">Description</th>
-                                <th scope="col" class="align-middle" width="20%">Terms and Conditions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -38,33 +37,9 @@
                                         <p><strong>{{ $coupon->details->name }}</strong></p>
                                     </td>
                                     <td class="align-middle"><p>{{ $coupon->details->description }}</p></td>
-                                    <td class="align-middle"><a href="#" data-toggle="modal" data-target="#terms{{$coupon->id}}">View Details</a></td>
-                                    <!-- <td>
-                                        <a href="{{ route('use-coupon',$coupon->coupon_id) }}" title="Use Coupon" class="btn btn-success btn-sm mb-1">Use Now</a>
-                                    </td> -->
                                 </tr>
-
-                                <!-- Modal -->
-                                <div class="modal fade" id="terms{{$coupon->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLongTitle">Terms and Conditions</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>{!! $coupon->details->terms_and_conditions !!}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             @empty
-                                <td colspan="2">
+                                <td colspan="1">
                                     <div class="alert alert-warning" role="alert">
                                         No Record found
                                     </div>

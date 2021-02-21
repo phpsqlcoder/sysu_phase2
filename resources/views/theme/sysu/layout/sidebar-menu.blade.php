@@ -5,9 +5,15 @@
     <li @if(Route::current()->getName() == 'profile.wishlist') class="active" @endif><a href="{{ route('profile.wishlist') }}">My Wishlist <span style="background-color: white; height: 23px; width: 20px;" class="badge">{{ \App\EcommerceModel\CustomerWishlist::wishlist_available() }}</span></a></li>
     <li @if(Route::current()->getName() == 'coupons-available') class="active" @endif><a href="#">My Coupons</a>
 		<ul class="ul-none">
-			<li @if(Route::current()->getName() == 'coupons-available') class="active" @endif><a href="{{ route('coupons-available') }}" style="color:@if(Route::current()->getName() == 'coupons-available') white @else black @endif">Available Coupons</a></li>
-			<li><a href="#">Expired Coupons</a></li>
-			<li><a href="#">Claimed Coupons</a></li>
+			<li @if(Route::current()->getName() == 'coupons-available') class="active" @endif>
+				<a href="{{ route('coupons-available') }}" style="color:@if(Route::current()->getName() == 'coupons-available') white @else black @endif">Available Coupons</a>
+			</li>
+			<li @if(Route::current()->getName() == 'coupons-expired') class="active" @endif>
+				<a href="{{ route('coupons-expired') }}" style="color:@if(Route::current()->getName() == 'coupons-expired') white @else black @endif">Expired Coupons</a>
+			</li>
+			<li @if(Route::current()->getName() == 'coupons-claimed') class="active" @endif>
+				<a href="{{ route('coupons-claimed') }}" style="color:@if(Route::current()->getName() == 'coupons-claimed') white @else black @endif">Claimed Coupons</a>
+			</li>
 		</ul>
 	</li>
 </ul>

@@ -17,6 +17,7 @@ class CreateCouponSalesTable extends Migration
             $table->bigIncrements('id');
             $table->integer('customer_id');
             $table->integer('coupon_id');
+            $table->string('coupon_code');
             $table->integer('sales_header_id');
             $table->timestamps();
         });

@@ -41,10 +41,11 @@ class CreateCouponsTable extends Migration
             $table->text('purchase_product_brand')->nullable();
             $table->decimal('purchase_amount',16,2)->nullable();
             $table->string('purchase_amount_type',150)->nullable();
-            $table->integer('amount_discount_type');
+            $table->integer('amount_discount_type')->nullable()->default(0);
             $table->decimal('purchase_qty',16,2)->nullable();
             $table->string('purchase_qty_type',150)->nullable();
-            $table->integer('qty_discount_type');
+            $table->integer('purchase_combination_counter')->nullable()->default(0);
+            $table->string('purchase_combination')->nullable();
             $table->string('activity_type',150)->nullable();
             $table->integer('customer_limit')->nullable();
             $table->string('usage_limit',150)->nullable();

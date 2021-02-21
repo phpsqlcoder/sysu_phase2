@@ -81,7 +81,10 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::post('/wishlist/remove-product','EcommerceControllers\WishlistController@remove_product')->name('wishlist.remove-product');
 
     // Coupons
-    Route::get('/account/coupons','EcommerceControllers\CouponFrontController@available')->name('coupons-available');
+    Route::get('/account/available-coupons','EcommerceControllers\CouponFrontController@available')->name('coupons-available');
+    Route::get('/account/expired-coupons','EcommerceControllers\CouponFrontController@expire')->name('coupons-expired');
+    Route::get('/account/claimed-coupons','EcommerceControllers\CouponFrontController@claimed')->name('coupons-claimed');
+
     Route::get('/checkout-use-coupon/{id}','EcommerceControllers\CouponFrontController@use_coupon')->name('use-coupon');
 
     Route::post('/add-manual-coupon','EcommerceControllers\CouponFrontController@add_manual_coupon')->name('add-manual-coupon');
@@ -235,6 +238,8 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         Route::post('/coupon-multiple-change-status','EcommerceControllers\CouponController@multiple_change_status')->name('coupon.multiple.change.status');
         Route::post('/coupon-multiple-delete','EcommerceControllers\CouponController@multiple_delete')->name('coupon.multiple.delete');
 
+        Route::get('/get-product-brands', 'EcommerceControllers\CouponFrontController@get_brands')->name('display.product-brands');
+
         //Reports
         Route::get('/report/customer_list', 'EcommerceControllers\ReportsController@customer_list')->name('report.customer.list');
         Route::get('/report/product_list', 'EcommerceControllers\ReportsController@product_list')->name('report.product.list');
@@ -244,6 +249,8 @@ Route::group(['prefix' => env('APP_PANEL', 'cerebro')], function () {
         Route::get('/report/inventory_list', 'EcommerceControllers\ReportsController@inventory_list')->name('report.inventory.list');
         Route::get('/report/inventory_reorder_point', 'EcommerceControllers\ReportsController@inventory_reorder_point')->name('report.inventory.reorder_point');
         Route::get('/report/stock-card/{id}', 'EcommerceControllers\ReportsController@stock_card')->name('report.product.stockcard');
+        Route::get('/report/coupon_list', 'EcommerceControllers\ReportsController@coupon_list')->name('report.coupon.list');
+
 
         // Roles
         Route::resource('/role', 'Settings\RoleController');
