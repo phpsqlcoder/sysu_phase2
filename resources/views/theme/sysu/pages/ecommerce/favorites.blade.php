@@ -29,27 +29,37 @@
                     <table class="table table-hover small overflow-auto">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" class="align-middle">Actions</th>
                                 <th scope="col" class="align-middle">Product Name</th>
                                 <th scope="col" class="align-middle">Available Stock</th>
+                                <th scope="col" class="align-middle">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($products as $product)
                                 <tr>
+                                    <td>{{ $product->product_details->name }}</td>
+                                    <td>
+                                        @if($product->product_details->maxpurchase > 0)
+                                            {{ $product->product_details->maxpurchase }}
+                                        @else
+                                            <span class="text-danger">Out of Stock</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="#" title="Remove Product" onclick="remove_product('{{$product->product_id}}');" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
+
+                                        <a href="{{route('product.front.show',$product->product_details->slug)}}" target="_blank" title="View Product Details" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
 
                                         @if($product->product_details->maxpurchase > 0)
                                             @if(\App\EcommerceModel\Cart::on_cart($product->product_id) == 0)
                                             <a href="{{ route('favorite.product-add-to-cart',$product->product_id) }}" title="Add to Cart" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
+                                            @else
+                                            <a href="javascript:;" title="Already on Cart" class="btn btn-warning btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
                                             @endif
+                                        @else
+                                            <a href="javascript:;" title="Add to Cart" class="btn btn-secondary btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
                                         @endif
-
-                                        <a href="{{route('product.front.show',$product->product_details->slug)}}" target="_blank" title="View Product Details" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                     </td>
-                                    <td>{{ $product->product_details->name }}</td>
-                                    <td>{{ $product->product_details->maxpurchase }}</td>
                                 </tr>
                             @empty
                                 <td>

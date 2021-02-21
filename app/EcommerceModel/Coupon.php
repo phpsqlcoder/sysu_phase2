@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Auth;
 use Carbon\Carbon;
 
+use App\EcommerceModel\Product;
 use App\EcommerceModel\CouponSale;
 
 
@@ -15,7 +16,7 @@ class Coupon extends Model
 {
 	use SoftDeletes;
 
-    protected $fillable = [ 'coupon_code', 'name', 'description', 'terms_and_conditions', 'activation_type', 'customer_scope', 'scope_customer_id', 'location','location_discount_type','location_discount_amount', 'amount', 'percentage', 'free_product_id', 'status', 'start_date', 'end_date', 'start_time', 'end_time', 'event_name', 'event_date', 'repeat_annually', 'purchase_product_id', 'purchase_product_cat_id', 'purchase_product_brand', 'purchase_amount', 'purchase_amount_type', 'amount_discount_type', 'purchase_qty', 'purchase_qty_type', 'qty_discount_type', 'activity_type', 'customer_limit', 'usage_limit', 'usage_limit_no', 'combination', 'availability', 'user_id'];
+    protected $fillable = [ 'coupon_code', 'name', 'description', 'terms_and_conditions', 'activation_type', 'customer_scope', 'scope_customer_id', 'location','location_discount_type','location_discount_amount', 'amount', 'percentage', 'free_product_id', 'status', 'start_date', 'end_date', 'start_time', 'end_time', 'event_name', 'event_date', 'repeat_annually', 'purchase_product_id', 'purchase_product_cat_id', 'purchase_product_brand', 'purchase_amount', 'purchase_amount_type', 'amount_discount_type', 'purchase_qty', 'purchase_qty_type', 'purchase_combination_counter','purchase_combination', 'activity_type', 'customer_limit', 'usage_limit', 'usage_limit_no', 'combination', 'availability', 'user_id'];
     
     public $timestamps = true;
 
@@ -39,6 +40,13 @@ class Coupon extends Model
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
         return $randomString;
+    }
+
+    public static function coupon_total_usage($couponid)
+    {
+        $total = CouponSale::where('coupon_id',$couponid)->count();
+
+        return $total;
     }
 
     public static function coupon_usage($couponid)
@@ -81,7 +89,9 @@ class Coupon extends Model
         $coupons = 
             Coupon::whereNotIn('id',function($query){
                 $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')->whereNotNull($purchase_field)->where($purchase_type,'min')->where($purchase_field,'<=',$purchase_value)->get();
+            })->where('status','ACTIVE')
+            ->where('purchase_combination_counter',0)
+            ->whereNotNull($purchase_field)->where($purchase_type,'min')->where($purchase_field,'<=',$purchase_value)->get();
 
         return $coupons;
     }
@@ -91,7 +101,9 @@ class Coupon extends Model
         $coupons = 
             Coupon::whereNotIn('id',function($query){
                 $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')->whereNotNull($purchase_field)->where($purchase_type,'max')->where($purchase_field,'>=',$purchase_value)->get();
+            })->where('status','ACTIVE')
+            ->where('purchase_combination_counter',0)
+            ->whereNotNull($purchase_field)->where($purchase_type,'max')->where($purchase_field,'>=',$purchase_value)->get();
 
         return $coupons;
     }
@@ -101,20 +113,32 @@ class Coupon extends Model
         $coupons = 
             Coupon::whereNotIn('id',function($query){
                 $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')->whereNotNull($purchase_field)->where($purchase_type,'exact')->where($purchase_field,$purchase_value)->get();
+            })->where('status','ACTIVE')
+            ->where('purchase_combination_counter',0)
+            ->whereNotNull($purchase_field)->where($purchase_type,'exact')->where($purchase_field,$purchase_value)->get();
 
         return $coupons;
     }
     
     public static function purchaseWithinDateRange()
     {
+        // $coupons = 
+        //     Coupon::whereNotIn('id',function($query){
+        //         $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
+        //     })->where('status','ACTIVE')
+        //     ->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
         $coupons = 
             Coupon::whereNotIn('id',function($query){
                 $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
+            })->where('status','ACTIVE')
+            ->where(function ($orWhereQuery){
+                $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
+                ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
+            })->get();
 
         return $coupons;
     }
+
     // public static function rewards_desc($couponID)
     // {
     //     $coupon = Coupon::find($couponID);

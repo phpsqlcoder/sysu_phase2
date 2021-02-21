@@ -40,7 +40,7 @@
 		<div>
 			<nav aria-label="breadcrumb">
 				<ol class="breadcrumb breadcrumb-style1 mg-b-10">
-					<li class="breadcrumb-item" aria-current="page">CMS</li>
+					<li class="breadcrumb-item" aria-current="page"><a href="{{route('dashboard')}}">CMS</a></li>
 					<li class="breadcrumb-item" aria-current="page"><a href="{{ route('coupons.index') }}">Coupons</a></li>
 					<li class="breadcrumb-item active" aria-current="page">Edit Coupon</li>
 				</ol>
@@ -49,7 +49,7 @@
 		</div>
 	</div>
 
-	<form method="post" action="{{ route('coupons.update',$coupon->id) }}" id="couponForm">
+	<form method="post" action="{{ route('coupons.update',$coupon->id) }}" id="couponForm" autocomplete="off">
 		@csrf
 		@method('PUT')
 		<div class="row row-sm">
@@ -72,7 +72,7 @@
 				</div>
 				<div class="form-group">
 					<label class="d-block">Distribution Type</label>
-					<div class="row">
+					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation')) || $coupon->activation_type == 'manual') checked @else checked @endif>
@@ -95,7 +95,7 @@
 				</div>
 				<div class="form-group">
 					<label class="d-block">Customer Scope</label>
-					<div class="row">
+					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" onclick="ShowHideDiv()" @if($coupon->customer_scope == 'all') checked @endif>
@@ -149,6 +149,8 @@
 								<option @if(in_array($location->name,$arr_loc)) selected @endif value="{{$location->name}}">{{ $location->name }}</option>
 							@endforeach
 						</select>
+						@hasError(['inputName' => 'location'])
+                    	@endhasError
 
 						<br><br>
 						<label class="d-block">Discount Type</label>
@@ -166,11 +168,9 @@
 								</div>
 							</div>
 						</div>
-						@hasError(['inputName' => 'discount_type'])
-                    	@endhasError
 
-						<label class="mg-t-10" id="discount_amount_label" style="display: @if($coupon->location_discount_amount > 0) block @else none @endif">Discount Amount</label>
-						<input type="number" name="sf_discount_amount" class="form-control @error('sf_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('sf_discount_amount',$coupon->location_discount_amount) }}" style="display: @if($coupon->location_discount_amount > 0) block @else none @endif">
+						<label class="mg-t-10" id="discount_amount_label">Shipping Fee Discount Amount</label>
+						<input type="number" name="sf_discount_amount" class="form-control @error('sf_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ $coupon->location_discount_amount }}">
 						@hasError(['inputName' => 'sf_discount_amount'])
                     	@endhasError
 
@@ -178,22 +178,28 @@
 
 					<div class="mb-3 reward-option" id="discount-amount-optn" style="display:@if(isset($coupon->amount)) block @else none @endif">
 						<label class="d-block">Discount Amount</label>
-						<input name="discount_amount" type="number" class="form-control" value="{{ $coupon->amount }}" placeholder="Php">
+						<input name="discount_amount" type="number" class="form-control @error('discount_amount') is-invalid @enderror" value="{{ $coupon->amount }}" placeholder="Php">
+						@hasError(['inputName' => 'discount_amount'])
+                    	@endhasError
 					</div>
 
 					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if(isset($coupon->percentage)) block @else none @endif">
 						<label class="d-block">Discount Percentage</label>
-						<input name="discount_percentage" type="number" class="form-control" value="{{ $coupon->percentage }}" placeholder="%">
+						<input name="discount_percentage" type="number" class="form-control @error('discount_percentage') is-invalid @enderror" value="{{ $coupon->percentage }}" placeholder="%">
+						@hasError(['inputName' => 'discount_percentage'])
+                    	@endhasError
 					</div>
 
 					<div class="mb-3 reward-option" id="free-product-optn" style="display:@if(isset($coupon->free_product_id)) block @else none @endif">
 						<label class="d-block">Free Product</label>
 						<select class="form-control select2" name="free_product_id" style="min-height: 32px;">
 							<option label="Choose one"></option>
-							@foreach($products as $product)
-								<option value="{{$product->id}}">{{ $product->name }}</option>
+							@foreach($free_products as $product)
+								<option @if($coupon->free_product_id == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
 							@endforeach
 						</select>
+						@hasError(['inputName' => 'free_product_id'])
+                    	@endhasError
 					</div>
 					<hr>
 				</div>
@@ -281,34 +287,39 @@
 					</div>
 				</div>
 
+
+
+
+
+
 				<div class="form-group">
 					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="coupon-purchase" onclick="myFunction()" name="coupon_setting[]" value="purchase" @if(is_array(old('coupon_setting')) && in_array('purchase', old('coupon_setting')) || isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) checked @endif>
+						<input type="checkbox" class="custom-control-input" id="coupon-purchase" onclick="myFunction()" name="coupon_setting[]" value="purchase" @if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) checked @endif>
 						<label class="custom-control-label" for="coupon-purchase">Purchase</label>
 					</div>
 				</div>
 
-				<div class="form-row border rounded p-3 mb-4" id="coupon-purchase-option" style="display:@if(is_array(old('coupon_setting')) && in_array('purchase', old('coupon_setting')) || isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) flex @else none @endif;">
+				<div class="form-row border rounded p-3 mb-4" id="coupon-purchase-option" style="display:@if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) flex @else none @endif;">
 					<div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-product" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="product" @if(is_array(old('coupon_purchase')) && in_array('product', old('coupon_purchase')) || isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand)) checked @endif>
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" id="coupon-product" name="purchase_product" class="custom-control-input" onclick="purchase_products()"  @if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand)) checked @endif >
 							<label class="custom-control-label" for="coupon-product">Product</label>
 						</div>
 					</div>
 					<div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-amount" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="amount" @if(is_array(old('coupon_purchase')) && in_array('amount', old('coupon_purchase')) || isset($coupon->purchase_amount)) checked @endif>
-							<label class="custom-control-label" for="coupon-amount">Amount</label>
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" id="coupon-amount" name="purchase_total_amount" class="custom-control-input" onclick="total_amount_purchase()" @if(isset($coupon->purchase_amount)) checked @endif>
+							<label class="custom-control-label" for="coupon-amount">Total Amount</label>
 						</div>
 					</div>
 					<div class="col-md-3">
-						<div class="custom-control custom-radio">
-							<input type="radio" id="coupon-quantity" name="coupon_purchase[]" class="custom-control-input" onclick="ShowHideDiv()" value="qty" @if(is_array(old('coupon_purchase')) && in_array('qty', old('coupon_purchase')) || isset($coupon->purchase_qty)) checked @endif>
-							<label class="custom-control-label" for="coupon-quantity">Quantity</label>
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" id="coupon-quantity" name="purchase_total_qty" class="custom-control-input" onclick="total_qty_purchase()" @if(isset($coupon->purchase_qty)) checked @endif>
+							<label class="custom-control-label" for="coupon-quantity">Total Quantity</label>
 						</div>
 					</div>
 
-					<div class="col-12 mt-3" id="coupon-product-form" style="display:@if(is_array(old('coupon_purchase')) && in_array('product', old('coupon_purchase')) || isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand)) block @else none @endif;">
+					<div class="col-12 mt-3" id="coupon-product-form" style="display:@if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand)) block @else none @endif;">
 						<small class="text-danger" style="display: none;" id="spanProductOpt"></small>
 						<div class="form-group">
 							<label class="d-block">Product Name</label>
@@ -336,7 +347,7 @@
 							<select class="form-control select2" multiple="multiple" name="product_name[]" id="product_opt">
 								<option label="Choose one"></option>
 								@foreach($products as $product)
-									<option @if(is_array(old('product_name')) && in_array($product->id, old('product_name')) || in_array($product->id,$arr_products)) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
+									<option @if(in_array($product->id,$arr_products)) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
 								@endforeach
 							</select>
 						</div>
@@ -346,7 +357,7 @@
 							<select class="form-control select2" multiple="multiple" name="product_category[]" id="category_opt">
 								<option label="Choose one"></option>
 								@foreach($categories as $category)
-									<option @if(is_array(old('product_category')) && in_array($category->id, old('product_category')) || in_array($category->id,$arr_categories)) selected @endif value="{{$category->id}}">{{ $category->name }}</option>
+									<option @if(in_array($category->id,$arr_categories)) selected @endif value="{{$category->id}}">{{ $category->name }}</option>
 								@endforeach
 							</select>
 						</div>
@@ -356,50 +367,61 @@
 							<select class="form-control select2" multiple="multiple" name="product_brand[]" id="brand_opt">
 								<option label="Choose one"></option>
 								@foreach($brands as $brand)
-									<option @if(is_array(old('product_brand')) && in_array($brand->brand, old('product_brand')) || in_array($brand->brand,$arr_brands)) selected @endif value="{{$brand->brand}}">{{$brand->brand}}</option>
+									<option @if(in_array($brand->brand,$arr_brands)) selected @endif value="{{$brand->brand}}">{{$brand->brand}}</option>
 								@endforeach
 							</select>
 						</div>
 					</div>
 
-					<div class="col-12 mt-3" id="coupon-amount-form" style="display:@if(is_array(old('coupon_purchase')) && in_array('amount', old('coupon_purchase')) || isset($coupon->purchase_amount)) block @else none @endif;">
+					<div class="col-12 mt-3" id="coupon-amount-form" style="display:@if(isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) block @else none @endif">
 						<div class="row">
-							<div class="col-12">
-								<label class="d-block">Amount *</label>
+							<div class="col-12" id="total-amount-div" style="display:@if(isset($coupon->purchase_amount)) block @else none @endif;">
+								<label class="d-block">Total Amount *</label>
 							</div>
-							<div class="col-md-6">
-								<input name="purchase_amount" id="purchase_amount" type="number" min="1" class="form-control" value="{{ old('purchase_amount',$coupon->purchase_amount) }}">
+							<div class="col-md-6" id="total-amount-input" style="display:@if(isset($coupon->purchase_amount)) block @else none @endif;">
+								<input name="purchase_amount" id="purchase_amount" type="number" min="1" class="form-control" value="{{ $coupon->purchase_amount }}">
 								<small id="spanPurchaseAmount" style="display: none;" class="text-danger"></small>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-6" id="total-amount-select" style="display:@if(isset($coupon->purchase_amount)) block @else none @endif;">
 								<select class="custom-select" name="amount_opt" id="amount_opt">
-									<option selected value="">Open this select menu</option>
-									<option @if(old('amount_opt') == 'min' || $coupon->purchase_amount_type == 'min') selected @endif value="min">Minimum</option>
-									<option @if(old('amount_opt') == 'max' || $coupon->purchase_amount_type == 'max') selected @endif value="max">Maximum</option>
-									<option @if(old('amount_opt') == 'exact' || $coupon->purchase_amount_type == 'exact') selected @endif value="exact">Exact</option>
+									<option value="">Choose One</option>
+									<option @if($coupon->purchase_amount_type == 'min') selected @endif value="min">Minimum</option>
+									<option @if($coupon->purchase_amount_type == 'max') selected @endif value="max">Maximum</option>
+									<option @if($coupon->purchase_amount_type == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanAmountOpt" style="display: none;" class="text-danger"></small>
 							</div>
-						</div>
-					</div>
 
-					<div class="col-12 mt-3" id="coupon-quantity-form" style="display:@if(is_array(old('coupon_purchase')) && in_array('qty', old('coupon_purchase')) || isset($coupon->purchase_qty)) block @else none @endif;">
-						<div class="row">
-							<div class="col-12">
-								<label class="d-block">Quantity *</label>
+							<!-- Quantity -->
+							<div class="col-12" id="total-quantity-div" style="padding-top: 10px;display:@if(isset($coupon->purchase_qty)) block @else none @endif;">
+								<label class="d-block">Total Quantity *</label>
 							</div>
-							<div class="col-md-6">
-								<input name="purchase_qty" id="purchase_qty" type="number" min="1" class="form-control" value="{{ old('purchase_qty',$coupon->purchase_qty) }}">
+							<div class="col-md-6" id="total-quantity-input" style="display:@if(isset($coupon->purchase_qty)) block @else none @endif;">
+								<input name="purchase_qty" id="purchase_qty" type="number" min="1" class="form-control" value="{{ $coupon->purchase_qty }}">
 								<small id="spanPurchaseQty" style="display: none;" class="text-danger"></small>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-6" id="total-quantity-select" style="display:@if(isset($coupon->purchase_qty)) block @else none @endif;">
 								<select class="custom-select" name="qty_opt" id="qty_opt">
-									<option selected value="">Open this select menu</option>
-									<option @if(old('qty_opt') == 'min' || $coupon->purchase_qty_type == 'min') selected @endif value="min">Minimum</option>
-									<option @if(old('qty_opt') == 'max' || $coupon->purchase_qty_type == 'max') selected @endif value="max">Maximum</option>
-									<option @if(old('qty_opt') == 'exact' || $coupon->purchase_qty_type == 'exact') selected @endif value="exact">Exact</option>
+									<option value="">Choose One</option>
+									<option @if($coupon->purchase_qty_type == 'min') selected @endif value="min">Minimum</option>
+									<option @if($coupon->purchase_qty_type == 'max') selected @endif value="max">Maximum</option>
+									<option @if($coupon->purchase_qty_type == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
+							</div>
+
+							<!-- Appy reward on total amount / product price -->
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="qty-total-amount" name="amount_discount" class="custom-control-input" value="1" @if($coupon->amount_discount_type == 1) checked @endif>
+									<label class="custom-control-label" for="qty-total-amount">Total Amount</label>
+								</div>
+							</div>
+							<div class="col-md-6 mt-3">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="qty-product-price" name="amount_discount" class="custom-control-input" value="2" @if($coupon->amount_discount_type == 2) checked @endif>
+									<label class="custom-control-label" for="qty-product-price">Product Price</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -480,14 +502,14 @@
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination" {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }}>
+							<input {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination">
 							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination (Can be combined by other coupons)</label>
 						</div>
 					</div>
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-availability" name="availability" {{ (old("availability") == "ON" || $coupon->availability == 1 ? "checked":"") }}>
+							<input {{ (old("availability") == "ON" || $coupon->availability == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-availability" name="availability">
 							<label class="custom-control-label" for="coupon-availability">Availability ( Optional : Can be use upon checkout )</label>
 						</div>
 					</div>
@@ -545,6 +567,97 @@
 
 @section('customjs')
 <script>
+	$('#reward-optn').change(function(){
+		$('.reward-option').hide();
+		$('#' + $(this).val()).show();
+	});
+
+	function sf_discount_type(){
+		var option = $('input[name="discount_type"]:checked').val();
+
+		if(option == 'full'){
+			$('#discount_amount_label').css('display','none');
+			$('#discount_amount_input').css('display','none');
+		} else {
+			$('#discount_amount_label').css('display','block');
+			$('#discount_amount_input').css('display','block');
+		}
+	}
+
+	function total_amount_purchase(){
+		if($('#coupon-amount').is(':checked')){
+			$('#coupon-amount-form').css('display','block');
+			$('#total-amount-div').css('display','block');
+			$('#total-amount-input').css('display','block');
+			$('#total-amount-select').css('display','block');
+		} else {
+			if($('#coupon-quantity').is(':checked')){
+				$('#total-amount-div').css('display','none');
+				$('#total-amount-input').css('display','none');
+				$('#total-amount-select').css('display','none');
+			} else {
+				$('#coupon-amount-form').css('display','none');
+			}
+		}
+	}
+
+	function total_qty_purchase(){
+		if($('#coupon-quantity').is(':checked')){
+			$('#coupon-amount-form').css('display','block');
+			$('#total-quantity-div').css('display','block');
+			$('#total-quantity-input').css('display','block');
+			$('#total-quantity-select').css('display','block');
+		} else {
+			if($('#coupon-amount').is(':checked')){
+				$('#total-quantity-div').css('display','none');
+				$('#total-quantity-input').css('display','none');
+				$('#total-quantity-select').css('display','none');
+			} else {
+				$('#coupon-amount-form').css('display','none');
+			}
+		}
+	}
+
+	function purchase_products(){
+		if($('#coupon-product').is(':checked')){
+			$('#coupon-product-form').css('display','block');
+		} else {
+			$('#coupon-product-form').css('display','none');
+		}
+		
+	}
+
+	$('#product_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#category_opt').attr("disabled", true);
+			$('#brand_opt').attr("disabled", true);
+		} else {
+			$('#category_opt').removeAttr("disabled");
+			$('#brand_opt').removeAttr("disabled");
+		}
+	});
+
+	$('#category_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#product_opt').attr("disabled", true);
+		} else {
+			$('#product_opt').removeAttr("disabled");
+		}
+	});
+
+	$('#brand_opt').change(function(){
+		var value = $(this).val();
+
+		if(value != ''){
+			$('#product_opt').attr("disabled", true);
+		} else {
+			$('#product_opt').removeAttr("disabled");
+		}
+	});
 
 	$('#btnSubmit').click(function(){
 
@@ -559,7 +672,7 @@
 				   	if(this.value == 'time') {
 					   	if(!$("input[name='coupon_time[]']:checked").val()) {
 					   		$('#coupon-time-option').addClass('is-invalid');
-				   			$('#no_selected_title').html('Please select at least one (1) time option.');      
+				   			$('#no_selected_title').html('Please select at least one (1) Time Setting option.');      
 	            			$('#prompt-no-selected').modal('show');
 	            			rs = false;
 	            			return false;
@@ -604,13 +717,8 @@
 				   	}
 
 				   	if(this.value == 'purchase') {
-				   		if(!$("input[name='coupon_purchase[]']:checked").val()) {
-				   			$('#coupon-purchase-option').addClass('is-invalid');
-				   			$('#no_selected_title').html('Please select at least one (1) purchase option.');      
-                			$('#prompt-no-selected').modal('show');
-                			rs = false;
-	            			return false;
-				   		} else {
+				   		if($('#coupon-product').is(':checked') || $('#coupon-amount').is(':checked') || $('#coupon-quantity').is(':checked')) {
+
 				   			$('#coupon-purchase-option').removeClass('is-invalid');
 				   			var selectedOption = $('input[name="coupon_purchase[]"]:checked').val();
 
@@ -676,75 +784,20 @@
 				   			}
 
 				   			rs = true;
+				   		} else {
+				   			$('#coupon-purchase-option').addClass('is-invalid');
+				   			$('#no_selected_title').html('Please select at least one (1) purchase option.');      
+                			$('#prompt-no-selected').modal('show');
+                			rs = false;
+	            			return false;
 				   		}
-				   	}	
+				   	}
 				});
 				
 				if(rs == true){
 					$('#couponForm').submit();
 				}
             }
-	});
-	
-	function sf_discount_type(){
-		var option = $('input[name="discount_type"]:checked').val();
-
-		if(option == 'full'){
-			$('#discount_amount_label').css('display','none');
-			$('#discount_amount_input').css('display','none');
-		} else {
-			$('#discount_amount_label').css('display','block');
-			$('#discount_amount_input').css('display','block');
-		}
-	}
-
-
-	$('#product_opt').change(function(){
-		var value = $(this).val();
-
-		if(value != ''){
-			$('#category_opt').attr("disabled", true);
-			$('#brand_opt').attr("disabled", true);
-		} else {
-			$('#category_opt').removeAttr("disabled");
-			$('#brand_opt').removeAttr("disabled");
-		}
-	});
-
-	$('#category_opt').change(function(){
-		var value = $(this).val();
-
-		if(value != ''){
-			$('#product_opt').attr("disabled", true);
-		} else {
-			$('#product_opt').removeAttr("disabled");
-		}
-	});
-
-	$('#brand_opt').change(function(){
-		var value = $(this).val();
-
-		if(value != ''){
-			$('#product_opt').attr("disabled", true);
-		} else {
-			$('#product_opt').removeAttr("disabled");
-		}
-	});
-
-	$('#coupon-purchase').click(function(){
-		if(this.checked){
-			$('#coupon-availability').attr("disabled", true);
-		} else {
-			$('#coupon-availability').removeAttr("disabled");
-		}
-	});
-
-	$('#coupon-availability').click(function(){
-		if(this.checked){
-			$('#coupon-purchase').attr("disabled", true);
-		} else {
-			$('#coupon-purchase').removeAttr("disabled");
-		}
 	});
 
 	$("#enableSwitch1").change(function() {
@@ -776,11 +829,6 @@
 		placeholder: 'Choose Options'
 	});
 
-	$('#reward-optn').change(function(){
-		$('.reward-option').hide();
-		$('#' + $(this).val()).show();
-	});
-
 	function myFunction() {
 		var checkCouponTime = document.getElementById("coupon-time");
 		var fieldCouponOption = document.getElementById("coupon-time-option");
@@ -798,14 +846,6 @@
 			fieldCouponOption.style.display = "none";
 		};
 
-		// var couponRules = document.getElementById("coupon-rules");
-		// var fieldRulesOption = document.getElementById("coupon-rules-option");
-		// if (couponRules.checked == true){
-		// 	fieldRulesOption.style.display = "flex";
-		// } else {
-		// 	fieldRulesOption.style.display = "none";
-		// };
-
 		var couponCustomerLimit = document.getElementById("coupon-customer-limit");
 		var fieldCustomerLimitOption = document.getElementById("coupon-customer-limit-form");
 		if (couponCustomerLimit.checked == true){
@@ -821,28 +861,17 @@
 		} else {
 			fieldCustomerUsageOption.style.display = "none";
 		};
-		
-		// var couponCustomerTransaction = document.getElementById("coupon-customer-transaction");
-		// var fieldCustomerTransactionOption = document.getElementById("coupon-customer-transaction-form");
-		// if (couponCustomerTransaction.checked == true){
-		// 	fieldCustomerTransactionOption.style.display = "block";
-		// } else {
-		// 	fieldCustomerTransactionOption.style.display = "none";
-		// };
-
-		var couponCustomerAmount = document.getElementById("coupon-customer-amount");
-		var fieldCustomerAmountOption = document.getElementById("coupon-customer-amount-form");
-		if (couponCustomerAmount.checked == true){
-			fieldCustomerAmountOption.style.display = "block";
-		} else {
-			fieldCustomerAmountOption.style.display = "none";
-		};
 	};
 
 	function ShowHideDiv() {
 		var couponDateTime = document.getElementById("coupon-date-time");
 		var couponDateTimeForm = document.getElementById("coupon-date-time-form");
 		couponDateTimeForm.style.display = couponDateTime.checked ? "block" : "none";
+
+		var couponCustom = document.getElementById("coupon-custom");
+		var couponCustomForm = document.getElementById("coupon-custom-form");
+		couponCustomForm.style.display = couponCustom.checked ? "block" : "none";
+
 
 		var scopeSpecific = document.getElementById("coupon-scope-specific");
 		var customerOption = document.getElementById("customer-optn");
@@ -859,30 +888,6 @@
 		var autoManual= document.getElementById("coupon-activate-auto");
 		var couponCodeAuto = document.getElementById("coupon-code");
 		couponCodeAuto.style.display = autoManual.checked ? "none" : "block";
-
-		var couponCustom = document.getElementById("coupon-custom");
-		var couponCustomForm = document.getElementById("coupon-custom-form");
-		couponCustomForm.style.display = couponCustom.checked ? "block" : "none";
-
-		var couponProduct = document.getElementById("coupon-product");
-		var couponProductForm = document.getElementById("coupon-product-form");
-		couponProductForm.style.display = couponProduct.checked ? "block" : "none";
-
-		var couponAmount = document.getElementById("coupon-amount");
-		var couponAmountForm = document.getElementById("coupon-amount-form");
-		couponAmountForm.style.display = couponAmount.checked ? "block" : "none";
-
-		var couponQuantity = document.getElementById("coupon-quantity");
-		var couponQuantityForm = document.getElementById("coupon-quantity-form");
-		couponQuantityForm.style.display = couponQuantity.checked ? "block" : "none";
-
-		// var couponReturningCustomer = document.getElementById("coupon-returning-customer");
-		// var couponReturningCustomerForm = document.getElementById("coupon-returning-form");
-		// couponReturningCustomerForm.style.display = couponReturningCustomer.checked ? "block" : "none";
-
-		// var couponFeaturedOrganization = document.getElementById("coupon-featured-organization");
-		// var couponFeaturedOrganizationForm = document.getElementById("coupon-featured-form");
-		// couponFeaturedOrganizationForm.style.display = couponFeaturedOrganization.checked ? "block" : "none";
 
 		var couponMultiUse = document.getElementById("coupon-multi-use");
 		var couponMultiUseForm = document.getElementById("coupon-multi-use-form");

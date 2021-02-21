@@ -41,14 +41,13 @@
                     <table class="table table-hover small text-center overflow-auto">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" class="align-middle">Action</th>
                                 <th scope="col" class="align-middle">Order#</th>
                                 <th scope="col" class="align-middle">Date</th>
                                 <th scope="col" class="align-middle">Amount</th>
                                 <th scope="col" class="align-middle">Paid</th>
                                 <th scope="col" class="align-middle">Balance</th>
                                 <th scope="col" class="align-middle">Delivery Status</th>
-                                
+                                <th scope="col" class="align-middle">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,6 +58,12 @@
                                 $btn = '';
                                 @endphp
                                 <tr>
+                                    <td>{{$sale->order_number}}</td>
+                                    <td>{{$sale->created_at}}</td>
+                                    <td>{{number_format($sale->gross_amount,2)}}</td>
+                                    <td>{{number_format($paid,2)}}</td>
+                                    <td>{{number_format($balance,2)}}</td>
+                                    <td>{{$sale->delivery_status}}</td>
                                     <td align="right">
                                         @if($sale->status<>'CANCELLED')
                                             <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
@@ -82,13 +87,6 @@
                                             <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                         @endif
                                     </td>
-                                    <td>{{$sale->order_number}}</td>
-                                    <td>{{$sale->created_at}}</td>
-                                    <td>{{number_format($sale->gross_amount,2)}}</td>
-                                    <td>{{number_format($paid,2)}}</td>
-                                    <td>{{number_format($balance,2)}}</td>
-                                    <td>{{$sale->delivery_status}}</td>
-                                    
                                 </tr>
                                 @php
 
