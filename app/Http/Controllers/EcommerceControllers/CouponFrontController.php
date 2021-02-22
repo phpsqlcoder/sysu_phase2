@@ -11,6 +11,7 @@ use App\EcommerceModel\Coupon;
 use App\EcommerceModel\CustomerCoupon;
 use App\EcommerceModel\CouponCart;
 use App\EcommerceModel\Product;
+use App\EcommerceModel\Cart;
 use App\Page;
 use Auth;
 
@@ -183,12 +184,14 @@ class CouponFrontController extends Controller
         $arr_products = [];
         $arr_categories = [];
 
-        $cartProducts = explode('|',$request->cproducts);
+        $cartProducts = Cart::where('user_id',Auth::id())->get();
+
+        // $cartProducts = explode('|',$request->cproducts);
 
         foreach ($cartProducts as $p) {
-            $product = Product::find($p);
+            $product = Product::find($p->product_id);
 
-            array_push($arr_products, $p);
+            array_push($arr_products, $p->product_id);
             array_push($arr_categories, $product->category_id);
 
             if(isset($product->brand)){

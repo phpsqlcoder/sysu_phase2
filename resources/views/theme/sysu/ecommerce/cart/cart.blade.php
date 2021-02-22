@@ -359,7 +359,7 @@
                 type: "GET",
                 url: "{{ route('display.collectibles') }}",
                 data: { 
-                    'cproducts' : products.slice(0,-1),
+                    // 'cproducts' : products.slice(0,-1),
                     'total_amount' : totalAmount,
                     'total_qty' : totalQty
                 },
