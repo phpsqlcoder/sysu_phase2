@@ -94,7 +94,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::get();
+        $categories = ProductCategory::orderBy('name','asc')->get();
 
         return view('admin.products.create',compact('categories'));
     }
@@ -199,7 +199,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        $categories = ProductCategory::get();
+        $categories = ProductCategory::orderBy('name','asc')->get();
 
         return view('admin.products.edit',compact('product','categories'));
     }
