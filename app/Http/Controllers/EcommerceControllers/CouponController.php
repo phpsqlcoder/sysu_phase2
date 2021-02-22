@@ -14,6 +14,7 @@ use App\EcommerceModel\ProductCategory;
 use App\User;
 use App\Deliverablecities;
 
+use Carbon\Carbon;
 use Auth;
 
 class CouponController extends Controller
@@ -225,11 +226,14 @@ class CouponController extends Controller
 
     public function update_coupon_time_settings($couponID,$request)
     {
+        $starttime = Carbon::parse($request->starttime)->format('H:i');
+        $endtime = Carbon::parse($request->endtime)->format('H:i');
+        
         Coupon::find($couponID)->update([
             'start_date' => $request->coupon_time[0] == 'datetime' ? $request->startdate : NULL,
             'end_date' => $request->coupon_time[0] == 'datetime' ? $request->enddate : NULL,
-            'start_time' => $request->coupon_time[0] == 'datetime' ? $request->starttime : NULL,
-            'end_time' => $request->coupon_time[0] == 'datetime' ? $request->endtime : NULL,
+            'start_time' => isset($request->starttime) ? $starttime : NULL,
+            'end_time' => isset($request->endtime) ? $endtime : NULL,
             'event_name' => $request->coupon_time[0] == 'custom' ? $request->eventname : NULL,
             'event_date' => $request->coupon_time[0] == 'custom' ? $request->eventdate : NULL,
             'repeat_annually' => $request->has('repeat_annually') ? 1 : 0,
