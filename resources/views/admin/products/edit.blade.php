@@ -65,6 +65,7 @@
                         <label class="d-block">Category</label>
                         <select name="category" id="category" class="selectpicker mg-b-5" data-style="btn btn-outline-light btn-md btn-block tx-left" title="Select category" data-width="100%">
                             <option value="0" >-- Select Category --</option>
+                            <option value="87" @if($product->category_id == 87) selected @endif>Free Products</option>
                             @foreach($categories as $category)
                                 <option value="{{$category->id}}" @if($product->category_id == $category->id) selected @endif>{{strtoupper($category->name)}}</option>
                             @endforeach
