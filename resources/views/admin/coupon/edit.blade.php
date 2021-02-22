@@ -216,7 +216,9 @@
 				<div class="form-group">
 					<div class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="coupon-time" onclick="myFunction()" name="coupon_setting[]" value="time" @if(is_array(old('coupon_setting')) && in_array('time', old('coupon_setting')) || isset($coupon->start_date) || isset($coupon->event_name)) checked @endif>
-						<label class="custom-control-label" for="coupon-time"> Time </label>
+						<label class="custom-control-label" for="coupon-time"> Time 
+							&nbsp;&nbsp;<span style="font-style: italic;">Set the date/time validity of the coupon.</span>
+						</label>
 					</div>
 				</div>
 
@@ -299,7 +301,9 @@
 				<div class="form-group">
 					<div class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="coupon-purchase" onclick="myFunction()" name="coupon_setting[]" value="purchase" @if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) checked @endif>
-						<label class="custom-control-label" for="coupon-purchase">Purchase</label>
+						<label class="custom-control-label" for="coupon-purchase">Purchase 
+							&nbsp;&nbsp;<span style="font-style: italic;">Coupon reward is received after activity conditions has been met.</span>
+						</label>
 					</div>
 				</div>
 
@@ -433,7 +437,7 @@
 
 				<div class="form-row border rounded p-3">
 					<div class="col-12">
-						<label><strong>Rules</strong></label>
+						<label><strong>Rules</strong>&nbsp;&nbsp;<span style="font-style: italic;">Set specific rules on the coupon.</span></label>
 						<div class="custom-control custom-checkbox">
 							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit" onclick="myFunction()" @if(isset($coupon->customer_limit)) checked @endif>
 							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit</label>
