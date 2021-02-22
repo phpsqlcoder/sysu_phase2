@@ -26,9 +26,18 @@ class ProductCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($param = null)
     {
-        $listing = new ListingHelper();
+        $customConditions = [
+            [
+                'field' => 'id',
+                'operator' => '<>',
+                'value' => 87,
+                'apply_to_deleted_data' => false
+            ]
+        ];
+
+        $listing = new ListingHelper('desc', 10, 'updated_at', $customConditions);
 
         $categories = $listing->simple_search(ProductCategory::class, $this->searchFields);
 
