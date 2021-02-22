@@ -165,7 +165,7 @@
                                 </div>
                                 
                                 <div class="cart-table-2 coupons-list mb-5 border rounded bg-white" id="couponList">
-                                    @php $discountAmount = 0; $discountPercentage = 0; $counter = 0; $totalDeduction = 0; @endphp
+                                    @php $discountAmount = 0; $discountPercentage = 0; $counter = 0; $totalDeduction = 0; $cproducts  = ''; @endphp
 
                                     @foreach($coupons as $coupon)
 

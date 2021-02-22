@@ -70,19 +70,21 @@
 					<textarea name="terms" rows="3" class="form-control">{{ old('terms') }}</textarea>
 				</div>
 				<div class="form-group">
-					<label class="d-block">Distribution Type</label>
+					<label class="d-block">Distribution Type *</label>
 					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation'))) checked @else checked @endif onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
 							</div>
+							<small style="font-style: italic;">Customer inputs a code to redeem coupon reward.</small>
 						</div>
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation'))) checked @endif onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-activate-auto">Automatic</label>
 							</div>
+							<small style="font-style: italic;">System automatically issues reward after customer completes an activity.</small>
 						</div>
 					</div>
 					<div class="mb-3" id="coupon-code">
@@ -101,12 +103,14 @@
 								<input type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" checked onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-all">All</label>
 							</div>
+							<small style="font-style: italic;">Coupon will be applicable to all customers who completed an activity.</small>
 						</div>
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-scope-specific" name="coupon_scope" class="custom-control-input" value="specific" onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-specific">Specific</label>
 							</div>
+							<small style="font-style: italic;">Only the specific customer will be able to use and claim the coupon reward.</small>
 						</div>
 					</div>
 				</div>
@@ -408,13 +412,13 @@
 						<div class="mt-3" style="display:{{ (old("customer_limit") ? "block":"none") }}" id="coupon-customer-limit-form">
 							<div class="input-group border rounded">
 								<span class="input-group-btn">
-									<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+									<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-minus"></span>
 									</button>
 								</span>
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1">
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="10">
 								<span class="input-group-btn">
-									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
+									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-plus"></span>
 									</button>
 								</span>
@@ -446,13 +450,13 @@
 								<div class="col-12 mt-3" id="coupon-multi-use-form" style="display:@if(is_array(old('usage_limit')) && in_array('multiple_use', old('usage_limit'))) flex @else none @endif;">
 									<div class="input-group border rounded">
 										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+											<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="multi_usage_limit_qty">
 												<span class="fa fa-minus"></span>
 											</button>
 										</span>
 										<input type="text" name="multi_usage_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('multi_usage_limit_qty',1) }}" min="1" max="10">
 										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
+											<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="multi_usage_limit_qty">
 												<span class="fa fa-plus"></span>
 											</button>
 										</span>
@@ -888,79 +892,77 @@
 
 
 // Points Earned start --------------------->
-	$('.btn-number').click(function(e){
-		e.preventDefault();
+    $('.btn-number').click(function(e){
+      	e.preventDefault();
 
-		fieldName = $(this).attr('data-field');
-		type      = $(this).attr('data-type');
-		var input = $("input[name='"+fieldName+"']");
-		var currentVal = parseInt(input.val());
-		if (!isNaN(currentVal)) {
-			if(type == 'minus') {
+      	fieldName = $(this).attr('data-field');
+      	type      = $(this).attr('data-type');
+      	var input = $("input[name='"+fieldName+"']");
+      	var currentVal = parseInt(input.val());
+      	if (!isNaN(currentVal)) {
+        	if(type == 'minus') {
 
-				if(currentVal > input.attr('min')) {
-					input.val(currentVal - 1).change();
-				} 
-				if(parseInt(input.val()) == input.attr('min')) {
-					$(this).attr('disabled', true);
-				}
+          		if(currentVal > input.attr('min')) {
+            		input.val(currentVal - 1).change();
+          		} 
+          		if(parseInt(input.val()) == input.attr('min')) {
+            		$(this).attr('disabled', true);
+          		}
+        	} else if(type == 'plus') {
 
-			} else if(type == 'plus') {
+          		if(currentVal < input.attr('max')) {
+            		input.val(currentVal + 1).change();
+          		}
+          		if(parseInt(input.val()) == input.attr('max')) {
+            		$(this).attr('disabled', true);
+          		}
 
-				if(currentVal < input.attr('max')) {
-					input.val(currentVal + 1).change();
-				}
-				if(parseInt(input.val()) == input.attr('max')) {
-					$(this).attr('disabled', true);
-				}
+        	}
+      	} else {
+        	input.val(0);
+      	}
+    });
 
-			}
-		} else {
-			input.val(0);
-		}
-	});
+    $('.input-number').focusin(function(){
+    	$(this).data('oldValue', $(this).val());
+    });
 
-	$('.input-number').focusin(function(){
-		$(this).data('oldValue', $(this).val());
-	});
+    $('.input-number').change(function() {
 
-$('.input-number').change(function() {
+      	minValue =  parseInt($(this).attr('min'));
+      	maxValue =  parseInt($(this).attr('max'));
+      	valueCurrent = parseInt($(this).val());
 
-	minValue =  parseInt($(this).attr('min'));
-	maxValue =  parseInt($(this).attr('max'));
-	valueCurrent = parseInt($(this).val());
+      	name = $(this).attr('name');
+      	if(valueCurrent >= minValue) {
+        	$(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
+      	} else {
+        	alert('Sorry, the minimum value was reached');
+        	$(this).val($(this).data('oldValue'));
+      	}
+      	if(valueCurrent <= maxValue) {
+        	$(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
+    	} else {
+        	alert('Sorry, the maximum value was reached');
+        	$(this).val($(this).data('oldValue'));
+    	}
+    });
 
-	name = $(this).attr('name');
-	if(valueCurrent >= minValue) {
-		$(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
-	} else {
-		alert('Sorry, the minimum value was reached');
-		$(this).val($(this).data('oldValue'));
-	}
-	if(valueCurrent <= maxValue) {
-		$(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
-	} else {
-		alert('Sorry, the maximum value was reached');
-		$(this).val($(this).data('oldValue'));
-	}
-});
-
-$(".input-number").keydown(function (e) {
-// Allow: backspace, delete, tab, escape, enter and .
-if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
-// Allow: Ctrl+A
-(e.keyCode == 65 && e.ctrlKey === true) || 
-// Allow: home, end, left, right
-(e.keyCode >= 35 && e.keyCode <= 39)) {
-// let it happen, don't do anything
-return;
-}
-
-// Ensure that it is a number and stop the keypress
-if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-	e.preventDefault();
-}
-});
+    $(".input-number").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+       	// Allow: Ctrl+A
+      	(e.keyCode == 65 && e.ctrlKey === true) || 
+       	// Allow: home, end, left, right
+      	(e.keyCode >= 35 && e.keyCode <= 39)) {
+         	// let it happen, don't do anything
+         	return;
+    	}
+    	// Ensure that it is a number and stop the keypress
+    	if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      		e.preventDefault();
+    	}
+    });
 // Points Earned end --------------------->
 
 $(function() {

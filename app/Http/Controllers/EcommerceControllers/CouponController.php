@@ -167,7 +167,7 @@ class CouponController extends Controller
             'name' => 'required|max:150',
             'description' => 'required',
             'reward' => 'required',
-            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
+            'code' => $request->coupon_activation[0] == 'manual' ? 'required' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
             'sf_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
