@@ -398,7 +398,7 @@
 						<label><strong>Rules</strong>&nbsp;&nbsp;<span style="font-style: italic;">Set specific rules on the coupon.</span></label>
 						<div class="custom-control custom-checkbox">
 							<input {{ (old("customer_limit") ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit"  onclick="myFunction()">
-							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit</label>
+							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit &nbsp;&nbsp;<span style="font-style: italic;">Maximum number of customers who can use the coupon.</span></label>
 						</div>
 
 						<div class="mt-3" style="display:{{ (old("customer_limit") ? "block":"none") }}" id="coupon-customer-limit-form">
@@ -422,7 +422,7 @@
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
 							<input {{ (old("usage_limit") ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-usage" name="usage_limit" onclick="myFunction()">
-							<label class="custom-control-label" for="coupon-customer-usage">Usage Limit</label>
+							<label class="custom-control-label" for="coupon-customer-usage">Usage Limit &nbsp;&nbsp;<span style="font-style: italic;">No. of times that a coupon can be used.</span></label>
 						</div>
 
 						<div class="mt3" id="coupon-customer-usage-form" style="display:{{ (old("usage_limit") ? "blcok":"none") }}">
