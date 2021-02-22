@@ -45,6 +45,7 @@
                         <label class="d-block">Parent Category</label>
                         <select id="parentPage" class="selectpicker mg-b-5 @error('parent_page') is-invalid @enderror" name="parent_page" data-style="btn btn-outline-light btn-md btn-block tx-left" title="- None -" data-width="100%">
                             <option value="0" selected>- None -</option>
+                            <option value="87">Free Products</option>
                             @foreach ($productCategories as $productCategory)
                                 <option value="{{ $productCategory->id }}">{{ $productCategory->name }}</option>
                             @endforeach

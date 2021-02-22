@@ -167,8 +167,8 @@
 						</div>
 
 						<label id="discount_amount_label">Shipping Fee Discount Amount</label>
-						<input type="number" name="sf_discount_amount" class="form-control @error('sf_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('sf_discount_amount') }}">
-						@hasError(['inputName' => 'sf_discount_amount'])
+						<input type="number" name="shipping_fee_discount_amount" class="form-control @error('shipping_fee_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('shipping_fee_discount_amount') }}">
+						@hasError(['inputName' => 'shipping_fee_discount_amount'])
                     	@endhasError
 					</div>
 

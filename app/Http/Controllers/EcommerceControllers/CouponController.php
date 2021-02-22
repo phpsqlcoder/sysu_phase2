@@ -71,7 +71,7 @@ class CouponController extends Controller
             'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
-            'sf_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'shipping_fee_discount_amount' => $request->discount_type == 'partial' ? 'required' : '',
             'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
             'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
             'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
@@ -83,7 +83,7 @@ class CouponController extends Controller
           $data = $request->all();
             $locations = $data['location'];
             $loc_discount_type = $request->discount_type;
-            $loc_discount_amount = $request->sf_discount_amount;
+            $loc_discount_amount = $request->shipping_fee_discount_amount;
 
             foreach($locations as $l){
                 $loc .= $l.'|';
@@ -171,11 +171,10 @@ class CouponController extends Controller
             'code' => $request->coupon_activation[0] == 'manual' ? 'required' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
-            'sf_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
+            'shipping_fee_discount_amount' => $request->reward == 'free-shipping-optn' ? 'required' : '',
             'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
             'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
             'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
-
         ])->validate();
 
         $loc = '';
@@ -183,7 +182,7 @@ class CouponController extends Controller
           $data = $request->all();
             $locations = $data['location'];
             $loc_discount_type = $request->discount_type;
-            $loc_discount_amount = $request->sf_discount_amount;
+            $loc_discount_amount = $request->shipping_fee_discount_amount;
 
             foreach($locations as $l){
                 $loc .= $l.'|';
@@ -203,8 +202,8 @@ class CouponController extends Controller
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
             'location' => $loc,
-            'location_discount_type' => $request->discount_type,
-            'location_discount_amount' => $request->discount_type == 'partial' ? $request->sf_discount_amount : 0,
+            'location_discount_type' => $loc_discount_type,
+            'location_discount_amount' => $loc_discount_amount,
             'amount' => $request->reward == 'discount-amount-optn' ? $request->discount_amount : NULL,
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
