@@ -138,8 +138,10 @@
 	                                        </div>
 	                                    </th>
                                         <td>
-                                            <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->coupon_code }}</strong><br>
-                                            {{ $coupon->name }}
+                                            <strong @if($coupon->trashed()) style="text-decoration:line-through;" @endif> {{ $coupon->name }}</strong><br>
+                                            @if($coupon->activation_type == 'manual')
+                                                {{ $coupon->coupon_code }}
+                                            @endif
                                         </td>
 	                                    <td>{{ $coupon->start_date }} {{ $coupon->start_time }}</td>
 	                                    <td>{{ $coupon->end_date }} {{ $coupon->end_time }}</td>

@@ -90,7 +90,7 @@
 					</div>
 					<div class="mb-3" id="coupon-code" style="display: @if($coupon->activation_type == 'manual') block @else none @endif">
 						<label class="d-block">Coupon Code</label>
-						<input type="text" name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code',$coupon->coupon_code) }}" placeholder="Coupon Code">
+						<input type="text" name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code',$coupon->coupon_code) }}">
 						@hasError(['inputName' => 'code'])
                     	@endhasError
 					</div>
@@ -213,16 +213,14 @@
 				<h4 class="mg-b-0 tx-spacing--1">Coupon Settings</h4>
 				<hr>
 
-				<div class="form-group">
-					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="coupon-time" onclick="myFunction()" name="coupon_setting[]" value="time" @if(is_array(old('coupon_setting')) && in_array('time', old('coupon_setting')) || isset($coupon->start_date) || isset($coupon->event_name)) checked @endif>
-						<label class="custom-control-label" for="coupon-time"> Time 
-							&nbsp;&nbsp;<span style="font-style: italic;">Set the date/time validity of the coupon.</span>
-						</label>
-					</div>
+				<div class="form-group">	
+					<label class="d-block">Time 
+						&nbsp;&nbsp;<span style="font-style: italic;">Set the date/time validity of the coupon.</span>
+					</label>
+					<input type="checkbox" class="custom-control-input" id="coupon-time" name="coupon_setting[]" value="time" checked style="display: none;">
 				</div>
 
-				<div class="form-row border rounded p-3 pt-4 mb-4" id="coupon-time-option" style="display:@if(is_array(old('coupon_time')) && in_array('datetime', old('coupon_time')) || is_array(old('coupon_time')) && in_array('custom', old('coupon_time')) || isset($coupon->start_date) || isset($coupon->event_name)) flex @else none @endif;">
+				<div class="form-row border rounded p-3 pt-4 mb-4" id="coupon-time-option" style="display:flex;">
 					<div class="col-md-3">
 						<div class="custom-control custom-radio">
 							<input type="radio" id="coupon-date-time" name="coupon_time[]" class="custom-control-input" onclick="ShowHideDiv()" value="datetime" @if(is_array(old('coupon_time')) && in_array('datetime', old('coupon_time')) || isset($coupon->start_date)) checked @endif>
@@ -252,21 +250,11 @@
 						<div class="row mt-3">
 							<div class="col-6">
 								<label class="d-block">Start Time</label>
-								<div class="input-group datetime">
-									<input name="starttime" type="text" class="form-control" autocomplete="off" value="{{ old('starttime',$coupon->start_time) }}">
-									<span class="input-group-addon">
-										<span class="glyphicon glyphicon-time"></span>
-									</span>
-								</div>
+								<input name="starttime" type="time" class="form-control" autocomplete="off" value="{{ $coupon->start_time }}">
 							</div>
 							<div class="col-6">
 								<label class="d-block">End Time</label>
-								<div class="input-group datetime">
-									<input name="endtime" type="text" class="form-control" autocomplete="off" value="{{ old('endtime',$coupon->end_time) }}">
-									<span class="input-group-addon">
-										<span class="glyphicon glyphicon-time"></span>
-									</span>
-								</div>
+								<input name="endtime" type="time" class="form-control" autocomplete="off" value="{{ $coupon->end_time }}">
 							</div>
 						</div>
 					</div>
@@ -457,7 +445,7 @@
 										$customerLimit = 1; 
 									}
 								@endphp
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$customerLimit)}}" min="1" max="10">
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$customerLimit)}}" min="1">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-plus"></span>
@@ -511,14 +499,14 @@
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
 							<input {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination">
-							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination (Can be combined by other coupons)</label>
+							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination &nbsp;&nbsp;<span style="font-style: italic;">Can be used together with other coupons.</span></label>
 						</div>
 					</div>
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
 							<input {{ (old("availability") == "ON" || $coupon->availability == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-availability" name="availability">
-							<label class="custom-control-label" for="coupon-availability">Availability ( Optional : Can be use upon checkout )</label>
+							<label class="custom-control-label" for="coupon-availability">Availability &nbsp;&nbsp;<span style="font-style: italic;">Can be used upon checkout.</span></label>
 						</div>
 					</div>
 				</div>
