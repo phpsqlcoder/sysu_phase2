@@ -51,7 +51,7 @@ class CouponController extends Controller
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
-        $free_products = Product::where('category_id',5)->where('status','PUBLISHED')->get();
+        $free_products = Product::where('category_id',87)->where('status','PUBLISHED')->get();
 
         return view('admin.coupon.create',compact('products','categories','brands','customers','locations','free_products'));
     }
@@ -150,7 +150,7 @@ class CouponController extends Controller
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
-        $free_products = Product::where('category_id',5)->where('status','PUBLISHED')->get();
+        $free_products = Product::where('category_id',87)->where('status','PUBLISHED')->get();
 
         return view('admin.coupon.edit',compact('coupon','products','categories','brands','customers','locations','free_products'));
     }
