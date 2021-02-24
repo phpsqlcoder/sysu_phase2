@@ -125,11 +125,10 @@
                                 </div>
                             </div>
 
-                            <div class="cart-table-2 coupons-list mb-5 rounded" id="couponList">
+                            <div id="couponList">
                                 <div id="manual-coupon-details"></div>
                                 <input type="hidden" id="coupon_counter" name="coupon_counter" value="0">
                             </div>
-
                             
                             <div class="mb-5">
                                 <h3 class="catalog-title">Summary</h3>
@@ -377,95 +376,76 @@
                             var validity = '';  
                         } else {
                             if(coupon.end_time == null){
-                                var validity = '<span class="border rounded p-1">Valid Till '+coupon.end_date+'</span>';
+                                var validity = ' - Valid Till '+coupon.end_date;
                             } else {
-                                var validity = '<span class="border rounded p-1">Valid Till '+coupon.end_date+' '+coupon.end_time+'</span>';
+                                var validity = ' - Valid Till '+coupon.end_date+' '+coupon.end_time;
                             }
                         }
 
                         if(jQuery.inArray(coupon.id, response.availability) !== -1){
 
                             if(jQuery.inArray(coupon.id, arr_selected_coupons) !== -1){
-                                if(coupon.amount_discount_type == 1){
-                                    if(coupon.free_product_id != null){
-                                        var btn = '<a href="#" id="couponBtn'+coupon.id+'" onclick="free_product_coupon('+coupon.id+')"><i class="fa fa-check"></i></a><p style="display:none;"><a href="#" class="productCouponRemove" id="'+coupon.id+'"><i class="fa fa-times"></i></a></p>';
-                                    } else {
-                                        var btn = '<a style="display:none;" href="#" id="couponBtn'+coupon.id+'" onclick="use_coupon('+coupon.id+')"><i class="fa fa-check"></i></a><p id="couponrmv'+coupon.id+'"><a href="#" class="float-right couponRemove" id="'+coupon.id+'" ><i class="fa fa-times"></i></a></p>';
-                                    }
-                                } else {
-                                    var btn = '<a style="display:none;" href="#" id="couponBtn'+coupon.id+'" onclick="choose_product('+coupon.id+')"><i class="fa fa-check"></i></a><p id="productCouponrmv'+coupon.id+'"><a href="#" class="float-right productCouponRemove" id="'+coupon.id+'" ><i class="fa fa-times"></i></a></p>';
-                                }
-                                var status = 'selected';
+                                var usebtn = '<button class="btn btn-success btn-sm" disabled>Applied</button>';
                             } else {
                                 if(coupon.amount_discount_type == 1){
                                     if(coupon.free_product_id != null){
-                                        var btn = '<a href="#" id="couponBtn'+coupon.id+'" onclick="free_product_coupon('+coupon.id+')"><i class="fa fa-check"></i></a><p style="display:none;"><a href="#" class="productCouponRemove" id="'+coupon.id+'"><i class="fa fa-times"></i></a></p>';
+                                        var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="free_product_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                     } else {
-                                        var btn = '<a href="#" id="couponBtn'+coupon.id+'" onclick="use_coupon('+coupon.id+')"><i class="fa fa-check"></i></a><p style="display:none;" id="couponrmv'+coupon.id+'"><a href="#" class="float-right couponRemove" id="'+coupon.id+'" ><i class="fa fa-times"></i></a></p>';
+                                        var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                     }
                                 } else {
-                                    var btn = '<a href="#" id="couponBtn'+coupon.id+'" onclick="choose_product('+coupon.id+')"><i class="fa fa-check"></i></a><p style="display:none;" id="productCouponrmv'+coupon.id+'"><a href="#" class="float-right productCouponRemove" id="'+coupon.id+'" ><i class="fa fa-times"></i></a></p>';
+                                    var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="choose_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                 }
-                                var status = '';
                             }
 
                             $('#collectibles').append(
-                                '<div class="coupon-item p-2 border rounded mb-1 '+status+'" id="coupondiv'+coupon.id+'">'+
+                                '<div class="coupon-item p-2 border rounded mb-1" id="coupondiv'+coupon.id+'">'+
                                     '<div class="row no-gutters">'+
                                         '<div class="col-12">'+
-                                            '<p class="float-right">'+btn+'</p>'+
+                                            '<input type="hidden" id="purchaseproductid'+coupon.id+'" value="'+coupon.purchase_product_id+'">'+
+                                            '<input type="hidden" id="discountpercentage'+coupon.id+'" value="'+coupon.percentage+'">'+
+                                            '<input type="hidden" id="discountamount'+coupon.id+'" value="'+coupon.amount+'">'+
+                                            '<input type="hidden" id="couponname'+coupon.id+'" value="'+coupon.name+'">'+
+                                            '<input type="hidden" id="couponcode'+coupon.id+'" value="'+coupon.coupon_code+'">'+
+                                            '<input type="hidden" id="couponterms'+coupon.id+'" value="'+coupon.terms_and_conditions+'">'+
+                                            '<input type="hidden" id="coupondesc'+coupon.id+'" value="'+coupon.description+'">'+
+                                            '<input type="hidden" id="couponfreeproductid'+coupon.id+'" value="'+coupon.free_product_id+'">'+
                                             '<div class="coupon-item-name">'+
-                                                '<input type="hidden" id="purchaseproductid'+coupon.id+'" value="'+coupon.purchase_product_id+'">'+
-                                                '<input type="hidden" id="discountpercentage'+coupon.id+'" value="'+coupon.percentage+'">'+
-                                                '<input type="hidden" id="discountamount'+coupon.id+'" value="'+coupon.amount+'">'+
-                                                '<input type="hidden" id="couponname'+coupon.id+'" value="'+coupon.name+'">'+
-                                                '<input type="hidden" id="couponcode'+coupon.id+'" value="'+coupon.coupon_code+'">'+
-                                                '<input type="hidden" id="couponterms'+coupon.id+'" value="'+coupon.terms_and_conditions+'">'+
-                                                '<input type="hidden" id="coupondesc'+coupon.id+'" value="'+coupon.description+'">'+
-                                                '<input type="hidden" id="couponfreeproductid'+coupon.id+'" value="'+coupon.free_product_id+'">'+
-                                                '<h5 class="m-0">'+coupon.name+'</h5>'+
+                                                '<h5 class="m-0">'+coupon.name+' <span>'+validity+'</span></h5>'+
                                             '</div>'+
-                                        '</div>'+
-                                        '<div class="col-11 small">'+
-                                            '<div class="coupon-item-desc">'+
+                                            '<div class="coupon-item-desc small mb-1">'+
                                                 '<span>'+coupon.description+'</span>'+
                                             '</div>'+
-                                            '<div class="coupon-item-valid text-muted mt-2">'+validity+'</div>'+
-                                        '</div>'+
-                                        '<div class="col-1 small text-right">'+
-                                            '<div class="coupon-item-terms"></div>'+
-                                            '<button type="button" class="btn btn-default p-0" data-toggle="tooltip" data-placement="top" title="'+coupon.terms_and_conditions+'"><i class="fa fa-info-circle"></i></button>'+
+                                            '<div class="coupon-item-btns">'+
+                                                usebtn+'&nbsp;'+
+                                                '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+coupon.terms_and_conditions+'">Terms & Conditions</button>'+
+                                            '</div>'+
                                         '</div>'+
                                     '</div>'+
                                 '</div>'
                             );
                         } else {
                             $('#collectibles').append(
-                                '<div class="coupon-item p-2 border rounded mb-1 disabled">'+
+                                '<div class="coupon-item p-2 border rounded mb-1 deactivate">'+
                                     '<div class="row no-gutters">'+
                                         '<div class="col-12">'+
-                                            '<p class="float-right"><a href="#" class="text-muted"><i class="fa fa-ban"></i></a></p>'+
                                             '<div class="coupon-item-name">'+
-                                                '<h5 class="m-0">'+coupon.name+'</h5>'+
+                                                '<h5 class="m-0">'+coupon.name+' <span>'+validity+'</span></h5>'+
                                             '</div>'+
-                                        '</div>'+
-                                        '<div class="col-11 small">'+
-                                            '<div class="coupon-item-desc">'+
+                                            '<div class="coupon-item-desc small mb-1">'+
                                                 '<span>'+coupon.description+'</span>'+
                                             '</div>'+
-                                            '<div class="coupon-item-valid text-muted mt-2">'+
-                                                '<div class="coupon-item-valid text-muted mt-2">'+validity+'</div>'+
-                                           '</div>'+
-                                        '</div>'+
-                                        '<div class="col-1 small text-right">'+
-                                            '<div class="coupon-item-terms"></div>'+
-                                            '<button type="button" class="btn btn-default p-0" data-toggle="tooltip" data-placement="top" title="'+coupon.terms_and_conditions+'"><i class="fa fa-info-circle"></i></button>'+
+                                            '<div class="coupon-item-btns">'+
+                                                '<button class="btn btn-success btn-sm disabled">Use Coupon</button>&nbsp;'+
+                                                '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+coupon.terms_and_conditions+'">Terms & Conditions</button>'+
+                                            '</div>'+
                                         '</div>'+
                                     '</div>'+
                                 '</div>'
                             );
                         }
-                        $("[data-toggle='tooltip']").tooltip();
+
+                        $('[data-toggle="popover"]').popover();
                     });
                     $('#exampleModalCenter').modal('show');
                 }
@@ -490,109 +470,61 @@
             }
         }
 
+    // coupon free products
         function free_product_coupon(cid){
-            var name  = $('#couponname'+cid).val();
-            var code  = $('#couponcode'+cid).val();
-            var desc = $('#coupondesc'+cid).val();
-            var terms = $('#couponterms'+cid).val();
-            var amount= $('#discountamount'+cid).val();
-            var percnt= $('#discountpercentage'+cid).val();
-
-            if(coupon_counter()){
-                $('#couponBtn'+cid).css('display','none');
-                $('#couponSpan'+cid).css('display','block');
-
-                $(".loop-iteration").each(function() {
-                    var id = this.value;
-                    var pname = $('#product_name_'+id).val();
-                    var productid = $('#pp'+id).val();
-
-                    $('#couponList').append(
-                        '<div class="p-3 border-bottom" id="couponDiv'+cid+'">'+
-                            '<input type="hidden" id="productid'+cid+'" value="'+id+'">'+
-                            '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                            '<p class="float-right productCouponRemove" id="'+cid+'"><a href="#"><i class="fa fa-times"></i></a></p>'+
-                            '<p><span class="h5 float-left"><strong>'+name+'</strong></span></p>'+
-                            '<div class="clearfix"></div>'+
-                            '<p>'+desc+'</p>'+
-                            '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
-                            '<p class="text-success">Applied On : '+pname+'</p>'+
-                        '</div>'
-                    );
-
-
-                    var x = productdiscount.split('|');
-                    var sub_price = $('#sum_sub_price'+id).val();
-
-                    if(x[0] == 'amount'){
-                        var totalDiscount = parseFloat(sub_price)-parseFloat(x[1]);
-                        var discount = parseFloat(x[1]);
-                    }
-
-                    if(x[1] == 'percent'){
-                        var percent = parseFloat(x[1])/100;
-                        var discount =  parseFloat(sub_price)*parseFloat(percent);
-
-                        var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
-                    }
-
-                    $('#cart_product_discount'+id).val(discount.toFixed(2));
-                    $('#sum_sub_price'+id).val(totalDiscount);
-
-                    $('#product_total_price'+id).css({'text-decoration':'line-through','color':'grey'});
-                    $('#product_new_price'+id).css('display','block');
-                    $('#product_new_price'+id).html('₱ '+addCommas(totalDiscount.toFixed(2))); 
-
-                    $('#cart_product_reward'+id).val(1);
-
-                    compute_grand_total();
-                    $('#modalCartProduct').modal('hide');
-                });
-            }
-
             if(coupon_counter()){
                 var name  = $('#couponname'+cid).val();
                 var terms = $('#couponterms'+cid).val();
+                var desc = $('#coupondesc'+cid).val();
                 var freeproductid = $('#couponfreeproductid'+cid).val();
 
                 $('#couponList').append(
-                    '<div class="p-3 border-bottom" id="couponDiv'+cid+'">'+
-                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                        '<p class="float-right cRmvFreeProduct" id="'+cid+'"><a href="#"><i class="fa fa-times"></i></a></p>'+
-                        '<p><span class="h5 float-left"><strong>'+name+'</strong></span></p>'+
-                        '<div class="clearfix"></div>'+
-                        '<input type="hidden" name="coupon_productid[]" value="0">'+
-                        '<input type="hidden" name="coupon_freeproductid[]" value="'+freeproductid+'">'+
-                        '<p>'+terms+'</p>'+
+                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                        '<div class="coupon-item p-2 border rounded mb-1">'+
+                            '<div class="row no-gutters">'+
+                                '<div class="col-12">'+
+                                    '<div class="coupon-item-name">'+
+                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-desc small mb-1">'+
+                                        '<span>'+desc+'</span>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-btns">'+
+                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                        '<input type="hidden" name="coupon_productid[]" value="0">'+
+                                        '<input type="hidden" name="coupon_freeproductid[]" value="'+freeproductid+'">'+
+                                        '<button type="button" class="btn btn-danger btn-sm cRmvFreeProduct" id="'+cid+'">Remove</button>&nbsp;'+
+                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
                     '</div>'
                 );
 
-                $('#couponBtn'+cid).css('display','none');
-                $('#couponSpan'+cid).css('display','block');
+                $('#couponBtn'+cid).prop('disabled',true);
+                $('#btnCpnTxt'+cid).html('Applied');
             }
         }
 
         $(document).on('click', '.cRmvFreeProduct', function(){  
             var id = $(this).attr("id");  
-            
-            $('#couponBtn'+id).css('display','block');
-            $('#couponSpan'+id).css('display','none');
 
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
 
+            $('#couponBtn'+id).prop('disabled',false);
+            $('#btnCpnTxt'+id).html('Use Coupon');
             $('#couponDiv'+id+'').remove();   
         });
-        
+    //
+    
+    // use coupon on total amount   
         function use_coupon(cid){
             var totalAmountDiscountCounter = $('#total_amount_discount_counter').val();
-            var grandTotal = $('#grandTotal').val();
-
             var name  = $('#couponname'+cid).val();
-            var code  = $('#couponcode'+cid).val();
             var desc = $('#coupondesc'+cid).val();
-            var amount= $('#discountamount'+cid).val();
-            var percnt= $('#discountpercentage'+cid).val();
+            var terms = $('#couponterms'+cid).val();
 
             if(coupon_counter()){
                 if(parseInt(totalAmountDiscountCounter) == 1){
@@ -607,18 +539,38 @@
                     return false;
                 }
 
+                $('#total_amount_discount_counter').val(1);
+                $('#couponBtn'+cid).prop('disabled',true);
+                $('#btnCpnTxt'+cid).html('Applied');
+
                 $('#couponList').append(
-                    '<div class="p-3 border-bottom" id="couponDiv'+cid+'">'+
-                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                        '<p class="float-right couponRemove" id="'+cid+'"><a href="#"><i class="fa fa-times"></i></a></p>'+
-                        '<p><span class="h5 float-left"><strong>'+name+'</strong></span></p>'+
-                        '<div class="clearfix"></div>'+
-                        '<input type="hidden" name="coupon_productid[]" value="0">'+
-                        '<p>'+desc+'</p>'+
+                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                        '<div class="coupon-item p-2 border rounded mb-1">'+
+                            '<div class="row no-gutters">'+
+                                '<div class="col-12">'+
+                                    '<div class="coupon-item-name">'+
+                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-desc small mb-1">'+
+                                        '<span>'+desc+'</span>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-btns">'+
+                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                        '<input type="hidden" name="coupon_productid[]" value="0">'+
+                                        '<button type="button" class="btn btn-danger btn-sm couponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
                     '</div>'
                 );
 
-                $('#total_amount_discount_counter').val(1); 
+                $('[data-toggle="popover"]').popover();
+
+                var grandTotal = $('#grandTotal').val();
+                var amount= $('#discountamount'+cid).val();
+                var percnt= $('#discountpercentage'+cid).val();
 
                 if(amount > 0){ 
                     var amountdiscount = amount;
@@ -631,11 +583,7 @@
                     var amountdiscount = discount;
                 }
 
-                $('#coupondiv'+cid).addClass('selected');
-                $('#couponBtn'+cid).css('display','none');
-                $('#couponrmv'+cid).css('display','block');
                 $('#total_amount_discount').val(amountdiscount);
-
                 compute_grand_total();
             }
         }
@@ -643,62 +591,50 @@
         $(document).on('click', '.couponRemove', function(){  
             var id = $(this).attr("id");  
             
-            $('#couponBtn'+id).css('display','block');
-            $('#couponrmv'+id).css('display','none');
-            $('#coupondiv'+id).removeClass('selected');
-
-            $('#total_amount_discount').val(0);
-
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
 
             var total_amount_counter = $('#total_amount_discount_counter').val();
             $('#total_amount_discount_counter').val(parseInt(total_amount_counter)-1);
+            $('#total_amount_discount').val(0);
 
-            $('#couponDiv'+id+'').remove();   
+            $('#couponDiv'+id+'').remove(); 
+            $('#couponBtn'+id).prop('disabled',false);
+            $('#btnCpnTxt'+id).html('Use Coupon');
 
             compute_grand_total();
         });
+    // end use coupon on total amount
 
+
+    // choose product
         function choose_product(cid){
             var amount= $('#discountamount'+cid).val();
             var percnt= $('#discountpercentage'+cid).val();
 
-            if(amount > 0){
-                var productdiscount = 'amount|'+amount;
-            }
-
-            if(percnt > 0){
-                var productdiscount = 'percent|'+percnt;
-            }
-
             var name  = $('#couponname'+cid).val();
             var desc = $('#coupondesc'+cid).val();
-            var amount= $('#discountamount'+cid).val();
-            var percnt= $('#discountpercentage'+cid).val();
+            var terms = $('#couponterms'+cid).val();
 
             var productid = $('#purchaseproductid'+cid).val();
             var pr = productid.slice(0,-1);
             var p = pr.split('|');
 
             if(coupon_counter()){
-                $('#coupondiv'+cid).addClass('selected');
-                $('#couponBtn'+cid).css('display','none');
-                $('#productCouponrmv'+cid).css('display','block');
+                $('#couponBtn'+cid).prop('disabled',true);
+                $('#btnCpnTxt'+cid).html('Applied');
 
                 
                 if(p.length == 1){
                     var iteration = $('#iteration'+p).val();
                 } else {
-                    var highest = -Infinity;
-                    var iteration;
+                    var highest = -Infinity; var iteration;
                     $(".sum_sub_price").each(function() {
                         var id = $(this).data('id');
                         var x = $('#cart_product_reward'+id).val();
                         if(x == 0){
                             highest = Math.max(highest, parseFloat(this.value));
                         }
-                        
                     });
                         
                     $(".sum_sub_price").each(function() {
@@ -713,17 +649,39 @@
                 var productid = $('#pp'+id).val();
 
                 $('#couponList').append(
-                    '<div class="p-3 border-bottom" id="couponDiv'+cid+'">'+
-                        '<input type="hidden" id="productid'+cid+'" value="'+id+'">'+
-                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                        '<p class="float-right productCouponRemove" id="'+cid+'"><a href="#"><i class="fa fa-times"></i></a></p>'+
-                        '<p><span class="h5 float-left"><strong>'+name+'</strong></span></p>'+
-                        '<div class="clearfix"></div>'+
-                        '<p>'+desc+'</p>'+
-                        '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
-                        '<p class="text-success">Applied On : '+pname+'</p>'+
+                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                        '<div class="coupon-item p-2 border rounded mb-1">'+
+                            '<div class="row no-gutters">'+
+                                '<div class="col-12">'+
+                                    '<div class="coupon-item-name">'+
+                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-desc small mb-1">'+
+                                        '<span>'+desc+'</span><br>'+
+                                        '<span class="text-success">Applied On : '+pname+'</span>'+
+                                    '</div>'+
+                                    '<div class="coupon-item-btns">'+
+                                        '<input type="hidden" id="productid'+cid+'" value="'+id+'">'+
+                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                        '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                        '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
                     '</div>'
                 );
+
+                $('[data-toggle="popover"]').popover();
+
+                if(amount > 0){
+                    var productdiscount = 'amount|'+amount;
+                }
+
+                if(percnt > 0){
+                    var productdiscount = 'percent|'+percnt;
+                }
 
                 var x = productdiscount.split('|');
                 var sub_price = $('#sum_sub_price'+id).val();
@@ -750,11 +708,9 @@
                 $('#cart_product_reward'+id).val(1);
 
                 compute_grand_total();
-                $('#modalCartProduct').modal('hide');
             }
         }
 
-        // remove coupon applied on products
         $(document).on('click','.productCouponRemove', function(){
             var id = $(this).attr('id'); // coupon id
             var pid = $('#productid'+id).val(); // product iteration id
@@ -771,13 +727,14 @@
             $('#cart_product_reward'+pid).val(0);
 
             $('#couponDiv'+id+'').remove(); 
-            $('#couponBtn'+id).css('display','block');
-            $('#productCouponrmv'+id).css('display','none');
-            $('#coupondiv'+id).removeClass('selected');
+            $('#couponBtn'+id).prop('disabled',false);
+            $('#btnCpnTxt'+id).html('Use Coupon');
 
             compute_grand_total();
         });
+    // end choose product
 
+    // update total sub per product
         function update_sub_total_price_per_item(id){
 
             var pr = parseFloat($('#quantity'+id).val()) * parseFloat($('#price'+id).val());
@@ -795,7 +752,9 @@
             $('#sum_sub_price'+id).val(total_pr);
             $('#product_total_price'+id).html('₱ '+ addCommas(pr.toFixed(2)));  
         }
+    //
 
+    // calculate grand total
         function compute_grand_total(){
             let summary_sub_price = 0;  
             var amountDiscount = parseFloat($('#total_amount_discount').val());
@@ -818,7 +777,9 @@
             $('#total_sub').html('₱ '+addCommas(summary_sub_price.toFixed(2)));
             $('#total_grand').html('₱ '+addCommas(total.toFixed(2)));  
         }
+    //
 
+    // remove product to cart
         function remove_item(i){
             swal({
                 title: 'Are you sure?',
@@ -839,7 +800,9 @@
                 }
             });  
         }
+    //
 
+    // amount number format
         function addCommas(nStr){
             nStr += '';
             x = nStr.split('.');
@@ -851,7 +814,6 @@
             }
             return x1 + x2;
         }
-
-
+    //
     </script>
 @endsection

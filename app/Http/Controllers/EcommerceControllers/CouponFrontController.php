@@ -183,7 +183,7 @@ class CouponFrontController extends Controller
     // Purchase Product, Category, Brand Only
         $purchasedCoupons = 
             Coupon::where('status','ACTIVE')
-            ->where('purchase_combination_counter',0)
+            ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('purchase_product_id')

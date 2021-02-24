@@ -88,7 +88,7 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
-            ->where('purchase_combination_counter',0)
+            ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'min')->where($purchase_field,'<=',$purchase_value)->get();
 
@@ -99,7 +99,7 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
-            ->where('purchase_combination_counter',0)
+            ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'max')->where($purchase_field,'>=',$purchase_value)->get();
 
@@ -110,7 +110,7 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
-            ->where('purchase_combination_counter',0)
+            ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'exact')->where($purchase_field,$purchase_value)->get();
 
@@ -127,6 +127,7 @@ class Coupon extends Model
         $coupons = 
             Coupon::where('status','ACTIVE')
             ->where('activation_type','auto')
+            ->where('purchase_combination_counter',1)
             ->where(function ($orWhereQuery){
                 $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
                 ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
