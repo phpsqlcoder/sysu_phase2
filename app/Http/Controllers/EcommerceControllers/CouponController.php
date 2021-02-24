@@ -109,7 +109,7 @@ class CouponController extends Controller
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
-            'availability' => ($request->has('availability')) ? 1 : 0,
+            // 'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -208,7 +208,7 @@ class CouponController extends Controller
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
-            'availability' => ($request->has('availability')) ? 1 : 0,
+            // 'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);
 
@@ -255,9 +255,9 @@ class CouponController extends Controller
 
         if($request->has('purchase_product')){
             $coupon_combination_counter++;
-            $coupon_combination .= 'product|';
             if(isset($request->product_name)){
                 $prodname = $data['product_name'];
+                $coupon_combination .= 'product|';
                 foreach($prodname as $prod){
                     $productnames .= $prod.'|';
                 }
@@ -323,8 +323,8 @@ class CouponController extends Controller
     {
         Coupon::find($couponID)->update([
             'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : NULL,
-            'usage_limit' => isset($request->usage_limit) ? $request->usage_limit[0] : NULL,
-            'usage_limit_no' => $request->usage_limit[0] == 'multiple_use' ? $request->multi_usage_limit_qty : NULL,
+            // 'usage_limit' => isset($request->usage_limit) ? $request->usage_limit[0] : NULL,
+            // 'usage_limit_no' => $request->usage_limit[0] == 'multiple_use' ? $request->multi_usage_limit_qty : NULL,
             'combination' => ($request->has('combination')) ? 1 : 0,
         ]);
     }

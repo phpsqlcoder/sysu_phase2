@@ -72,9 +72,11 @@ class CheckoutController extends Controller
         // Coupon Rules
         // OrderTotal Amount and Quantity 
         $totalAmount = 0;
+        $totalWithoutCoupon = 0;
         $totalQty = 0;
         foreach($products as $c){
             $totalQty += $c->qty;
+            $totalWithoutCoupon += $c->product->discountedprice*$c->qty;
             $product_sub = $c->product->discountedprice*$c->qty;
 
             $coupon = CouponCart::where('customer_id',Auth::id())->where('product_id',$c->product_id);
@@ -101,7 +103,7 @@ class CheckoutController extends Controller
             }
         }
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','customerCoupons','totalAmount','totalProducts','couponUsed','couponLimit'));
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','customerCoupons','totalAmount','totalQty','totalWithoutCoupon','totalProducts','couponUsed','couponLimit'));
     }
 
     public function payment_completed() {
