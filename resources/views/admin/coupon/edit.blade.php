@@ -423,9 +423,14 @@
 					</div>
 				</div>
 
+				<div class="form-group">	
+					<label class="d-block">Rules 
+						&nbsp;&nbsp;<span style="font-style: italic;">Set specific rules on the coupon.</span>
+					</label>
+				</div>
+
 				<div class="form-row border rounded p-3">
 					<div class="col-12">
-						<label><strong>Rules</strong>&nbsp;&nbsp;<span style="font-style: italic;">Set specific rules on the coupon.</span></label>
 						<div class="custom-control custom-checkbox">
 							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit" onclick="myFunction()" @if(isset($coupon->customer_limit)) checked @endif>
 							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit &nbsp;&nbsp;<span style="font-style: italic;">Maximum number of customers who can use the coupon.</span></label>
@@ -458,55 +463,8 @@
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-usage" name="usage_limit" onclick="myFunction()" @if(isset($coupon->usage_limit)) checked @endif>
-							<label class="custom-control-label" for="coupon-customer-usage">Usage Limit &nbsp;&nbsp;<span style="font-style: italic;">No. of times that a coupon can be used.</span></label>
-						</div>
-
-						<div class="mt3" id="coupon-customer-usage-form" style="display:@if(is_array(old('coupon_rule')) && in_array('usage_limit', old('coupon_rule')) || isset($coupon->usage_limit)) block @else none @endif;">
-							<div class="row">
-								<div class="col-md-4 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-single-use" name="usage_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="single_use" @if(is_array(old('usage_limit')) && in_array('single_use', old('usage_limit')) || $coupon->usage_limit == 'single_use') checked @endif>
-										<label class="custom-control-label" for="coupon-single-use">Single Use</label>
-									</div>
-								</div>
-								<div class="col-md-4 mt-3">
-									<div class="custom-control custom-radio">
-										<input type="radio" id="coupon-multi-use" name="usage_limit[]" class="custom-control-input" onclick="ShowHideDiv()" value="multiple_use" @if(is_array(old('usage_limit')) && in_array('multiple_use', old('usage_limit')) || $coupon->usage_limit == 'multiple_use') checked @endif>
-										<label class="custom-control-label" for="coupon-multi-use">Multi Use</label>
-									</div>
-								</div>
-								<div class="col-12 mt-3" id="coupon-multi-use-form" style="display:@if(is_array(old('usage_limit')) && in_array('multiple_use', old('usage_limit')) || $coupon->usage_limit == 'multiple_use') flex @else none @endif;">
-									<div class="input-group border rounded">
-										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="multi_usage_limit_qty">
-												<span class="fa fa-minus"></span>
-											</button>
-										</span>
-										<input type="text" name="multi_usage_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('multi_usage_limit_qty',isset($coupon->usage_limit_no) ? $coupon->usage_limit_no : 1) }}" min="1" max="10">
-										<span class="input-group-btn">
-											<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="multi_usage_limit_qty">
-												<span class="fa fa-plus"></span>
-											</button>
-										</span>
-									</div>
-								</div>
-								<div class="col-12"><hr></div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-12 mt-3">
-						<div class="custom-control custom-checkbox">
 							<input {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination">
 							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination &nbsp;&nbsp;<span style="font-style: italic;">Can be used together with other coupons.</span></label>
-						</div>
-					</div>
-
-					<div class="col-12 mt-3">
-						<div class="custom-control custom-checkbox">
-							<input {{ (old("availability") == "ON" || $coupon->availability == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-availability" name="availability">
-							<label class="custom-control-label" for="coupon-availability">Availability &nbsp;&nbsp;<span style="font-style: italic;">Can be used upon checkout.</span></label>
 						</div>
 					</div>
 				</div>
@@ -666,50 +624,41 @@
             	$('input[name="coupon_setting[]"]:checked').each(function(){
 
 				   	if(this.value == 'time') {
-					   	if(!$("input[name='coupon_time[]']:checked").val()) {
-					   		$('#coupon-time-option').addClass('is-invalid');
-				   			$('#no_selected_title').html('Please select at least one (1) Time Setting option.');      
-	            			$('#prompt-no-selected').modal('show');
-	            			rs = false;
-	            			return false;
-					   	} else {
-					   		$('#coupon-time-option').removeClass('is-invalid');
-					   		var selectedOption = $('input[name="coupon_time[]"]:checked').val();
+				   		var selectedOption = $('input[name="coupon_time[]"]:checked').val();
 
-					   		if(selectedOption == 'datetime'){
-					   			var startdate = $('#dateFrom').val();
-						   		if(startdate.length === 0){
-						   			$('#dateFrom').addClass('is-invalid');
-						   			$('#spanDatefrom').css('display','block');
-						   			$('#spanDatefrom').html('Start Date field is required.');
-						   			rs = false;
-	            					return false;
-						   		}
+				   		if(selectedOption == 'datetime'){
+				   			var startdate = $('#dateFrom').val();
+					   		if(startdate.length === 0){
+					   			$('#dateFrom').addClass('is-invalid');
+					   			$('#spanDatefrom').css('display','block');
+					   			$('#spanDatefrom').html('Start Date field is required.');
+					   			rs = false;
+            					return false;
 					   		}
+				   		}
 
-					   		if(selectedOption == 'custom'){
-					   			var eventname = $('#eventname').val();
-					   			var eventdate = $('#eventdate').val();
+				   		if(selectedOption == 'custom'){
+				   			var eventname = $('#eventname').val();
+				   			var eventdate = $('#eventdate').val();
 
-					   			if(eventname.length === 0){
-					   				$('#eventname').addClass('is-invalid');
-						   			$('#spanEventName').css('display','block');
-						   			$('#spanEventName').html('Event name field is required.');
-						   			rs = false;
-	            					return false;
-					   			}
+				   			if(eventname.length === 0){
+				   				$('#eventname').addClass('is-invalid');
+					   			$('#spanEventName').css('display','block');
+					   			$('#spanEventName').html('Event name field is required.');
+					   			rs = false;
+            					return false;
+				   			}
 
-					   			if(eventdate.length === 0){
-					   				$('#eventdate').addClass('is-invalid');
-						   			$('#spanEventDate').css('display','block');
-						   			$('#spanEventDate').html('Event date field is required.');
-						   			rs = false;
-	            					return false;
-					   			}
-					   		}
+				   			if(eventdate.length === 0){
+				   				$('#eventdate').addClass('is-invalid');
+					   			$('#spanEventDate').css('display','block');
+					   			$('#spanEventDate').html('Event date field is required.');
+					   			rs = false;
+            					return false;
+				   			}
+				   		}
 
-					   		rs = true;
-					   	}	
+				   		rs = true;	
 				   	}
 
 				   	if(this.value == 'purchase') {
@@ -718,7 +667,7 @@
 				   			$('#coupon-purchase-option').removeClass('is-invalid');
 				   			var selectedOption = $('input[name="coupon_purchase[]"]:checked').val();
 
-				   			if(selectedOption == 'product'){
+				   			if($('#coupon-product').is(':checked')){
 				   				var product = $('#product_opt').val();
 				   				var category = $('#category_opt').val();
 				   				var brand = $('#brand_opt').val();
@@ -735,7 +684,7 @@
 				   				rs = true;
 				   			}
 
-				   			if(selectedOption == 'amount'){
+				   			if($('#coupon-amount').is(':checked')){
 				   				var amount = $('#purchase_amount').val();
 						   		var amounttype = $('#amount_opt').val();
 
@@ -758,7 +707,7 @@
 						   		rs = true;
 				   			}
 
-				   			if(selectedOption == 'qty'){
+				   			if($('#coupon-quantity').is(':checked')){
 				   				var qty = $('#purchase_qty').val();
 						   		var qtytype = $('#qty_opt').val();
 
@@ -848,14 +797,6 @@
 			fieldCustomerLimitOption.style.display = "block";
 		} else {
 			fieldCustomerLimitOption.style.display = "none";
-		};
-
-		var couponCustomerUsage = document.getElementById("coupon-customer-usage");
-		var fieldCustomerUsageOption = document.getElementById("coupon-customer-usage-form");
-		if (couponCustomerUsage.checked == true){
-			fieldCustomerUsageOption.style.display = "block";
-		} else {
-			fieldCustomerUsageOption.style.display = "none";
 		};
 	};
 

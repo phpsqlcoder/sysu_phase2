@@ -9,6 +9,7 @@ use App\Helpers\ListingHelper;
 
 use App\EcommerceModel\Coupon;
 use App\EcommerceModel\CustomerCoupon;
+use App\EcommerceModel\CouponSale;
 use App\EcommerceModel\CouponCart;
 use App\EcommerceModel\Product;
 use App\EcommerceModel\Cart;
@@ -93,32 +94,12 @@ class CouponFrontController extends Controller
         //
     }
 
-    public function available()
-    {
-        $page = new Page();
-        $page->name = 'Available Coupons';
-
-        $coupons = CustomerCoupon::where('customer_id',Auth::id())->where('coupon_status','ACTIVE')->get();
-
-        return view('theme.sysu.pages.ecommerce.coupons-available',compact('page','coupons'));
-    }
-
-    public function expire()
-    {
-        $page = new Page();
-        $page->name = 'Expired Coupons';
-
-        $coupons = CustomerCoupon::where('customer_id',Auth::id())->where('coupon_status','EXPIRED')->get();
-
-        return view('theme.sysu.pages.ecommerce.coupons-expired',compact('page','coupons'));
-    }
-
     public function claimed()
     {
         $page = new Page();
         $page->name = 'Claimed Coupons';
 
-        $coupons = CustomerCoupon::where('customer_id',Auth::id())->where('usage_status','>',0)->get();
+        $coupons = CouponSale::where('customer_id',Auth::id())->get();
 
         return view('theme.sysu.pages.ecommerce.coupons-claimed',compact('page','coupons'));
     }
@@ -201,10 +182,9 @@ class CouponFrontController extends Controller
         
     // Purchase Product, Category, Brand Only
         $purchasedCoupons = 
-            Coupon::whereNotIn('id',function($query){
-                $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')
+            Coupon::where('status','ACTIVE')
             ->where('purchase_combination_counter',0)
+            ->where('activation_type','auto')
             ->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('purchase_product_id')
                       ->orwhereNotNull('purchase_product_cat_id')
@@ -245,16 +225,15 @@ class CouponFrontController extends Controller
 
     // Purchase Combination = Product ID or Product Category or Product Brand + total amount + total quantity
         $purchasedCombinationCoupons = 
-        Coupon::whereNotIn('id',function($query){
-            $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-        })->where('status','ACTIVE')
+        Coupon::where('status','ACTIVE')
         ->where('purchase_combination_counter','>',0)
+        ->where('activation_type','auto')
         ->where(function ($orWhereQuery){
             $orWhereQuery->orwhereNotNull('purchase_product_id')
-                  ->orwhereNotNull('purchase_product_cat_id')
-                  ->orwhereNotNull('purchase_product_brand')
-                  ->orwhereNotNull('purchase_amount')
-                  ->orwhereNotNull('purchase_qty');
+              ->orwhereNotNull('purchase_product_cat_id')
+              ->orwhereNotNull('purchase_product_brand')
+              ->orwhereNotNull('purchase_amount')
+              ->orwhereNotNull('purchase_qty');
         })->get();
 
         $combination_counter = 0;
@@ -341,8 +320,7 @@ class CouponFrontController extends Controller
         $purchased_combined_coupons = Coupon::whereIn('id',$arr_purchase_combination_coupons)->get();
     //
 
-        $collectibles = 
-            collect($couponsMinTotalAmount)
+        $collectibles = collect($couponsMinTotalAmount)
             ->merge($couponsMaxTotalAmount)
             ->merge($couponsExactTotalAmount)
             ->merge($couponsMinTotalQty)
@@ -353,17 +331,15 @@ class CouponFrontController extends Controller
             ->merge($purchased_combined_coupons);
 
 
-        $arr_collectibles = [];
-        foreach($collectibles as $collect){
-            $availability = Coupon::collectible_usage($collect->id);
-            array_push($arr_collectibles,$availability);
+        $arr_coupon_availability = [];
+        foreach($collectibles as $coupon){
+            array_push($arr_coupon_availability,$coupon->id);
         }
 
-        $totalCollectibles = count($collectibles);
+        $coupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereNull('location')->get();
 
-        return response()->json(['collectibles' => $collectibles, 'total_collectibles' => $totalCollectibles, 'availability' => $arr_collectibles]);
+        return response()->json(['coupons' => $coupons, 'availability' => $arr_coupon_availability]);
 
-        // return view('theme.sysu.ecommerce.cart.collectible-coupons',compact('collectibles','totalCollectibles'));
     }
 
     public function get_brands(Request $request)

@@ -87,10 +87,9 @@ class Coupon extends Model
     public static function purchaseMinValue($purchase_field,$purchase_type,$purchase_value)
     {
         $coupons = 
-            Coupon::whereNotIn('id',function($query){
-                $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')
+            Coupon::where('status','ACTIVE')
             ->where('purchase_combination_counter',0)
+            ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'min')->where($purchase_field,'<=',$purchase_value)->get();
 
         return $coupons;
@@ -99,10 +98,9 @@ class Coupon extends Model
     public static function purchaseMaxValue($purchase_field,$purchase_type,$purchase_value)
     {
         $coupons = 
-            Coupon::whereNotIn('id',function($query){
-                $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')
+            Coupon::where('status','ACTIVE')
             ->where('purchase_combination_counter',0)
+            ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'max')->where($purchase_field,'>=',$purchase_value)->get();
 
         return $coupons;
@@ -111,10 +109,9 @@ class Coupon extends Model
     public static function purchaseExactValue($purchase_field,$purchase_type,$purchase_value)
     {
         $coupons = 
-            Coupon::whereNotIn('id',function($query){
-                $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')
+            Coupon::where('status','ACTIVE')
             ->where('purchase_combination_counter',0)
+            ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'exact')->where($purchase_field,$purchase_value)->get();
 
         return $coupons;
@@ -128,9 +125,8 @@ class Coupon extends Model
         //     })->where('status','ACTIVE')
         //     ->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
         $coupons = 
-            Coupon::whereNotIn('id',function($query){
-                $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-            })->where('status','ACTIVE')
+            Coupon::where('status','ACTIVE')
+            ->where('activation_type','auto')
             ->where(function ($orWhereQuery){
                 $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
                 ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
@@ -138,36 +134,4 @@ class Coupon extends Model
 
         return $coupons;
     }
-
-    // public static function rewards_desc($couponID)
-    // {
-    //     $coupon = Coupon::find($couponID);
-
-    //     if(isset($coupon->location)){
-    //         return 
-    //         '<tr>
-    //             <td>Coupon Reward: Free Shipping</td>
-    //             <td></td>
-    //         </tr>';
-    //     }
-
-    //     if(isset($coupon->amount)){
-    //         return 
-    //         '<tr>
-    //             <td>LESS : Discount Amount</td>
-    //             <td align="right">&#8369; '.$coupon->amount.'</td>
-    //         </tr>';
-    //     }
-    // }
-
-    //  public static function coupon_reward($couponID)
-    //  {
-    //     $coupon = Coupon::find($couponID);
-
-    //     if(isset($coupon->amount)){
-    //         $reward =  $coupon->amount;
-    //     }
-
-    //     return $reward;
-    //  }
 }

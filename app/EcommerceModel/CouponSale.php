@@ -12,7 +12,7 @@ class CouponSale extends Model
     protected $fillable = [ 'customer_id', 'coupon_id', 'coupon_code', 'sales_header_id'];
     public $timestamps = true;
 
-    public function coupon_details()
+    public function details()
     {
     	return $this->belongsTo(Coupon::class,'coupon_id');
     }
