@@ -78,9 +78,11 @@ class CouponController extends Controller
 
         ])->validate();
 
+        $data = $request->all();
+
         $loc = '';
         if($request->reward == 'free-shipping-optn'){
-          $data = $request->all();
+          
             $locations = $data['location'];
             $loc_discount_type = $request->discount_type;
             $loc_discount_amount = $request->shipping_fee_discount_amount;
@@ -93,6 +95,14 @@ class CouponController extends Controller
             $loc_discount_type = NULL;
             $loc_discount_amount = 0;
         }
+
+        $customernames = '';
+        if(isset($request->customer)){
+            $customers = $data['customer'];
+            foreach($customers as $c){
+                $customernames .= $c.'|';
+            }
+        }
         
         $coupon = Coupon::create([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
@@ -101,7 +111,7 @@ class CouponController extends Controller
             'terms_and_conditions' => $request->terms,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
-            'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
+            'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
             'location' => $loc,
             'location_discount_type' => $loc_discount_type,
             'location_discount_amount' => $loc_discount_amount,
@@ -177,9 +187,10 @@ class CouponController extends Controller
             'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
         ])->validate();
 
+        $data = $request->all();
+
         $loc = '';
         if($request->reward == 'free-shipping-optn'){
-          $data = $request->all();
             $locations = $data['location'];
             $loc_discount_type = $request->discount_type;
             $loc_discount_amount = $request->shipping_fee_discount_amount;
@@ -193,6 +204,14 @@ class CouponController extends Controller
             $loc_discount_amount = 0;
         }
 
+        $customernames = '';
+        if(isset($request->customer)){
+            $customers = $data['customer'];
+            foreach($customers as $c){
+                $customernames .= $c.'|';
+            }
+        }
+
         Coupon::find($coupon->id)->update([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : $coupon->coupon_code,
             'name' => $request->name,
@@ -200,7 +219,7 @@ class CouponController extends Controller
             'terms_and_conditions' => $request->terms,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
-            'scope_customer_id' => $request->coupon_scope == 'specific' ? $request->customer : NULL,
+            'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
             'location' => $loc,
             'location_discount_type' => $loc_discount_type,
             'location_discount_amount' => $loc_discount_amount,

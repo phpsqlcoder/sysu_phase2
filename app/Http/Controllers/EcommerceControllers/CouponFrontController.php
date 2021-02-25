@@ -159,6 +159,7 @@ class CouponFrontController extends Controller
         // Purchase within daterange
         $couponsDateTimePurchase = Coupon::purchaseWithinDateRange();
 
+
         // Purchase Products
         $arr_coupons = [];
         $arr_brands = [];
@@ -336,9 +337,50 @@ class CouponFrontController extends Controller
             array_push($arr_coupon_availability,$coupon->id);
         }
 
-        $coupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereNull('location')->get();
+        $coupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','all');
+        if($request->page_name == 'cart'){
+            $coupons = $coupons->whereNull('location')->orderBy('name','asc');
+            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->whereNull('location')->get();
+        } else {
+            $coupons = $coupons->whereIn('amount_discount_type',[1])->where(function ($orWhereQuery){
+                $orWhereQuery->orwhereNotNull('location')
+                    ->orwhereNotNull('amount')
+                    ->orwhereNotNull('percentage');
+            })->orderBy('name','asc');
 
-        return response()->json(['coupons' => $coupons, 'availability' => $arr_coupon_availability]);
+            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->whereIn('amount_discount_type',[1])->where(function ($orWhereQuery){
+                $orWhereQuery->orwhereNotNull('location')
+                    ->orwhereNotNull('amount')
+                    ->orwhereNotNull('percentage');
+            })->get();
+        }
+
+        $coupons = $coupons->get();
+
+        $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->get();
+
+        $arr_customer_coupons = [];
+        $arr_customer_id = [];
+        foreach($coupon_customer as $coupon){
+            $customerID = explode('|',$coupon->scope_customer_id);
+            foreach($customerID as $id){
+                array_push($arr_customer_id, $id);
+            }
+
+            if(in_array(Auth::id(), $arr_customer_id)){
+                array_push($arr_customer_coupons, $coupon->id);
+            }
+        }
+
+        if(empty($arr_customer_coupons)){
+            $allCoupons = $coupons;
+        } else {
+            $customerCoupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereIn('id',[$arr_customer_coupons])->get();
+            // all or specific coupons
+            $allCoupons = collect($customerCoupons)->merge($coupons);
+        }
+
+        return response()->json(['coupons' => $allCoupons, 'availability' => $arr_coupon_availability]);
 
     }
 

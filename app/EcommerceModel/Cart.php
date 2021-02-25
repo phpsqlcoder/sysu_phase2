@@ -18,7 +18,7 @@ class Cart extends Model
 
     public function product()
     {
-        return $this->belongsTo('\App\EcommerceModel\Product');
+        return $this->belongsTo('\App\EcommerceModel\Product','product_id');
     }
 
     public function getItemTotalPriceAttribute()

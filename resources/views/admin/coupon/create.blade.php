@@ -116,7 +116,7 @@
 				</div>
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="customer-optn" style="display:none">
-						<select class="form-control select2" name="customer">
+						<select class="form-control select2" name="customer[]" multiple="multiple">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
 								<option value="{{$customer->id}}">{{ $customer->name }}</option>
@@ -174,13 +174,13 @@
 
 					<div class="mb-3 reward-option" id="discount-amount-optn" style="display:@if($errors->any() && old('reward') == 'discount-amount-optn') block @else none @endif">
 						<label class="d-block">Discount Amount *</label>
-						<input name="discount_amount" type="number" class="form-control @error('discount_amount') is-invalid @enderror" value="{{ old('discount_amount') }}">
+						<input name="discount_amount" type="number" class="form-control @error('discount_amount') is-invalid @enderror" value="{{ old('discount_amount') }}" placeholder="Php">
 						@hasError(['inputName' => 'discount_amount'])
                     	@endhasError
 					</div>
 
 					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if($errors->any() && old('reward') == 'discount-percentage-optn') block @else none @endif">
-						<label class="d-block">Discount Percentage = % *</label>
+						<label class="d-block">Discount Percentage % *</label>
 						<input name="discount_percentage" type="number" class="form-control @error('discount_percentage') is-invalid @enderror" placeholder="%" value="{{ old('discount_percentage') }}">
 						@hasError(['inputName' => 'discount_percentage'])
                     	@endhasError
@@ -816,10 +816,6 @@
 		var autoManual= document.getElementById("coupon-activate-auto");
 		var couponCodeAuto = document.getElementById("coupon-code");
 		couponCodeAuto.style.display = autoManual.checked ? "none" : "block";
-
-		var couponMultiUse = document.getElementById("coupon-multi-use");
-		var couponMultiUseForm = document.getElementById("coupon-multi-use-form");
-		couponMultiUseForm.style.display = couponMultiUse.checked ? "block" : "none";
 	};
 
 

@@ -9,7 +9,7 @@ use App\EcommerceModel\SalesHeader;
 class CouponSale extends Model
 {
 	protected $table = "coupon_sales";
-    protected $fillable = [ 'customer_id', 'coupon_id', 'coupon_code', 'sales_header_id'];
+    protected $fillable = [ 'customer_id', 'coupon_id', 'coupon_code', 'sales_header_id', 'order_status'];
     public $timestamps = true;
 
     public function details()
