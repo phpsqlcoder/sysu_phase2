@@ -361,7 +361,8 @@
                 url: "{{ route('display.collectibles') }}",
                 data: {
                     'total_amount' : totalAmount,
-                    'total_qty' : totalQty
+                    'total_qty' : totalQty,
+                    'page_name' : 'cart',
                 },
                 success: function( response ) {
                     $('#collectibles').empty();
@@ -446,6 +447,7 @@
                         }
 
                         $('[data-toggle="popover"]').popover();
+                        
                     });
                     $('#exampleModalCenter').modal('show');
                 }
@@ -513,8 +515,6 @@
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
 
-            $('#couponBtn'+id).prop('disabled',false);
-            $('#btnCpnTxt'+id).html('Use Coupon');
             $('#couponDiv'+id+'').remove();   
         });
     //
@@ -599,8 +599,6 @@
             $('#total_amount_discount').val(0);
 
             $('#couponDiv'+id+'').remove(); 
-            $('#couponBtn'+id).prop('disabled',false);
-            $('#btnCpnTxt'+id).html('Use Coupon');
 
             compute_grand_total();
         });
@@ -727,8 +725,6 @@
             $('#cart_product_reward'+pid).val(0);
 
             $('#couponDiv'+id+'').remove(); 
-            $('#couponBtn'+id).prop('disabled',false);
-            $('#btnCpnTxt'+id).html('Use Coupon');
 
             compute_grand_total();
         });

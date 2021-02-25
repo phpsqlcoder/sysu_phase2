@@ -19,6 +19,7 @@ class CreateCouponSalesTable extends Migration
             $table->integer('coupon_id');
             $table->string('coupon_code');
             $table->integer('sales_header_id');
+            $table->string('order_status')->default('UNPAID');
             $table->timestamps();
         });
     }

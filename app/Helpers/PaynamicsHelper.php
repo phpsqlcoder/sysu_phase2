@@ -4,7 +4,10 @@
 namespace App\Helpers;
 
 use App\EcommerceModel\Cart;
+use App\EcommerceModel\CouponCart;
+use App\EcommerceModel\Coupon;
 use App\Helpers\Webfocus\Setting;
+use Auth;
 
 class PaynamicsHelper
 {
@@ -27,6 +30,27 @@ class PaynamicsHelper
             $deliveryFee = number_format($deliveryFee, 2, '.', '');
             $itemXml = $itemXml . "<Items><itemname>Delivery Fee</itemname><quantity>1</quantity><amount>{$deliveryFee}</amount></Items>";
         }
+
+        $coupons = CouponCart::where('customer_id',Auth::id())->get();
+        $totalDiscount = 0;
+        foreach($coupons as $coupon){
+            $c = Coupon::find($coupon->coupon_id);
+
+            if(isset($c->amount)){
+                $discount = number_format($c->amount,2,'.','');
+            }
+
+            if(isset($c->percentage)){
+                $percent = $c->percentage/100;
+                $discount = $totalAmount*$percent;
+
+                $discount = number_format($discount,2,'.','');
+            }
+
+            $totalDiscount += $discount;
+        }
+
+        $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$totalDiscount}</amount></Items>";
         
         $_mid = $merchant['id']; //<-- your merchant id
         $_requestid = $requestId;

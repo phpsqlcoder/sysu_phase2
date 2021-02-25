@@ -173,8 +173,8 @@
 							</div>
 						</div>
 
-						<label class="mg-t-10" id="discount_amount_label">Shipping Fee Discount Amount</label>
-						<input type="number" name="shipping_fee_discount_amount" class="form-control @error('shipping_fee_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ $coupon->location_discount_amount }}">
+						<label class="mg-t-10" id="discount_amount_label" style="display: @if($coupon->location_discount_type == 'full') none @else block @endif;">Shipping Fee Discount Amount</label>
+						<input type="number" name="shipping_fee_discount_amount" class="form-control @error('shipping_fee_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ $coupon->location_discount_amount }}" style="display: @if($coupon->location_discount_type == 'full') none @else block @endif;">
 						@hasError(['inputName' => 'shipping_fee_discount_amount'])
                     	@endhasError
 

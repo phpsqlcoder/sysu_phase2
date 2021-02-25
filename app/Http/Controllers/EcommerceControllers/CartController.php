@@ -274,14 +274,8 @@ class CartController extends Controller
         $customer_name = Auth::user()->fullName;
         $customer_contact_number =  $request->mobile ?? Auth::user()->mobile;
            
-        if(isset($request->deductedAmount)){
-            $totalPrice = ($request->total_amount-$request->deductedAmount);
-        } else {
-            $totalPrice = $request->total_amount;
-        }
- 
+        $totalPrice = $request->total_amount;
         $requestId = $this->next_order_number();  
- 
         $member = Auth::user();
               
         $salesHeader = SalesHeader::create([
@@ -370,7 +364,6 @@ class CartController extends Controller
 
     public function receive_data_from_payment_gateway(Request $request)
     {
-
         logger($request);
         
         $paymentResponse = (isset($_POST['paymentresponse'])) ? $_POST['paymentresponse'] : null;
@@ -378,7 +371,6 @@ class CartController extends Controller
         if (empty($paymentResponse)) {
             return false;
         }
-
 
         
         $body = str_replace(" ", "+", $paymentResponse);
@@ -447,7 +439,18 @@ class CartController extends Controller
                         'response_code' => $responseStatus->response_code
                     ]);
 
-                    // $this->get_coupons();
+                    $c = CouponSale::where('sales_header_id',$sales->id);
+                    $c->update(['order_status' => 'PAID']);
+
+                    $coupons = $c->get();
+                    foreach($coupons as $coupon){
+                        $totalCustomer = CouponSale::where('coupon_id',$coupon->coupon_id)->count();
+                        $cpn = Coupon::find($coupon->coupon_id);
+                        
+                        if($totalCustomer == $cpn->customer_limit){
+                            $cpn->update(['status' => 'INACTIVE']);
+                        }
+                    }
                     
                 } else if ($responseStatus->response_code == "GR053") {
                     $log['response_title'] = 'Cancelled';
@@ -456,6 +459,8 @@ class CartController extends Controller
                     $sales->update([
                         'payment_status' => 'CANCELLED'                        
                     ]);
+
+                    CouponSale::where('sales_header_id',$sales->id)->update(['order_status' => 'PAID']);
                 } else {
 
                     $log['response_title'] = 'Failed';
@@ -464,6 +469,8 @@ class CartController extends Controller
                     $sales->update([
                         'payment_status' => 'FAILED'
                     ]);
+
+                    CouponSale::where('sales_header_id',$sales->id)->update(['order_status' => 'PAID']);
                 }
             } else {
                 $log['response_title'] = 'Invalid Signature';
@@ -527,29 +534,33 @@ class CartController extends Controller
         $coupons = $data['couponid'];
         foreach($coupons as $c){
             $coupon = Coupon::find($c);
+            CouponSale::create([
+                'customer_id' => Auth::id(),
+                'coupon_id' => $c,
+                'coupon_code' => $coupon->coupon_code,
+                'sales_header_id' => $salesid
+            ]);
 
-            $totalUsage = CouponSale::where('coupon_id',$c)->count();
-            // if coupon has set customer limit
-            if(isset($coupon->customer_limit)){
-                // check if customer limit is not reach
-                if($totalUsage <= $coupon->customer_limit){
-                   CouponSale::create([
-                        'customer_id' => Auth::id(),
-                        'coupon_id' => $c,
-                        'coupon_code' => $coupon->coupon_code,
-                        'sales_header_id' => $salesid
-                    ]);
-                } else {
-                    $coupon->update(['status', 'INACTIVE']);
-                }
-            } else {
-                CouponSale::create([
-                    'customer_id' => Auth::id(),
-                    'coupon_id' => $c,
-                    'coupon_code' => $coupon->coupon_code,
-                    'sales_header_id' => $salesid
-                ]);
-            }    
+            // $totalUsage = CouponSale::where('coupon_id',$c)->count();
+            // // if coupon has set customer limit
+            // if(isset($coupon->customer_limit)){
+            //     // check if customer limit is not reach
+            //     if($totalUsage <= $coupon->customer_limit){
+            //        CouponSale::create([
+            //             'customer_id' => Auth::id(),
+            //             'coupon_id' => $c,
+            //             'coupon_code' => $coupon->coupon_code,
+            //             'sales_header_id' => $salesid
+            //         ]);
+            //     }
+            // } else {
+            //     CouponSale::create([
+            //         'customer_id' => Auth::id(),
+            //         'coupon_id' => $c,
+            //         'coupon_code' => $coupon->coupon_code,
+            //         'sales_header_id' => $salesid
+            //     ]);
+            // }    
         }
     }
 }
