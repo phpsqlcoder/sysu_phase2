@@ -67,8 +67,10 @@
                     @endhasError
 				</div>
 				<div class="form-group">
-					<label class="d-block">Terms and Conditions</label>
-					<textarea name="terms" rows="3" class="form-control">{{ old('terms',$coupon->terms_and_conditions) }}</textarea>
+					<label class="d-block">Terms and Conditions *</label>
+					<textarea name="terms_and_conditions" rows="3" class="form-control @error('terms_and_conditions') is-invalid @enderror">{{ old('terms_and_conditions',$coupon->terms_and_conditions) }}</textarea>
+					@hasError(['inputName' => 'terms_and_conditions'])
+                    @endhasError
 				</div>
 				<div class="form-group">
 					<label class="d-block">Distribution Type</label>
