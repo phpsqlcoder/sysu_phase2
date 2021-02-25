@@ -67,6 +67,7 @@ class CouponController extends Controller
         Validator::make($request->all(), [
             'name' => 'required|max:150',
             'description' => 'required',
+            'terms_and_conditions' => 'required',
             'reward' => 'required',
             'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
             'reward' => 'required',
@@ -108,7 +109,7 @@ class CouponController extends Controller
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
-            'terms_and_conditions' => $request->terms,
+            'terms_and_conditions' => $request->terms_and_conditions,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
@@ -177,6 +178,7 @@ class CouponController extends Controller
         Validator::make($request->all(), [
             'name' => 'required|max:150',
             'description' => 'required',
+            'terms_and_conditions' => 'required',
             'reward' => 'required',
             'code' => $request->coupon_activation[0] == 'manual' ? 'required' : '',
             'reward' => 'required',
@@ -216,7 +218,7 @@ class CouponController extends Controller
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : $coupon->coupon_code,
             'name' => $request->name,
             'description' => $request->description,
-            'terms_and_conditions' => $request->terms,
+            'terms_and_conditions' => $request->terms_and_conditions,
             'activation_type' => $request->coupon_activation[0],
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
