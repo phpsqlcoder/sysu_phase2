@@ -16,6 +16,7 @@ return [
     'showing_zero_items' => 'Showing 0 of 0 items',
     'showing_items' => 'Showing :firstitem to :lastitem of :total items',
 
+    'no_product_selected' => 'Please select at least one (1) product.',
     'publish' => 'Publish',
     'private' => 'Private',
     'delete' => 'Delete',

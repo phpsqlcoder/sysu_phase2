@@ -40,7 +40,7 @@
                                     <td>{{ $product->product_details->name }}</td>
                                     <td>
                                         @if($product->product_details->maxpurchase > 0)
-                                            {{ $product->product_details->maxpurchase }}
+                                            <span class="text-success">Available</span>
                                         @else
                                             <span class="text-danger">Out of Stock</span>
                                         @endif

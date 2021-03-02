@@ -106,11 +106,13 @@
                                     <div class="cart-table-row px-3">
                                         <div style="width:100%;">
                                             <div class="form-group row mb-2">
-                                                <div class="col-md-9">
+                                                <div class="col-md-12">
                                                     <input class="form-control" type="text" id="coupon_code" placeholder="Enter Coupon Code">
                                                 </div>
-                                                <div class="col-md-3 ">
-                                                    <button type="button" class="btn btn-success" id="couponManualBtn">Apply</button>
+                                            </div>
+                                            <div class="form-group row mb-2">
+                                                <div class="col-md-12">
+                                                    <button type="button" class="btn btn-block btn-success" id="couponManualBtn">Apply Coupon</button>
                                                 </div>
                                             </div>
                                             <div class="field_wrapper_coupon"></div>

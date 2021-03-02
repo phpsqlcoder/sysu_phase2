@@ -66,59 +66,140 @@
                     </div>
                 </div>
 
-                <div class="access-table-head">
-                    <div class="table-responsive-lg text-nowrap">
-                        <table class="table table-borderless" style="width:100%;">
-                            <thead>
-                            <tr>
-                                <td width="50%">Select Products</td>
-                                <td class="text-right">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="checkbox_all">
-                                        <label class="custom-control-label" for="checkbox_all"></label>
-                                    </div>
-                                </td>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
+                <div class="form-group">
+                    <label>Type *</label>
+                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
+                        <option selected disabled value="">Choose One</option>
+                        <option value="brand">Brand</option>
+                        <option value="category">Category</option>
+                    </select>
                 </div>
 
-                <table class="table table-hover" style="width:100%;">
-                    <thead>
-                        
-                    </thead>
-                    <tbody>
-                    @foreach($categories as $category)
-                        @if(count($category->published_products) > 0)
-                            <tr>
-                                <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $category->name }}</p></td>
-                                <td class="text-right">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input category category_{{$category->id}}" data-category="{{$category->id}}" id="cat{{$category->id}}">
-                                        <label class="custom-control-label" for="cat{{$category->id}}"></label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                @forelse($category->published_products as $product)
-                                    <tr>
-                                        <td>{{ $product->name }}</td>
-                                        <td class="text-right">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb category_{{$product->category_id}}" id="pcategory{{$product->id}}">
-                                                <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
+                <div style="display: none;" id="tbl_brand">
+                    <div class="access-table-head" id="div_brand">
+                        <div class="table-responsive-lg text-nowrap">
+                            <table class="table table-borderless" style="width:100%;">
+                                <thead>
+                                <tr>
+                                    <td width="50%"><strong>Select Brands</strong></td>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover" style="width:100%;">
+                        <thead></thead>
+                        <tbody>
+                        @foreach($brands as $brand)
+                            @php
+                                $products = \App\EcommerceModel\Product::where('status','PUBLISHED')->where('brand',$brand->brand)->get();
+                            @endphp
+
+                            @if(count($products))
+                                <tr>
+                                    <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $brand->brand }}</p></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input cb_brand" data-toggle="collapse" data-target="#product_brands{{str_replace(' ','_',$brand->brand) }}" id="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}">
+                                            
+                                            <label class="custom-control-label" for="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8" class="hiddenRow">
+                                        <div class="accordian-body collapse div_brand" id="product_brands{{str_replace(' ','_',$brand->brand) }}">
+                                            <div class="autoship-table">
+                                                <div class="mg-b-10">
+                                                    <table class="table">
+                                                        <thead></thead>
+                                                        <tbody>
+                                                            @forelse($products as $product)
+                                                                <tr>
+                                                                    <td>{{ $product->name }}</td>
+                                                                    <td class="text-right">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cbbrand" id="pbrand{{$product->id}}">
+                                                                            <label class="custom-control-label" for="pbrand{{$product->id}}"></label>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr><td colspan="2">No Products</td></tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr><td>No Products</td></tr>
-                                @endforelse
-                            </tr>
-                        @endif
-                    @endforeach
-                    </tbody>
-                </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: none;" id="tbl_product">
+                    <div class="access-table-head" id="div_products">
+                        <div class="table-responsive-lg text-nowrap">
+                            <table class="table table-borderless" style="width:100%;">
+                                <thead>
+                                <tr>
+                                    <td width="50%"><strong>Select Categories</strong></td>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover" style="width:100%;">
+                        <thead></thead>
+                        <tbody>
+                        @foreach($categories as $category)
+                            @if(count($category->published_products) > 0)
+                                <tr>
+                                    <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $category->name }}</p></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input category" data-toggle="collapse" data-target="#product_category{{$category->id}}"  id="cat{{$category->id}}">
+                                            <label class="custom-control-label" for="cat{{$category->id}}"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="hiddenRow">
+                                        <div class="accordian-body collapse" id="product_category{{$category->id}}">
+                                            <div>
+                                                <table class="table" cellpadding="0">
+                                                    <thead></thead>
+                                                    <tbody>
+                                                        @forelse($category->published_products as $product)
+                                                            <tr>
+                                                                <td>{{ $product->name }}</td>
+                                                                <td class="text-right">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb" id="pcategory{{$product->id}}">
+                                                                        <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr><td colspan="2">No Products</td></tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
             </div>
 
             <div class="col-lg-12 mg-t-20 mg-b-30">
@@ -158,6 +239,20 @@
     <script src="{{ asset('lib/select2/js/select2.min.js') }}"></script>
 
     <script>
+        function promo_type(){
+            var val = $('#type').val();
+
+            if(val == 'brand'){
+                $('#tbl_brand').css('display','block');
+                $('#tbl_product').css('display','none');
+            }
+
+            if(val == 'category'){
+                $('#tbl_brand').css('display','none');
+                $('#tbl_product').css('display','block');
+            }
+        }
+
         var dateToday = new Date(); 
 
         $(function(){
@@ -195,23 +290,6 @@
 
 @section('customjs')
 	<script>
-        /*** Handles the Select All Checkbox ***/
-        $("#checkbox_all").click(function(){
-            $('.cb').not(this).prop('checked', this.checked);
-            $('.category').not(this).prop('checked', this.checked);
-        });
-
-        $('.category').on('click', function() {
-            let category = $(this).data('category');
-            let checked = $(this).is(':checked');
-            let objectName = '.category_'+category;
-            $(objectName).each(function() {
-                this.checked = checked;
-            });
-        });
-
-
-        
         $('#promo_form').submit(function(){
             if(!$("input[name='productid[]']:checked").val()) {        
                 $('#prompt-no-selected').modal('show');

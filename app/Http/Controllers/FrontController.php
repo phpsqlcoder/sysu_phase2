@@ -12,14 +12,15 @@ use App\User;
 use Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Article;
 
 class FrontController extends Controller
 {
 
     public function home()
     {
-        return redirect()->route('product.front.list');
-        return $this->page('home')->withShortcodes();
+        return $this->page('home');
+        // return $this->page('home')->withShortcodes();
     }
 
     public function privacy_policy(){
@@ -50,14 +51,20 @@ class FrontController extends Controller
 
     public function page($slug)
     {
-
-        if(Auth::guest()) {
+        if (Auth::guest()) {
             $page = Page::where('slug', $slug)->where('status', 'PUBLISHED')->first();
         } else {
             $page = Page::where('slug', $slug)->first();
         }
 
-        if($page == null) {
+        if ($page == null) {
+            $view404 = 'theme.'.env('FRONTEND_TEMPLATE').'.pages.404';
+            if (view()->exists($view404)) {
+                $page = new Page();
+                $page->name = 'Page not found';
+                return view($view404, compact('page'));
+            }
+
             abort(404);
         }
 
@@ -66,24 +73,66 @@ class FrontController extends Controller
         $footer = Page::where('slug', 'footer')->where('name', 'footer')->first();
 
         if (!empty($page->template)) {
-            return view('theme.'.env('FRONTEND_TEMPLATE').'.pages.'.$page->template, compact('footer','page', 'breadcrumb'))->withShortcodes();
+            return view('theme.'.env('FRONTEND_TEMPLATE').'.pages.'.$page->template, compact('footer', 'page', 'breadcrumb'));
         }
 
         $parentPage = null;
-        if ($page->has_parent_page() || $page->has_sub_pages())
-        {
+        $parentPageName = $page->name;
+        $currentPageItems = [];
+        $currentPageItems[] = $page->id;
+        if ($page->has_parent_page() || $page->has_sub_pages()) {
             if ($page->has_parent_page()) {
                 $parentPage = $page->parent_page;
-                while($parentPage->has_parent_page()) {
+                $parentPageName = $parentPage->name;
+                $currentPageItems[] = $parentPage->id;
+                while ($parentPage->has_parent_page()) {
                     $parentPage = $parentPage->parent_page;
+                    $currentPageItems[] = $parentPage->id;
                 }
             } else {
                 $parentPage = $page;
+                $currentPageItems[] = $parentPage->id;
             }
         }
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.page', compact('footer', 'page', 'parentPage','breadcrumb'))->withShortcodes();
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.page', compact('footer', 'page', 'parentPage', 'breadcrumb', 'currentPageItems', 'parentPageName'));
     }
+    // public function page($slug)
+    // {
+
+    //     if(Auth::guest()) {
+    //         $page = Page::where('slug', $slug)->where('status', 'PUBLISHED')->first();
+    //     } else {
+    //         $page = Page::where('slug', $slug)->first();
+    //     }
+
+    //     if($page == null) {
+    //         abort(404);
+    //     }
+
+    //     $breadcrumb = $this->breadcrumb($page);
+
+    //     $footer = Page::where('slug', 'footer')->where('name', 'footer')->first();
+
+    //     if (!empty($page->template)) {
+    //         return view('theme.'.env('FRONTEND_TEMPLATE').'.pages.'.$page->template, compact('footer','page', 'breadcrumb'))->withShortcodes();
+    //     }
+
+    //     $parentPage = null;
+    //     if ($page->has_parent_page() || $page->has_sub_pages())
+    //     {
+    //         if ($page->has_parent_page()) {
+    //             $parentPage = $page->parent_page;
+    //             while($parentPage->has_parent_page()) {
+    //                 $parentPage = $parentPage->parent_page;
+    //             }
+    //         } else {
+    //             $parentPage = $page;
+    //         }
+    //     }
+
+    //     return view('theme.'.env('FRONTEND_TEMPLATE').'.page', compact('footer', 'page', 'parentPage','breadcrumb'))->withShortcodes();
+    // }
 
     public function contact_us(ContactUsRequest $request)
     {

@@ -55,8 +55,9 @@ class PromoController extends Controller
     public function create()
     {
         $categories = ProductCategory::where('status','PUBLISHED')->orderBy('name','asc')->get();
+        $brands = Product::whereNotNull('brand')->distinct()->get(['brand']);
 
-        return view('admin.promos.create',compact('categories'));
+        return view('admin.promos.create',compact('categories','brands'));
     }
 
     /**
@@ -79,9 +80,8 @@ class PromoController extends Controller
         );
 
         $data = $request->all();
-        $prodId = $data['productid'];
-
         $date = explode(' - ',$request->promotion_dt);
+        $prodId = $data['productid'];
 
         $promo = Promo::create([
             'name' => $request->name,
@@ -90,24 +90,19 @@ class PromoController extends Controller
             'discount' => $request->discount,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
             'is_expire' => 0,
+            'type' => $request->type,
             'user_id' => Auth::id()
         ]);
 
         if($promo){
             foreach($prodId as $key => $id){
-                // $sale = DB::table('promo_products')->join('promos','promo_products.promo_id','=','promos.id')->where('promo_products.product_id',$id)->where('promos.status','INACTIVE')->count();
-
-                // if($sale){
-                //     PromoProducts::where('product_id',$id)->delete();
-                // }
-
                 $product = Product::find($id);
                 PromoProducts::create([
                     'promo_id' => $promo->id,
                     'product_id' => $id,
                     'user_id' => Auth::id()
                 ]); 
-            }
+            } 
         }
         
         return redirect()->route('promos.index')->with('success', __('standard.promos.create_success'));
@@ -133,25 +128,11 @@ class PromoController extends Controller
      */
     public function edit($id)
     {
-        // $unsale_products = 
-        //     Product::where('status','PUBLISHED')->where('discount','<',1)->whereNotIn('id', function($query){
-        //         $query->select('product_id')->from('promo_products')
-        //         ->join('promos','promos.id','=','promo_products.promo_id')
-        //         ->where('promos.status','ACTIVE')
-        //         ->where('promos.is_expire', 0);
-        //     })->get();
-
-        // $onsale_products = 
-        //     Product::where('status','PUBLISHED')->whereIn('id', function($query) use ($id){
-        //         $query->select('product_id')->from('promo_products')
-        //         ->join('promos','promos.id','=','promo_products.promo_id')
-        //         ->where('promos.id',$id);
-        //     })->get();
-
         $categories = ProductCategory::where('status','PUBLISHED')->orderBy('name','asc')->get();
+        $brands = Product::whereNotNull('brand')->distinct()->get(['brand']);
         $promo = Promo::find($id);
 
-        return view('admin.promos.edit',compact('categories','promo'));
+        return view('admin.promos.edit',compact('categories','promo','brands'));
     }
 
     /**
@@ -173,6 +154,7 @@ class PromoController extends Controller
             'promo_end' => $date[1].':00.000',
             'discount' => $request->discount,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
+            'type' => $request->type,
             'user_id' => Auth::id()
         ]);
         
@@ -185,8 +167,15 @@ class PromoController extends Controller
                 array_push($arr_promoproducts,$p->product_id);
             }
 
+            if($request->type == 'brand'){
+                $selected_products = $data['brand'];
+            }
+
+            if($request->type == 'category'){
+                $selected_products = $data['productid'];
+            }
+
             // save new promotional products
-            $selected_products = $data['productid'];
             foreach($selected_products as $key => $prod){
                 if(!in_array($prod,$arr_promoproducts)){
                     $product = Product::find($prod);

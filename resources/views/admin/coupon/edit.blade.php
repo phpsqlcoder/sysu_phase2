@@ -85,9 +85,9 @@
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation')) || $coupon->activation_type == 'auto') checked @endif>
-								<label class="custom-control-label" for="coupon-activate-auto">Automatic</label>
+								<label class="custom-control-label" for="coupon-activate-auto">Automatically Enabled</label>
 							</div>
-							<small style="font-style: italic;">System automatically issues reward after customer completes an activity.</small>
+							<small style="font-style: italic;">Coupon is automatically enabled after customer completes an activity.</small>
 						</div>
 					</div>
 					<div class="mb-3" id="coupon-code" style="display: @if($coupon->activation_type == 'manual') block @else none @endif">
@@ -150,7 +150,7 @@
 						<label class="d-block">Location</label>
 						<select class="form-control select2" name="location[]" multiple="multiple" style="min-height: 32px;">
 							<option label="Select Area"></option>
-							<option value="all">All Area</option>
+							<option value="all" @if(in_array('all',$arr_loc)) selected @endif>All Area</option>
 							@foreach($locations as $location)
 								<option @if(in_array($location->name,$arr_loc)) selected @endif value="{{$location->name}}">{{ $location->name }}</option>
 							@endforeach

@@ -66,60 +66,165 @@
                     @hasError(['inputName' => 'status'])
                     @endhasError
                 </div>
-                
-                <div class="access-table-head">
-                    <div class="table-responsive-lg text-nowrap">
-                        <table class="table table-borderless" style="width:100%;">
-                            <thead>
-                            <tr>
-                                <td width="50%">Select Products</td>
-                                <td class="text-right">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="checkbox_all">
-                                        <label class="custom-control-label" for="checkbox_all"></label>
-                                    </div>
-                                </td>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
+
+                <div class="form-group">
+                    <label>Type *</label>
+                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
+                        <option disabled value="">Choose One</option>
+                        <option @if($promo->type == 'brand') selected @endif value="brand">Brand</option>
+                        <option @if($promo->type == 'category') selected @endif value="category">Category</option>
+                    </select>
                 </div>
 
-                <table class="table table-hover" style="width:100%;">
-                    <thead>
-                        
-                    </thead>
-                    <tbody>
-                    @foreach($categories as $category)
-                        @if(count($category->published_products) > 0)
-                            <tr>
-                                <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $category->name }}</p></td>
-                                <td class="text-right">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input category category_{{$category->id}}" data-category="{{$category->id}}" id="cat{{$category->id}}">
-                                        <label class="custom-control-label" for="cat{{$category->id}}"></label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                @forelse($category->published_products as $product)
-                                    <tr>
-                                        <td>{{ $product->name }}</td>
-                                        <td class="text-right">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb category_{{$product->category_id}}" id="pcategory{{$product->id}}" @if(\App\EcommerceModel\PromoProducts::is_promo($promo->id,$product->id) > 0) checked @endif>
-                                                <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
+                <div style="display: @if($promo->type == 'brand') block @else none; @endif" id="tbl_brand">
+                    <div class="access-table-head" id="div_brand">
+                        <div class="table-responsive-lg text-nowrap">
+                            <table class="table table-borderless" style="width:100%;">
+                                <thead>
+                                <tr>
+                                    <td width="50%"><strong>Select Brands</strong></td>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover" style="width:100%;">
+                        <thead></thead>
+                        <tbody>
+                        @foreach($brands as $brand)
+                            @php
+                                $counter = 0;
+                                $products = \App\EcommerceModel\Product::where('status','PUBLISHED')->where('brand',$brand->brand)->get();
+                                foreach($products as $p){
+                                    $pproducts = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();
+                                    if($pproducts > 0){
+                                        $counter++;
+                                    }
+                                }
+                            @endphp
+
+                            @if(count($products))
+                                <tr>
+                                    <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $brand->brand }}</p></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input cb_brand" data-toggle="collapse" data-target="#product_brands{{str_replace(' ','_',$brand->brand) }}" id="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}" @if($counter > 0) checked @endif>
+                                            
+                                            <label class="custom-control-label" for="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="8" class="hiddenRow">
+                                        <div class="accordian-body collapse" id="product_brands{{str_replace(' ','_',$brand->brand) }}">
+                                            <div class="autoship-table">
+                                                <div class="mg-b-10">
+                                                    <table class="table">
+                                                        <thead></thead>
+                                                        <tbody>
+                                                            @forelse($products as $product)
+                                                                @php
+                                                                    $promo_products = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$product->id)->count();
+                                                                @endphp
+                                                                <tr>
+                                                                    <td>{{ $product->name }}</td>
+                                                                    <td class="text-right">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <input type="checkbox" name="brand[]" value="{{$product->id}}" class="custom-control-input cbbrand" id="pbrand{{$product->id}}" @if($promo_products > 0) checked @endif>
+                                                                            <label class="custom-control-label" for="pbrand{{$product->id}}"></label>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr><td colspan="2">No Products</td></tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr><td>No Products</td></tr>
-                                @endforelse
-                            </tr>
-                        @endif
-                    @endforeach
-                    </tbody>
-                </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: @if($promo->type == 'category') block @else none; @endif;" id="tbl_product">
+                    <div class="access-table-head" id="div_products">
+                        <div class="table-responsive-lg text-nowrap">
+                            <table class="table table-borderless" style="width:100%;">
+                                <thead>
+                                <tr>
+                                    <td width="50%"><strong>Select Categories</strong></td>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table table-hover" style="width:100%;">
+                        <thead>
+                            
+                        </thead>
+                        <tbody>
+                        @foreach($categories as $category)
+                            @if(count($category->published_products) > 0)
+                                @php
+                                    $products = \App\EcommerceModel\Product::where('status','PUBLISHED')->where('category_id',$category->id)->get();
+                                    foreach($products as $p){
+                                        $cproducts = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();
+                                        if($cproducts > 0){
+                                            $counter++;
+                                        }
+                                    }
+                                @endphp
+                                <tr>
+                                    <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $category->name }}</p></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input category" data-toggle="collapse" data-target="#product_category{{$category->id}}"  id="cat{{$category->id}}" @if($counter>0) checked @endif>
+                                            <label class="custom-control-label" for="cat{{$category->id}}"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="hiddenRow">
+                                        <div class="accordian-body collapse @if($counter>0) show @endif" id="product_category{{$category->id}}">
+                                            <div>
+                                                <table class="table" cellpadding="0">
+                                                    <thead></thead>
+                                                    <tbody>
+                                                        @forelse($category->published_products as $product)
+                                                            @php
+                                                                $promo_products = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$product->id)->count();
+                                                            @endphp
+                                                            <tr>
+                                                                <td>{{ $product->name }}</td>
+                                                                <td class="text-right">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb" id="pcategory{{$product->id}}" @if($promo_products > 0) checked @endif>
+                                                                        <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            @empty
+                                                            <tr><td colspan="2">No Products</td></tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="col-lg-12 mg-t-20 mg-b-30">
@@ -196,34 +301,19 @@
 
 @section('customjs')
     <script>
-        /*** Handles the Select All Checkbox ***/
-        $("#checkbox_all").click(function(){
-            $('.cb').not(this).prop('checked', this.checked);
-            $('.category').not(this).prop('checked', this.checked);
-        });
+        function promo_type(){
+            var val = $('#type').val();
 
-        $('.category').on('click', function() {
-            let category = $(this).data('category');
-            let checked = $(this).is(':checked');
-            let objectName = '.category_'+category;
-            $(objectName).each(function() {
-                this.checked = checked;
-            });
-        });
+            if(val == 'brand'){
+                $('#tbl_brand').css('display','block');
+                $('#tbl_product').css('display','none');
+            }
 
-        $("#checkbox_onsale").click(function(){
-            $('.cb_onsale').not(this).prop('checked', this.checked);
-            $('.category_onsale').not(this).prop('checked', this.checked);
-        });
-
-        $('.category_onsale').on('click', function() {
-            let category = $(this).data('category_onsale');
-            let checked = $(this).is(':checked');
-            let objectName = '.onsale_'+category;
-            $(objectName).each(function() {
-                this.checked = checked;
-            });
-        });
+            if(val == 'category'){
+                $('#tbl_brand').css('display','none');
+                $('#tbl_product').css('display','block');
+            }
+        }
 
         $('#promo_form').submit(function(){
             if(!$("input[name='productid[]']:checked").val()) {        

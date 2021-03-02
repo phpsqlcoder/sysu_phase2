@@ -40,7 +40,7 @@
                                     <td>{{ $product->product_details->name }}</td>
                                     <td>
                                         @if($product->product_details->maxpurchase > 0)
-                                            {{ $product->product_details->maxpurchase }}
+                                            <span class="text-success">Available</span>
                                         @else
                                             <span class="text-danger">Out of Stock</span>
                                         @endif
@@ -57,7 +57,9 @@
                                             <a href="javascript:;" title="Already on Cart" class="btn btn-warning btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
                                             @endif
                                         @else
-                                            <a href="javascript:;" title="Add to Cart" class="btn btn-secondary btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>&nbsp;
+                                            @if(\App\EcommerceModel\CustomerWishlist::product_exist($product->product_id) == 0)
+                                                <a href="{{ route('favorite.add-to-wishlist',$product->product_id)}}" title="Add to Wishlist" class="btn btn-secondary btn-sm mb-1"><i class="fa fa-briefcase pb-1"></i></a>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
