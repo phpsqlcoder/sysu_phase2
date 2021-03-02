@@ -118,6 +118,7 @@
 				</div>
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="customer-optn" style="display:none">
+						<label class="d-block">Customer Name *</label>
 						<select class="form-control select2" name="customer[]" multiple="multiple">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
@@ -179,6 +180,49 @@
 						<input name="discount_amount" type="number" class="form-control @error('discount_amount') is-invalid @enderror" value="{{ old('discount_amount') }}" placeholder="Php">
 						@hasError(['inputName' => 'discount_amount'])
                     	@endhasError
+
+						<div class="row" style="padding-bottom: 10px;margin-top: 20px;">
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" checked onclick="product_discount_amount(1)">
+									<label class="custom-control-label" for="discount-total-amount">Total Amount</label>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="discount-product-price" name="amount_discount" class="custom-control-input" value="2" onclick="product_discount_amount(2)">
+									<label class="custom-control-label" for="discount-product-price">Product Price</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: none;" id="discount_selection">
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onclick="product_discount('current');">
+									<label class="custom-control-label" for="same-product">Current Product</label>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onclick="product_discount('highest');">
+									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="specific-product" name="product_discount" onclick="" class="custom-control-input" value="specific" onclick="product_discount('specific');">
+									<label class="custom-control-label" for="specific-product">Specific Product</label>
+								</div>
+							</div>
+						</div>
+
+						<select class="form-control select2" name="discount_productid" id="discount_productid">
+							<option label="Choose Product"></option>
+							@foreach($products as $product)
+								<option @if(old('discount_productid') == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
+							@endforeach
+						</select>
 					</div>
 
 					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if($errors->any() && old('reward') == 'discount-percentage-optn') block @else none @endif">
@@ -280,7 +324,7 @@
 					<div class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="coupon-purchase" onclick="myFunction()" name="coupon_setting[]" value="purchase" @if(is_array(old('coupon_setting')) && in_array('purchase', old('coupon_setting'))) checked @endif>
 						<label class="custom-control-label" for="coupon-purchase">Purchase 
-							&nbsp;&nbsp;<span style="font-style: italic;">Coupon reward is received after activity conditions has been met.</span>
+							&nbsp;&nbsp;<span style="font-style: italic;">Coupon is received after the purchase conditions have been met.</span>
 						</label>
 					</div>
 				</div>
@@ -375,20 +419,6 @@
 									<option @if(old('qty_opt') == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
-							</div>
-
-							<!-- Appy reward on total amount / product price -->
-							<div class="col-md-6 mt-3">
-								<div class="custom-control custom-radio">
-									<input type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" checked>
-									<label class="custom-control-label" for="discount-total-amount">Total Amount</label>
-								</div>
-							</div>
-							<div class="col-md-6 mt-3">
-								<div class="custom-control custom-radio">
-									<input type="radio" id="discount-product-price" name="amount_discount" class="custom-control-input" value="2">
-									<label class="custom-control-label" for="discount-product-price">Product Price</label>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -486,6 +516,21 @@
 
 @section('customjs')
 <script>
+	function product_discount(x){
+		if(x == 'specific'){
+			$('#discount_productid').css('display','block');
+		} else {
+			$('#discount_productid').css('display','none');
+		}
+	}
+	function product_discount_amount(x){
+		if(x == 2){
+			$('#discount_selection').css('display','flex');
+		} else {
+			$('#discount_selection').css('display','none');
+		}
+	}
+
 	$('#reward-optn').change(function(){
 		$('.reward-option').hide();
 		$('#' + $(this).val()).show();
