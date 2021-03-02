@@ -84,9 +84,9 @@
 						<div class="col-6">
 							<div class="custom-control custom-radio">
 								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation'))) checked @endif onclick="ShowHideDiv()">
-								<label class="custom-control-label" for="coupon-activate-auto">Automatic</label>
+								<label class="custom-control-label" for="coupon-activate-auto">Automatically Enabled</label>
 							</div>
-							<small style="font-style: italic;">System automatically issues reward after customer completes an activity.</small>
+							<small style="font-style: italic;">Coupon is automatically enabled after customer completes an activity.</small>
 						</div>
 					</div>
 					<div class="mb-3" id="coupon-code">

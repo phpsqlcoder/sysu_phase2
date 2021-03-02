@@ -50,4 +50,11 @@ class CustomerWishlist extends Model
 
         return $counter;
     }
+
+    public static function product_exist($productid)
+    {
+        $count = CustomerWishlist::where('product_id',$productid)->count();
+
+        return $count;
+    }
 }

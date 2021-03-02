@@ -26,7 +26,7 @@ Route::get('/albums/preview', 'FrontController@test')->name('albums.preview');
 
 
 //Product Frontend
-Route::any('/', 'Product\Front\ProductFrontController@list')->name('product.front.list');
+Route::any('/shop', 'Product\Front\ProductFrontController@list')->name('product.front.list');
 //Route::post('/shop', 'Product\Front\ProductFrontController@list_search')->name('product.front.list_post');
 Route::get('/products/{slug}', 'Product\Front\ProductFrontController@show')->name('product.front.show');
 
@@ -71,6 +71,7 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::post('/favorite/remove-product','EcommerceControllers\FavoriteController@remove_product')->name('favorite.remove-product');
     Route::post('/add-to-favorites','EcommerceControllers\FavoriteController@btn_add_to_favorites')->name('btn-add-to-favorites');
     Route::post('/remove-to-favorites','EcommerceControllers\FavoriteController@btn_remove_to_favorites')->name('btn-remove-to-favorites');
+    Route::get('/product-add-to-wishlit/{productid}','EcommerceControllers\FavoriteController@add_to_wishlist')->name('favorite.add-to-wishlist');
 
     // Wishlist
     Route::get('/account/wishlist','EcommerceControllers\WishlistController@index_front')->name('profile.wishlist');

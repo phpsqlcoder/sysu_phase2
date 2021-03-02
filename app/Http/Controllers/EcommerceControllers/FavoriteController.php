@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 use App\Helpers\ListingHelper;
 use App\EcommerceModel\Cart;
+use App\EcommerceModel\CustomerWishlist;
 use App\Page;
 use Auth;
 
@@ -197,6 +198,17 @@ class FavoriteController extends Controller
                 'success' => true,               
             ]);
         }
+    }
+
+    public function add_to_wishlist($productid)
+    {
+        CustomerWishlist::create([
+            'customer_id' => Auth::id(),
+            'product_id' => $productid
+        ]);
+
+        return back()->with('success','Product has been added to wishlist.');
+
     }
 
 }

@@ -38,7 +38,7 @@
                 @endif
                 <div class="table-history" style="overflow-x:auto;">
 
-                    <table class="table table-hover small text-center overflow-auto">
+                    <table id="salesTransaction" class="table table-hover small text-center overflow-auto">
                         <thead class="thead-dark">
                             <tr>
                                 <th scope="col" class="align-middle">Order#</th>
@@ -66,9 +66,9 @@
                                     <td>{{$sale->delivery_status}}</td>
                                     <td align="right">
                                         @if($sale->status<>'CANCELLED')
-                                            <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
+                                            <a href="#" title="Wiew Items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                             @if ($balance > 0)
-                                                <a href="{{route('my-account.pay-again',$sale->id)}}" title="Pay now" class="btn btn-success btn-sm mb-1"><i class="fa fa-credit-card pb-1"></i></a>&nbsp;
+                                                <a href="{{route('my-account.pay-again',$sale->id)}}" title="Pay Now" class="btn btn-success btn-sm mb-1"><i class="fa fa-credit-card pb-1"></i></a>&nbsp;
                                             @endif
                                             @if($paid <= 0)                                            
                                                 <a href="#" title="Cancel Order" onclick="cancel_unpaid_order('{{$sale->order_number}}')" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
@@ -76,15 +76,15 @@
                                                 <a target="_blank" href="https://forms.office.com/Pages/ResponsePage.aspx?id=XEGiMjf44Uyvp90T9OPGD8Ao7kIPdnhJk-AhXKYQL4JUQkRFMUo0MEEwS0ZDR0hHRFI0NEFVQTVTQy4u" title="Cancel Order" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
                                             @endif
                                             
-                                            <a href="#" title="view delivery history" class="btn btn-success btn-sm mb-1" data-toggle="modal" data-target="#delivery{{$sale->id}}"><i class="fa fa-truck pb-1"></i></a>
+                                            <a href="#" title="View Delivery History" class="btn btn-success btn-sm mb-1" data-toggle="modal" data-target="#delivery{{$sale->id}}"><i class="fa fa-truck pb-1"></i></a>
 
                                             @if($sale->delivery_status == 'Delivered')
-                                                <a href="#" title="reorder items" data-toggle="modal" data-target="#reorder_products{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>
+                                                <a href="#" title="Reorder Items" data-toggle="modal" data-target="#reorder_products{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-shopping-cart pb-1"></i></a>
 
                                                 <!-- <a href="#" title="Reorder" class="btn btn-success btn-sm mb-1" onclick="reorder('{{$sale->id}}')"><i class="fa fa-shopping-cart pb-1"></i></a> -->    
                                             @endif
                                         @else
-                                            <a href="#" title="view items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
+                                            <a href="#" title="View Items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                         @endif
                                     </td>
                                 </tr>
@@ -416,9 +416,13 @@
 {!!$modals!!}
 @endsection
 
+
 @section('pagejs')
+    <script src="{{ asset('theme/sysu/plugins/datatables/datatables.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-    <script>
+    <script>   
+
+
         /*** Handles the Select All Checkbox ***/
         function checkbox_all(saleid){
             var status = $('#ckbox'+saleid).is(":checked") ? true : false;

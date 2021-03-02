@@ -339,14 +339,18 @@
                                     '<input type="hidden" id="couponfreeproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['free_product_id']+'">'
                                 );
 
-                                if(returnData.coupon_details['amount_discount_type'] == 1){
-                                    if(returnData.coupon_details['free_product_id'] != null){
-                                        free_product_coupon(returnData.coupon_details['id']);
+                                if(returnData.coupon_details['location'] == null){
+                                    if(returnData.coupon_details['amount_discount_type'] == 1){
+                                        if(returnData.coupon_details['free_product_id'] != null){
+                                            free_product_coupon(returnData.coupon_details['id']);
+                                        } else {
+                                            use_coupon(returnData.coupon_details['id']);
+                                        }
                                     } else {
-                                        use_coupon(returnData.coupon_details['id']);
+                                        choose_product(returnData.coupon_details['id']);
                                     }
                                 } else {
-                                    choose_product(returnData.coupon_details['id']);
+                                    use_sf_coupon(returnData.coupon_details['id']);
                                 }
 
                                 swal({

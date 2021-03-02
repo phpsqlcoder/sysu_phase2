@@ -36,33 +36,28 @@
 @endsection
 
 @section('content')
-    <main>
         <section class="mt-4">
             <div class="container">
                 <div class="row no-gutters">
                     <div class="col-md-12">
                         <div class="main-banner">
-                            {{-- 
                             <div class="slick-slider" id="banner">
+                                @php
+                                    $banners = \App\Banner::where('album_id',5)->get();
+                                @endphp
+
+                                @foreach($banners as $banner)
                                 <div class="banner-wrapper">
-                                    <div class="banner-image"><img src="{{ asset('theme/sysu/images/banners/banner1.jpg') }}" /></div>
+                                    <div class="banner-image"><img src="{{ $banner->image_path }}" /></div>
                                 </div>
-                                <div class="banner-wrapper">
-                                    <div class="banner-image"><img src="{{ asset('theme/sysu/images/banners/banner2.jpg') }}" /></div>
-                                </div>
-                            </div>
-                            --}}
-                            <div class="slick-slider" id="banner" style="height: 130px;">
-                                <div class="alert alert-danger text-center" role="alert" style="font-size:25px;">
-                                   We are currently on soft launch. We ask for your patience and understanding as we continuously improve our service. Please note that we are delivering to Metro Manila, Rizal & selected Bulacan areas only.
-                                </div>
-                               
+                                @endforeach
                             </div>
                         </div>
                     </div>                   
                 </div>
             </div>
         </section>
+
         <div id="mySidenav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         </div>
@@ -393,9 +388,6 @@
                 </div>
             </div>
         </section>
-        
-        
-    </main>
     <div id="loading-overlay">
         <div class="loading-icon"></div>
     </div>

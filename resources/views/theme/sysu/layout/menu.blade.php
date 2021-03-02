@@ -5,15 +5,13 @@
             <div class="col-lg-10">
                 <!-- RD Navbar Nav -->
                 <ul class="rd-navbar-nav">
-                    <li><a href="{{route('product.front.list')}}">Shop</a></li>
-                    
-                        @php
-                            $menu = \App\Menu::where('is_active', 1)->first();
-                        @endphp
-                        @foreach ($menu->parent_navigation() as $item)
-                            @include('theme.sysu.layout.menu-item', ['item' => $item])
-                        @endforeach
-                    
+                    @php
+                        $menu = \App\Menu::where('is_active', 1)->first();
+                    @endphp
+                    @foreach ($menu->parent_navigation() as $item)
+                        @include('theme.sysu.layout.menu-item', ['item' => $item])
+                    @endforeach
+                    <li><a href="{{route('product.front.list')}}" class="btn btn-danger text-light btn-shop"><strong>Shop</strong></a></li>
                 </ul>
                 <!-- END RD Navbar Nav -->
             </div>
