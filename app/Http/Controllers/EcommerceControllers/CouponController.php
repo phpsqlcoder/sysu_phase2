@@ -104,7 +104,21 @@ class CouponController extends Controller
                 $customernames .= $c.'|';
             }
         }
-        
+
+        $amount_discount = NULL;
+        if($request->reward == 'discount-amount-optn' || $request->reward == 'discount-percentage-optn'){
+            $amount_discount = $request->amount_discount;
+        }
+
+        $discount_productid = NULL;
+        if($request->product_discount == 'current'){
+            $discount_productid = $request->product_name[0];
+        }
+
+        if($request->product_discount == 'specific'){
+            $discount_productid = $request->discount_productid;
+        }
+
         $coupon = Coupon::create([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
@@ -120,6 +134,9 @@ class CouponController extends Controller
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
+            'amount_discount_type' => $amount_discount,
+            'product_discount' => $request->amount_discount == 2 ? $request->product_discount : NULL,
+            'discount_product_id' => $discount_productid,
             // 'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);
@@ -324,7 +341,6 @@ class CouponController extends Controller
             'purchase_qty' =>  $totalqty,
             'purchase_amount_type' => $amounttype,
             'purchase_qty_type' =>  $qtytype,
-            'amount_discount_type' => $request->amount_discount,
             'purchase_combination_counter' => $coupon_combination_counter,
             'purchase_combination' => $coupon_combination
         ]);

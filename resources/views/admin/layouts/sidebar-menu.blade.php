@@ -185,7 +185,7 @@
                 <a href="" class="nav-link"><i data-feather="users"></i> <span>Promos</span></a>
                 <ul>
                     <li @if (\Route::current()->getName() == 'promos.index'|| \Route::current()->getName() == 'promos.edit') class="active" @endif><a href="{{ route('promos.index') }}">Manage Promos</a></li>
-                    <li>@if (\Route::current()->getName() == 'promos.create') class="active" @endif<a href="{{ route('promos.create') }}">Create a Promo</a></li>
+                    <li @if (\Route::current()->getName() == 'promos.create') class="active" @endif><a href="{{ route('promos.create') }}">Create a Promo</a></li>
                 </ul>
             </li>
         @endif

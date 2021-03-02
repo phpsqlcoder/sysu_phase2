@@ -118,6 +118,7 @@
 				</div>
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="customer-optn" style="display:@if($coupon->customer_scope == 'specific') block @else none @endif">
+						<label class="d-block">Customer Name *</label>
 						<select class="form-control select2" name="customer">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
@@ -292,7 +293,7 @@
 					<div class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="coupon-purchase" onclick="myFunction()" name="coupon_setting[]" value="purchase" @if(isset($coupon->purchase_product_id) || isset($coupon->purchase_product_cat_id) || isset($coupon->purchase_product_brand) || isset($coupon->purchase_amount) || isset($coupon->purchase_qty)) checked @endif>
 						<label class="custom-control-label" for="coupon-purchase">Purchase 
-							&nbsp;&nbsp;<span style="font-style: italic;">Coupon reward is received after activity conditions has been met.</span>
+							&nbsp;&nbsp;<span style="font-style: italic;">Coupon is received after the purchase conditions have been met.</span>
 						</label>
 					</div>
 				</div>
