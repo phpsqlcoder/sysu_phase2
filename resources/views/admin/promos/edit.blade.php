@@ -94,9 +94,10 @@
                         <tbody>
                         @foreach($brands as $brand)
                             @php
+                                $pproducts = 0;
                                 $products = \App\EcommerceModel\Product::where('status','PUBLISHED')->where('brand',$brand->brand)->get();
                                 foreach($products as $p){
-                                    $pproducts = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();
+                                    $pproducts += \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();   
                                 }
                             @endphp
 
@@ -121,11 +122,14 @@
                                                         <thead></thead>
                                                         <tbody>
                                                             @forelse($products as $product)
+                                                                @php
+                                                                    $exist = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$product->id)->count();
+                                                                @endphp
                                                                 <tr>
                                                                     <td>{{ $product->name }}</td>
                                                                     <td class="text-right">
                                                                         <div class="custom-control custom-checkbox">
-                                                                            <input type="checkbox" name="brand[]" value="{{$product->id}}" class="custom-control-input cbbrand" id="pbrand{{$product->id}}" @if($pproducts > 0) checked @endif>
+                                                                            <input type="checkbox" name="brand[]" value="{{$product->id}}" class="custom-control-input cbbrand" id="pbrand{{$product->id}}" @if($exist > 0) checked @endif>
                                                                             <label class="custom-control-label" for="pbrand{{$product->id}}"></label>
                                                                         </div>
                                                                     </td>
@@ -167,9 +171,10 @@
                         @foreach($categories as $category)
                             @if(count($category->published_products) > 0)
                                 @php
+                                    $cproducts = 0;
                                     $products = \App\EcommerceModel\Product::where('status','PUBLISHED')->where('category_id',$category->id)->get();
                                     foreach($products as $p){
-                                        $cproducts = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();
+                                        $cproducts += \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$p->id)->count();
                                     }
                                 @endphp
                                 <tr>
@@ -189,11 +194,14 @@
                                                     <thead></thead>
                                                     <tbody>
                                                         @forelse($products as $product)
+                                                            @php
+                                                                $exist = \App\EcommerceModel\PromoProducts::where('promo_id',$promo->id)->where('product_id',$product->id)->count();
+                                                            @endphp
                                                             <tr>
                                                                 <td>{{ $product->name }}</td>
                                                                 <td class="text-right">
                                                                     <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb" id="pcategory{{$product->id}}" @if($cproducts>0) checked @endif>
+                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb" id="pcategory{{$product->id}}" @if($exist>0) checked @endif>
                                                                         <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
                                                                     </div>
                                                                 </td>
