@@ -29,110 +29,93 @@ class CheckoutController extends Controller
         $page = new Page();
         $page->name = 'Checkout';
         
-        $products = Cart::where('user_id',Auth::id())->get(); 
-        $totalProducts = $products->count();     
+        $products = Cart::where('user_id',Auth::id())->get();      
 
         $locations = Deliverablecities::where('status','PUBLISHED')->orderBy('name')->get();
         $user = Auth::user();
         
-        if ($products->count() == 0) {
+        if($products->count() == 0) {
             return redirect()->route('product.front.list');
         }
 
         $coupons = CouponCart::where('customer_id',Auth::id())->get();
-        
-        $totalAmountCouponCounter = 0;
-        foreach($coupons as $coupon){
-            $c = Coupon::find($coupon->coupon_id);
-            if(isset($c->amount) || isset($c->percentage)){
-                $totalAmountCouponCounter++;
-            }
-        }
-
         $couponUsed = $coupons->count();
         $couponLimit = 3;
 
-        $sfeeCoupon = 
-            CustomerCoupon::join('coupons','customer_coupons.coupon_id','=','coupons.id')->select('customer_coupons.*','coupons.location')
-            ->whereNotNull('coupons.location')
-            ->where('customer_coupons.coupon_status','ACTIVE')
-            ->get();
 
-
-        $discountAmountCoupon = 
-            CustomerCoupon::join('coupons','customer_coupons.coupon_id','=','coupons.id')->select('customer_coupons.*','coupons.amount','coupons.percentage','coupons.amount_discount_type')
-            ->where(function ($query){
-                $query->orwhereNotNull('coupons.amount')
-                ->orwhereNotNull('coupons.percentage');
-            })->where('customer_coupons.coupon_status','ACTIVE')->where('coupons.amount_discount_type',1)->get();
-
-        $customerCoupons = collect($sfeeCoupon)->merge($discountAmountCoupon);
-
-        
-        // Coupon Rules
-        // OrderTotal Amount and Quantity 
         $totalAmount = 0;
-        $totalWithoutCoupon = 0;
         $totalQty = 0;
-        foreach($products as $c){
-            $totalQty += $c->qty;
-            $totalWithoutCoupon += $c->product->discountedprice*$c->qty;
-            $product_sub = $c->product->discountedprice*$c->qty;
+        $product_subtotal = 0;
+        foreach($products as $p){
+            $totalQty += $p->qty;
+            $totalAmount += $p->product->discountedprice*$p->qty;
 
-            $coupon = CouponCart::where('customer_id',Auth::id())->where('product_id',$c->product_id);
-            if($coupon->count()){
-                $c = $coupon->first();
+            $couponCart = CouponCart::where('customer_id',Auth::id())->where('product_id',$p->product_id);;
 
-                // get coupon reward
-                if(isset($c->details->amount)){
+            if($couponCart->count()){
+                $remainingQty = $p->qty-$couponCart->count();
+                // get product subtotal of remaining qty
+                $product_subtotal += $p->product->discountedprice*$remainingQty;
 
-                    $total_prod_sub = $product_sub-$c->details->amount;
-                    $totalAmount += $total_prod_sub;
+                // get total discount amount
+                $coupon = $couponCart->first();
 
-                } elseif(isset($c->details->percentage)){
-
-                    $percent = $c->details->percentage/100;
-                    $discount = $product_sub*$percent;
-
-                    $total_prod_sub = $product_sub-$discount;
-                    $totalAmount += $total_prod_sub;
-
+                if(isset($coupon->details->amount)){
+                    $productsub = $p->product->discountedprice*$couponCart->count();
+                    $product_subtotal += $productsub*($coupon->details->amount*$couponCart->count());
                 }   
+
+                if(isset($coupon->details->percentage)){
+                    $productsub = $p->product->discountedprice*$couponCart->count();
+                    $percent = ($coupon->details->percentage*$couponCart->count())/100;
+                    $discount = $productsub*$percent;
+
+                    $product_subtotal += $productsub-$discount;
+                }
+
             } else {
-                $totalAmount += $c->product->discountedprice*$c->qty;
+                $product_subtotal += $p->product->discountedprice*$p->qty;
+            }
+
+        }
+
+
+        // get total amount discount
+        $totalAmountCoupons = CouponCart::where('customer_id',Auth::id())->whereNull('product_id')->get();
+        $amountDiscount = 0;
+        $total_amount_discount_counter = 0;
+        foreach($totalAmountCoupons as $c){
+            $coupon = Coupon::find($c->coupon_id);
+            if($coupon->amount_discount_type == 1){
+                $total_amount_discount_counter++;
+
+                if(isset($coupon->amount)){
+                    $amountDiscount += $coupon->amount;
+                }
+
+                if(isset($counpon->percentage)){
+                    $percent = $coupon->percentage/100;
+                    $discount = $product_subtotal*$percent;
+
+                    $amountDiscount += $discount;
+                }
             }
         }
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','customerCoupons','totalAmount','totalQty','totalWithoutCoupon','totalProducts','couponUsed','couponLimit'));
+        $grandTotal = $product_subtotal-$amountDiscount;
+
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','totalAmount','totalQty','grandTotal','amountDiscount','product_subtotal','couponUsed','couponLimit','total_amount_discount_counter'));
     }
 
-    public function payment_completed() {
+    public function remove_coupon($id)
+    {
+        CouponCart::where('customer_id',Auth::id())->where('coupon_id',$id)->delete();
 
+        return back()->with('success','Coupon has been removed.');
+    }
 
-        // $products = Cart::where('user_id',Auth::id())->get();
-        //    $user = Auth::user()->profile;
-        //    $header = SalesHeader::create([
-        //        'user_id' => Auth::id(),
-        //        'order_number' => substr(md5(rand()),0,6),
-        //        'customer_name' => $user->name,
-        //        'customer_contact_number' => $user->phone,
-        //        'customer_address' => $user->memberAddress,
-        //        'customer_delivery_adress' => $user->deliveryAddress,
-        //        'delivery_tracking_number' => substr(md5(rand()),0,6),
-        //        'delivery_fee_amount' => 0,
-        //        'gross_amount' => $products->sum('itemTotalPrice'),
-        //        'tax_amount' => 0,
-        //        'net_amount' => $products->sum('itemTotalPrice'),
-        //        'discount_amount' => 0,
-        //        'payment_status' => 'Completed',
-        //        'delivery_status' => 'Processing Stock',
-        //        'status' => 'Published',
-        //        'currency' => 'Php'
-        //    ])
-
-        //    // foreach($products as $product){
-
-        //    // }
+    public function payment_completed()
+    {
         $delete_products = Cart::where('user_id',Auth::id())->delete();
         return redirect()->route('profile.sales')->with('message', 'Transaction Completed!');
     }

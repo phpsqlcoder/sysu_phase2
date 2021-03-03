@@ -92,6 +92,7 @@ Route::group(['middleware' => ['authenticated']], function () {
     Route::post('/add-manual-coupon','EcommerceControllers\CouponFrontController@add_manual_coupon')->name('add-manual-coupon');
 
     Route::get('/display-collectibles', 'EcommerceControllers\CouponFrontController@collectibles')->name('display.collectibles');
+    Route::get('/remove-coupon/{id}','EcommerceControllers\CheckoutController@remove_coupon')->name('checkout.remove-coupon');
 
 
 });

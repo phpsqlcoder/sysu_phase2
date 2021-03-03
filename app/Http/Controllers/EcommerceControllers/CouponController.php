@@ -105,7 +105,7 @@ class CouponController extends Controller
             }
         }
 
-        $amount_discount = NULL;
+        $amount_discount = 1;
         if($request->reward == 'discount-amount-optn' || $request->reward == 'discount-percentage-optn'){
             $amount_discount = $request->amount_discount;
         }

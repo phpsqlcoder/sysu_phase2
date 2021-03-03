@@ -349,14 +349,28 @@ class CartController extends Controller
             'cancel' => route('profile.sales'),
         ];
         
+
+        if(isset($request->couponid)){
+            $data = $request->all();
+            $coupons = $data['couponid'];
+            foreach($coupons as $coupon){
+                CouponCart::create([
+                    'coupon_id' => $coupon,
+                    'customer_id' => Auth::id()
+                ]);
+            }
+        }
+
         $base64Code = PaynamicsHelper::payNow($requestId, Auth::user(), $carts, $totalPrice, $urls, false ,$request->delivery_fee);
 
         Cart::where('user_id', Auth::id())->delete();
-        
-        $this->remove_cart_coupon();
-        if($request->coupon_counter > 0){
-            $this->update_coupon_status($request,$salesHeader->id);    
+        if($base64Code){
+            if($request->coupon_counter > 0){
+                $this->update_coupon_status($request,$salesHeader->id);    
+            }
         }
+        
+        
         
         return view('theme.paynamics.sender', compact('base64Code'));
        
@@ -451,6 +465,8 @@ class CartController extends Controller
                             $cpn->update(['status' => 'INACTIVE']);
                         }
                     }
+
+                    $this->remove_cart_coupon();
                     
                 } else if ($responseStatus->response_code == "GR053") {
                     $log['response_title'] = 'Cancelled';
@@ -504,6 +520,7 @@ class CartController extends Controller
 
     public function update_coupon_status($request,$salesid)
     {
+
         $data = $request->all();
 
         if(isset($request->freeproductid)){

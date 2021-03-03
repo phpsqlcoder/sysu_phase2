@@ -115,71 +115,73 @@ class CouponFrontController extends Controller
     }
 
     public function add_manual_coupon(Request $request)
-    {
-
+    {   
         $coupon = Coupon::where('coupon_code',$request->couponcode)->where('activation_type','manual');
-
         if($coupon->exists()){
             $c = $coupon->first();
 
-            if($c->status == 'EXPIRED' || $c->status == 'INACTIVE'){
+            $couponCart = CouponCart::where('customer_id',Auth::id())->where('coupon_id',$c->id)->exists();
+            if($couponCart){
                 return response()->json([
-                    'expired' => true,               
+                    'exist' => true,               
                 ]);
             } else {
-                
-                CouponCart::create([
-                    'customer_id' => Auth::id(),
-                    'coupon_id' => $c->id
-                ]);
+                if($c->status == 'EXPIRED' || $c->status == 'INACTIVE'){
+                    return response()->json([
+                        'expired' => true,               
+                    ]);
+                } else {
+                    
+                    // CouponCart::create([
+                    //     'customer_id' => Auth::id(),
+                    //     'coupon_id' => $c->id
+                    // ]);
 
-                return response()->json([
-                    'success' => true, 
-                    'coupon_details' => $c              
-                ]);
+                    return response()->json([
+                        'success' => true, 
+                        'coupon_details' => $c              
+                    ]);
+                }
             }
         } else {
             return response()->json([
                 'not_exist' => true,               
             ]);
         }
+        
     }
 
     public function collectibles(Request $request){
-        // Total Purchase Amount
-        $couponsMinTotalAmount = Coupon::purchaseMinValue('purchase_amount','purchase_amount_type',$request->total_amount);
-        $couponsMaxTotalAmount = Coupon::purchaseMaxValue('purchase_amount','purchase_amount_type',$request->total_amount);
-        $couponsExactTotalAmount = Coupon::purchaseExactValue('purchase_amount','purchase_amount_type',$request->total_amount);
+        // Total Purchase Amount Only
+            $couponsMinTotalAmount = Coupon::purchaseMinValue('purchase_amount','purchase_amount_type',$request->total_amount);
+            $couponsMaxTotalAmount = Coupon::purchaseMaxValue('purchase_amount','purchase_amount_type',$request->total_amount);
+            $couponsExactTotalAmount = Coupon::purchaseExactValue('purchase_amount','purchase_amount_type',$request->total_amount);
+        //
 
-        //Total Purchase Quantity
-        $couponsMinTotalQty = Coupon::purchaseMinValue('purchase_qty','purchase_qty_type',$request->total_qty);
-        $couponsMaxTotalQty = Coupon::purchaseMaxValue('purchase_qty','purchase_qty_type',$request->total_qty);
-        $couponsExactTotalQty = Coupon::purchaseExactValue('purchase_qty','purchase_qty_type',$request->total_qty);
+        //Total Purchase Quantity Only
+            $couponsMinTotalQty = Coupon::purchaseMinValue('purchase_qty','purchase_qty_type',$request->total_qty);
+            $couponsMaxTotalQty = Coupon::purchaseMaxValue('purchase_qty','purchase_qty_type',$request->total_qty);
+            $couponsExactTotalQty = Coupon::purchaseExactValue('purchase_qty','purchase_qty_type',$request->total_qty);
+        //
 
-        // Purchase within daterange
-        // $couponsDateTimePurchase = Coupon::purchaseWithinDateRange();
+        // Cart Products
+            $arr_coupons = [];
+            $arr_brands = [];
+            $arr_products = [];
+            $arr_categories = [];
 
+            $cartProducts = Cart::where('user_id',Auth::id())->get();
+            foreach ($cartProducts as $p) {
+                $product = Product::find($p->product_id);
 
-        // Purchase Products
-        $arr_coupons = [];
-        $arr_brands = [];
-        $arr_products = [];
-        $arr_categories = [];
+                array_push($arr_products, $p->product_id);
+                array_push($arr_categories, $product->category_id);
 
-        $cartProducts = Cart::where('user_id',Auth::id())->get();
-
-        // $cartProducts = explode('|',$request->cproducts);
-
-        foreach ($cartProducts as $p) {
-            $product = Product::find($p->product_id);
-
-            array_push($arr_products, $p->product_id);
-            array_push($arr_categories, $product->category_id);
-
-            if(isset($product->brand)){
-                array_push($arr_brands, $product->brand);
+                if(isset($product->brand)){
+                    array_push($arr_brands, $product->brand);
+                }
             }
-        }
+        //
         
     // Purchase Product, Category, Brand Only
         $purchasedCoupons = 
@@ -192,36 +194,36 @@ class CouponFrontController extends Controller
                       ->orwhereNotNull('purchase_product_brand');
             })->get();
 
-            foreach ($purchasedCoupons as $coupon) {
-                if(isset($coupon->purchase_product_id)){
-                    $products   = explode('|',$coupon->purchase_product_id);
-                    foreach($products as $prodid){
-                        if(in_array($prodid, $arr_products)){
-                            array_push($arr_coupons, $coupon->id);
-                        }
-                    }
-                }
-
-                if(isset($coupon->purchase_product_cat_id)){
-                    $categories = explode('|',$coupon->purchase_product_cat_id);
-                    foreach($categories as $catid){
-                        if(in_array($catid, $arr_categories)){
-                            array_push($arr_coupons, $coupon->id);
-                        }
-                    }
-                }
-
-                if(isset($coupon->purchase_product_brand)){
-                    $brands     = explode('|',$coupon->purchase_product_brand);
-                    foreach($brands as $brand){
-                        if(in_array($brand, $arr_brands)){
-                            array_push($arr_coupons, $coupon->id);
-                        }
+        foreach ($purchasedCoupons as $coupon) {
+            if(isset($coupon->purchase_product_id)){
+                $products   = explode('|',$coupon->purchase_product_id);
+                foreach($products as $prodid){
+                    if(in_array($prodid, $arr_products)){
+                        array_push($arr_coupons, $coupon->id);
                     }
                 }
             }
 
-            $purchased_coupons = Coupon::whereIn('id',$arr_coupons)->get();
+            if(isset($coupon->purchase_product_cat_id)){
+                $categories = explode('|',$coupon->purchase_product_cat_id);
+                foreach($categories as $catid){
+                    if(in_array($catid, $arr_categories)){
+                        array_push($arr_coupons, $coupon->id);
+                    }
+                }
+            }
+
+            if(isset($coupon->purchase_product_brand)){
+                $brands     = explode('|',$coupon->purchase_product_brand);
+                foreach($brands as $brand){
+                    if(in_array($brand, $arr_brands)){
+                        array_push($arr_coupons, $coupon->id);
+                    }
+                }
+            }
+        }
+
+        $purchased_coupons = Coupon::whereIn('id',$arr_coupons)->get();
     //
 
     // Purchase Combination = Product ID or Product Category or Product Brand + total amount + total quantity
@@ -243,30 +245,85 @@ class CouponFrontController extends Controller
             $purchasetype = explode('|',$coupon->purchase_combination);
 
             foreach($purchasetype as $type){
-                if($type == 'product'){
-                    if(isset($coupon->purchase_product_id)){
-                        $products   = explode('|',$coupon->purchase_product_id);
-                        foreach($products as $prodid){
-                            if(in_array($prodid, $arr_products)){
-                                $combination_counter .= 'product|';
+                // Check Products
+                    if($type == 'product'){
+                        if(isset($coupon->purchase_product_id)){
+                            $products   = explode('|',$coupon->purchase_product_id);
+                            foreach($products as $prodid){
+                                if(in_array($prodid, $arr_products)){
+                                    $combination_counter .= 'product|';
+                                }
                             }
+                        }
+
+                        if(isset($coupon->purchase_product_cat_id)) {
+                            $categories = explode('|',$coupon->purchase_product_cat_id);
+                            foreach($categories as $catid){
+                                if(in_array($catid, $arr_categories)){
+                                    $combination_counter .= 'product|';
+                                }
+                            }
+                        }
+
+                        if(isset($coupon->purchase_product_brand)) {
+                            $brands     = explode('|',$coupon->purchase_product_brand);
+                            foreach($brands as $brand){
+                                if(in_array($brand, $arr_brands)){
+                                    $combination_counter .= 'product|';
+                                }
+                            }
+                        }
+                    }
+                //
+
+                if($type == 'qty'){
+                    $arr_prod = [];
+                    if(isset($coupon->purchase_product_id)){
+                        $prod   = explode('|',$coupon->purchase_product_id);
+                        foreach($prod as $p){
+                            array_push($arr_prod, $p);
                         }
                     }
 
                     if(isset($coupon->purchase_product_cat_id)) {
                         $categories = explode('|',$coupon->purchase_product_cat_id);
-                        foreach($categories as $catid){
-                            if(in_array($catid, $arr_categories)){
-                                $combination_counter .= 'product|';
+                        foreach($categories as $cat){
+                            $xx = Product::where('category_id',$cat)->get();
+                            foreach($xx as $x){
+                                array_push($arr_prod, $x->id);
                             }
                         }
                     }
 
                     if(isset($coupon->purchase_product_brand)) {
-                        $brands     = explode('|',$coupon->purchase_product_brand);
+                        $brands = explode('|',$coupon->purchase_product_brand);
                         foreach($brands as $brand){
-                            if(in_array($brand, $arr_brands)){
-                                $combination_counter .= 'product|';
+                            $xx = Product::where('brand',$brand)->get();
+                            foreach($xx as $x){
+                                array_push($arr_prod, $x->id);
+                            }
+                        }
+                    }
+
+                    $products = Product::whereIn('id',$arr_prod)->get();
+
+                    foreach($products as $prod){
+                        $cartData = Cart::where('user_id',Auth::id())->where('product_id',$prod->id);
+                        // check if product exist on cart
+                        if($cartData->exists()){
+                            $cart = $cartData->first();
+
+                            if($coupon->purchase_qty_type == 'min'){
+                                if($cart->qty >= $coupon->purchase_qty){
+                                    $combination_counter .= 'qty|';
+                                    break;
+                                }
+                            }
+                            if($coupon->purchase_qty_type == 'max'){
+                                if($cart->qty <= $coupon->purchase_qty){
+                                    $combination_counter .= 'qty|';
+                                    break;
+                                }
                             }
                         }
                     }
@@ -282,21 +339,6 @@ class CouponFrontController extends Controller
                     if($coupon->purchase_amount_type == 'max'){
                         if($request->total_amount <= $coupon->purchase_amount){
                             $combination_counter .= 'amount|';
-                        }
-                    }
-                }
-
-                if($type == 'qty'){
-                    $cart = Cart::where('user_id',Auth::id())->where('product_id',$coupon->discount_product_id)->first();
-                    if($coupon->purchase_qty_type == 'min'){
-                        if($cart->qty >= $coupon->purchase_qty){
-                            $combination_counter .= 'qty|';
-                        }
-                    }
-
-                    if($coupon->purchase_qty_type == 'max'){
-                        if($request->total_qty <= $coupon->purchase_qty){
-                            $combination_counter .= 'qty|';
                         }
                     }
                 }
@@ -332,17 +374,17 @@ class CouponFrontController extends Controller
             $coupons = $coupons->whereNull('location')->orderBy('name','asc');
             $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->whereNull('location')->get();
         } else {
-            $coupons = $coupons->whereIn('amount_discount_type',[1])->where(function ($orWhereQuery){
+            $coupons = $coupons->where('amount_discount_type',1)->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('location')
                     ->orwhereNotNull('amount')
                     ->orwhereNotNull('percentage');
-            })->orderBy('name','asc');
+                })->orderBy('name','asc');
 
-            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->whereIn('amount_discount_type',[1])->where(function ($orWhereQuery){
+            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->where('amount_discount_type',1)->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('location')
                     ->orwhereNotNull('amount')
                     ->orwhereNotNull('percentage');
-            })->get();
+                })->get();
         }
 
         $coupons = $coupons->get();

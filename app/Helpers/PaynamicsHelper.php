@@ -33,21 +33,44 @@ class PaynamicsHelper
 
         $coupons = CouponCart::where('customer_id',Auth::id())->get();
         $totalDiscount = 0;
+        $totalSfDiscount = 0;
+        $sfDiscount = 0;
         foreach($coupons as $coupon){
             $c = Coupon::find($coupon->coupon_id);
 
-            if(isset($c->amount)){
-                $discount = number_format($c->amount,2,'.','');
-            }
+            if(isset($c->location)){
+                if($c->location_discount_type == 'partial'){
+                    $sfDiscount += number_format($c->location_discount_amount,2,'.','');
+                } else {
+                    $sfDiscount += number_format($deliveryFee,2,'.','');
+                }
+                $totalSfDiscount += $sfDiscount;
+            } else {
+                if(isset($c->amount)){
+                    $discount = number_format($c->amount,2,'.','');
+                }
 
-            if(isset($c->percentage)){
-                $percent = $c->percentage/100;
-                $discount = number_format($totalAmount*$percent,2,'.','');
-            }
+                if(isset($c->percentage)){
+                    $percent = $c->percentage/100;
+                    $discount = number_format($totalAmount*$percent,2,'.','');
+                }
 
-            $totalDiscount += $discount;
+                $totalDiscount += $discount;
+            }
+            
+            
+
+            // if(isset($c->location)){
+            //     if($c->location_discount_type == 'partial'){
+            //         $sfDiscount += number_format($c->location_discount_amount,2,'.','');
+            //     } else {
+            //         $sfDiscount += number_format($deliveryFee,2,'.','');
+            //     }
+            // }
+            // $totalSfDiscount += $sfDiscount;
         }
 
+        $itemXml = $itemXml . "<Items><itemname>Delivery Discount</itemname><quantity>1</quantity><amount>-{$totalSfDiscount}</amount></Items>";
         $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$totalDiscount}</amount></Items>";
         
         $_mid = $merchant['id']; //<-- your merchant id

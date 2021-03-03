@@ -153,11 +153,13 @@
                                     <div class="cart-table-row px-3 border-bottom-0">
                                         <div style="width:100%;">
                                             <div class="form-group row mb-2">
-                                                <div class="col-md-9">
+                                                <div class="col-md-12">
                                                     <input class="form-control" type="text" id="coupon_code" placeholder="Enter Coupon Code">
                                                 </div>
-                                                <div class="col-md-3 ">
-                                                    <button type="button" class="btn btn-success" id="couponManualBtn">Apply</button>
+                                            </div>
+                                            <div class="form-group row mb-2">
+                                                <div class="col-md-12">
+                                                    <button type="button" class="btn btn-block btn-success" id="couponManualBtn">Apply Coupon</button>
                                                 </div>
                                             </div>
                                             <div class="field_wrapper_coupon"></div>
@@ -167,21 +169,11 @@
                                 </div>
 
                                 <div class="bg-white" id="couponList">
-                                    @php $discountAmount = 0; $discountPercentage = 0; $counter = 0; $totalDeduction = 0; $cproducts  = ''; @endphp
+                                    @php $counter = 0; @endphp
 
                                     @foreach($coupons as $coupon)
                                         @php $counter++; @endphp
-                                        @php
-                                            if(isset($coupon->details->amount) && $coupon->details->amount_discount_type == 1){
-                                                $discountAmount = $coupon->details->amount;
-                                            }
-
-                                            if(isset($coupon->details->discount) && $coupon->details->amount_discount_type == 1){
-                                                $discountPercentage = $coupon->details->discount;
-                                            }
-                                        @endphp
                                         <div class="coupon-item p-2 border rounded mb-1" id="couponDiv{{$coupon->coupon_id}}">
-                                            <input type="hidden" name="couponid[]" value="{{$coupon->coupon_id}}">
                                             @if(isset($coupon->details->free_product_id))
                                             <input type="hidden" name="freeproductid[]" value="{{$coupon->details->free_product_id}}">
                                             @endif
@@ -197,9 +189,7 @@
                                                         @endif
                                                     </div>
                                                     <div class="coupon-item-btns">
-                                                        @if(!isset($coupon->product_id))
-                                                        <button class="btn btn-danger btn-sm couponRemove" id="{{$coupon->coupon_id}}">Remove</button>
-                                                        @endif
+                                                        <a href="{{ route('checkout.remove-coupon',$coupon->coupon_id) }}" class="btn btn-danger btn-sm text-white">Remove</a>
                                                         <button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="{{ $coupon->details->terms_and_conditions }}">Terms & Conditions</button>
                                                     </div>
                                                 </div>
@@ -209,27 +199,6 @@
                                 </div>
                                 <input type="hidden" name="coupon_counter" id="coupon_counter" value="{{$counter}}">
                             </div>
-
-                            @php
-                                if($discountAmount > 0){
-                                    $total = $totalAmount-$discountAmount;
-                                    $deductionAmount = $discountAmount;
-
-                                    $total_amount_discount_counter = 1;
-                                } elseif($discountPercentage > 0){
-                                    $discountAmountPercentage = $discountPercentage/100;
-                                    $discount = $totalAmount*$discountAmountPercentage;
-
-                                    $total = $totalAmount-$discount;
-                                    $deductionAmount = $discount;
-
-                                    $total_amount_discount_counter = 1;
-                                } else {
-                                    $total = $totalAmount;
-                                    $total_amount_discount_counter = 0;
-                                    $deductionAmount = 0;
-                                }
-                            @endphp
                             
                             <div class="mb-4">
                                 <h3 class="catalog-title">Payment Summary</h3>
@@ -238,18 +207,18 @@
                                         <tr>
                                             <td>Order:</td>
                                             <td align="right">
-                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$totalAmount}}">
+                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$product_subtotal}}">
                                                 <input type="hidden" id="delivery_fee" name="delivery_fee" value="0">
-                                                <input type="hidden" id="total_amount" name="total_amount" value="{{$total}}">
-                                                &#8369; {{number_format($totalAmount,2)}}</td>
+                                                <input type="hidden" id="total_amount" name="total_amount" value="{{$grandTotal}}">
+                                                &#8369; {{number_format($product_subtotal,2)}}</td>
                                         </tr>
                                         
                                         <input type="hidden" id="total_amount_discount_counter" value="{{$total_amount_discount_counter}}">
-                                        <input type="hidden" id="total_amount_discount" value="{{$deductionAmount}}">
-                                        <tr id="promotion" style="@if($discountAmount > 0 || $discountPercentage > 0) @else display:none @endif;">
+                                        <input type="hidden" id="total_amount_discount" value="{{$amountDiscount}}">
+                                        <tr id="promotion" style="@if($amountDiscount > 0) @else display:none @endif;">
                                             <td class="text-danger">Order Discount</td>
                                             <td align="right" class="text-danger" id="total_deduction">
-                                                &#8369; {{number_format($deductionAmount,2)}}
+                                                &#8369; {{number_format($amountDiscount,2)}}
                                             </td>
                                         </tr>
 
@@ -267,7 +236,7 @@
 
                                         <tr style="font-size:20px;font-weight:bold;">
                                             <td>Total:</td>
-                                            <td align="right">&#8369; <span id="total_amount_div">{{number_format($total,2)}}</span></td>
+                                            <td align="right">&#8369; <span id="total_amount_div">{{number_format($grandTotal,2)}}</span></td>
                                         </tr>
                                     </table>                    
                                     <div class="form-group text-right">                            
@@ -290,7 +259,7 @@
         <div class="loading-icon"></div>
     </div> 
 
-    <input type="hidden" id="totalAmountWithoutCoupon" value="{{number_format($totalWithoutCoupon,2,'.','')}}">
+    <input type="hidden" id="totalAmountWithoutCoupon" value="{{number_format($totalAmount,2,'.','')}}">
     <input type="hidden" id="totalQty" value="{{$totalQty}}">
 
     <div id="manual-coupon-details"></div>
@@ -305,6 +274,35 @@
         $('#couponManualBtn').click(function(){
             var couponCode = $('#coupon_code').val()
 
+            // check total use shipping fee coupons
+            var sfcoupon = parseFloat($('#sf_discount_coupon').val());
+            if(sfcoupon == 1){
+                swal({
+                    title: '',
+                    text: "Only one (1) coupon for shipping fee discount.",         
+                });
+                return false;
+            }
+
+            // check if has selected delivery location
+            if (!$("input[name='shipping_type']:checked").val()) {
+                swal({
+                    title: '',
+                    text: "Please select a delivery option!",         
+                });
+                return false;
+            }
+
+            // check if selected coupon applicable on selected delivery location
+            var option = $('input[name="shipping_type"]:checked').val();
+            if(option == 'storepickup'){
+                swal({
+                    title: '',
+                    text: "Shipping fee coupon discount is only applicable on Delivery option!",         
+                });
+                return false;
+            }
+
             $.ajax({
                 data: {
                     "couponcode": couponCode,
@@ -313,53 +311,60 @@
                 type: "post",
                 url: "{{route('add-manual-coupon')}}",
                 success: function(returnData) {
+                    if(returnData['exist']){
+                        swal({
+                            title: '',
+                            text: "Coupon already used.",         
+                        }); 
+                        return false;
+                    }
 
                     if(returnData['not_exist']){
                         swal({
                             title: '',
                             text: "Coupon not found.",         
                         }); 
-                    } else {
-                        if(returnData['expired']){
-                            swal({
-                                title: '',
-                                text: "Coupon is already expired.",         
-                            }); 
-                        } else {
-                            if (returnData['success']) {
-
-                                $('#manual-coupon-details').append(
-                                    '<input type="hidden" id="purchaseproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['purchase_product_id']+'">'+
-                                    '<input type="hidden" id="discountpercentage'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['percentage']+'">'+
-                                    '<input type="hidden" id="discountamount'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['amount']+'">'+
-                                    '<input type="hidden" id="couponname'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['name']+'">'+
-                                    '<input type="hidden" id="couponcode'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['coupon_code']+'">'+
-                                    '<input type="hidden" id="couponterms'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['terms_and_conditions']+'">'+
-                                    '<input type="hidden" id="coupondesc'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['description']+'">'+
-                                    '<input type="hidden" id="couponfreeproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['free_product_id']+'">'
-                                );
-
-                                if(returnData.coupon_details['location'] == null){
-                                    if(returnData.coupon_details['amount_discount_type'] == 1){
-                                        if(returnData.coupon_details['free_product_id'] != null){
-                                            free_product_coupon(returnData.coupon_details['id']);
-                                        } else {
-                                            use_coupon(returnData.coupon_details['id']);
-                                        }
-                                    } else {
-                                        choose_product(returnData.coupon_details['id']);
-                                    }
-                                } else {
-                                    use_sf_coupon(returnData.coupon_details['id']);
-                                }
-
-                                swal({
-                                    title: '',
-                                    text: "Coupon has been added.",         
-                                });
-                            }  
-                        }
+                        return false;
                     }
+
+                    if(returnData['expired']){
+                        swal({
+                            title: '',
+                            text: "Coupon is already expired.",         
+                        }); 
+                        return false;
+                    }
+
+                    if (returnData['success']) {
+
+                        $('#manual-coupon-details').append(
+                            '<input type="hidden" id="sflocation'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['location']+'">'+
+                            '<input type="hidden" id="sfdiscounttype'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['location_discount_type']+'">'+
+                            '<input type="hidden" id="sfdiscountamount'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['location_discount_amount']+'">'+
+                            '<input type="hidden" id="purchaseproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['purchase_product_id']+'">'+
+                            '<input type="hidden" id="discountpercentage'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['percentage']+'">'+
+                            '<input type="hidden" id="discountamount'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['amount']+'">'+
+                            '<input type="hidden" id="couponname'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['name']+'">'+
+                            '<input type="hidden" id="couponcode'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['coupon_code']+'">'+
+                            '<input type="hidden" id="couponterms'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['terms_and_conditions']+'">'+
+                            '<input type="hidden" id="coupondesc'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['description']+'">'+
+                            '<input type="hidden" id="couponfreeproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['free_product_id']+'">'
+                        );
+
+                        if(returnData.coupon_details['location'] == null){
+                            if(returnData.coupon_details['amount_discount_type'] == 1){
+                                if(returnData.coupon_details['free_product_id'] != null){
+                                    free_product_coupon(returnData.coupon_details['id']);
+                                } else {
+                                    use_coupon(returnData.coupon_details['id']);
+                                }
+                            } else {
+                                choose_product(returnData.coupon_details['id']);
+                            }
+                        } else {
+                            use_sf_coupon(returnData.coupon_details['id']);
+                        }
+                    } 
                 }
             });
         });
@@ -369,7 +374,6 @@
             var counter = $('#coupon_counter').val();
 
             if(parseInt(counter) < parseInt(limit)){
-
                 $('#coupon_counter').val(parseInt(counter)+1);
                 return true;
 
@@ -482,102 +486,106 @@
         }
 
         function use_sf_coupon(cid){
+            // check total use shipping fee coupons
+            var sfcoupon = parseFloat($('#sf_discount_coupon').val());
+            if(sfcoupon == 1){
+                swal({
+                    title: '',
+                    text: "Only one (1) coupon for shipping fee discount.",         
+                });
+                return false;
+            }
+
+            // check if has selected delivery location
+            if (!$("input[name='shipping_type']:checked").val()) {
+                swal({
+                    title: '',
+                    text: "Please select a delivery option!",         
+                });
+                return false;
+            }
+
+            // check if selected coupon applicable on selected delivery location
+            var option = $('input[name="shipping_type"]:checked').val();
+            if(option == 'storepickup'){
+                swal({
+                    title: '',
+                    text: "Shipping fee coupon discount is only applicable on Delivery option!",         
+                });
+                return false;
+            }
+            
             if(coupon_counter()){
-                var sfcoupon = parseFloat($('#sf_discount_coupon').val());
-                if(sfcoupon == 1){
-                    swal({
-                        title: '',
-                        text: "Only one (1) coupon for shipping fee discount.",         
-                    });
-                    return false;
-                }
+                var selectedLocation = $('#location').val();
+                var loc = selectedLocation.split('|');
 
-                if (!$("input[name='shipping_type']:checked").val()) {
-                    swal({
-                        title: '',
-                        text: "Please select a delivery option!",         
-                    });
-                } else {
-                    var option = $('input[name="shipping_type"]:checked').val();
+                var couponLocation = $('#sflocation'+cid).val();
+                var cLocation = couponLocation.split('|');
 
-                    if(option == 'storepickup'){
-                        swal({
-                            title: '',
-                            text: "Shipping fee coupon discount is only applicable on Delivery option!",         
-                        });
-                    } else {
-                        var selectedLocation = $('#location').val();
-                        var loc = selectedLocation.split('|');
+                var arr_coupon_location = [];
+                $.each(cLocation, function(key, value) {
+                    arr_coupon_location.push(value);
+                });
 
-                        var couponLocation = $('#sflocation'+cid).val();
-                        var cLocation = couponLocation.split('|');
+                if(jQuery.inArray(loc[0], arr_coupon_location) !== -1){
 
-                        var arr_coupon_location = [];
-                        $.each(cLocation, function(key, value) {
-                            arr_coupon_location.push(value);
-                        });
-
-                        if(jQuery.inArray(loc[0], arr_coupon_location) !== -1){
-
-                            var name  = $('#couponname'+cid).val();
-                            var terms = $('#couponterms'+cid).val();
-                            var desc = $('#coupondesc'+cid).val();
-                            
-                            $('#couponList').append(
-                                '<div id="couponDiv'+cid+'">'+
-                                    '<div class="coupon-item p-2 border rounded mb-1">'+
-                                        '<div class="row no-gutters">'+
-                                            '<div class="col-12">'+
-                                                '<div class="coupon-item-name">'+
-                                                    '<h5 class="m-0">'+name+' <span></span></h5>'+
-                                                '</div>'+
-                                                '<div class="coupon-item-desc small mb-1">'+
-                                                    '<span>'+desc+'</span>'+
-                                                '</div>'+
-                                                '<div class="coupon-item-btns">'+
-                                                    '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                                                    '<input type="hidden" name="coupon_productid[]" value="0">'+
-                                                    '<button type="button" class="btn btn-danger btn-sm sfCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
-                                                    '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
-                                                '</div>'+
-                                            '</div>'+
+                    var name  = $('#couponname'+cid).val();
+                    var terms = $('#couponterms'+cid).val();
+                    var desc = $('#coupondesc'+cid).val();
+                    
+                    $('#couponList').append(
+                        '<div id="couponDiv'+cid+'">'+
+                            '<div class="coupon-item p-2 border rounded mb-1">'+
+                                '<div class="row no-gutters">'+
+                                    '<div class="col-12">'+
+                                        '<div class="coupon-item-name">'+
+                                            '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-desc small mb-1">'+
+                                            '<span>'+desc+'</span>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                            '<input type="hidden" name="coupon_productid[]" value="0">'+
+                                            '<button type="button" class="btn btn-danger btn-sm sfCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                            '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
                                         '</div>'+
                                     '</div>'+
-                                '</div>'
-                            );
+                                '</div>'+
+                            '</div>'+
+                        '</div>'
+                    );
 
-                            $('#sf_discount_coupon').val(1);
-                            var sf_type = $('#sfdiscounttype'+cid).val();
-                            var sf_discount = parseFloat($('#sfdiscountamount'+cid).val());
+                    $('#sf_discount_coupon').val(1);
+                    var sf_type = $('#sfdiscounttype'+cid).val();
+                    var sf_discount = parseFloat($('#sfdiscountamount'+cid).val());
 
-                            if(sf_type == 'full'){
-                                dfee = parseFloat($('#delivery_fee').val());
+                    if(sf_type == 'full'){
+                        dfee = parseFloat($('#delivery_fee').val());
 
-                                $('#sf_discount_amount').val(dfee);
+                        $('#sf_discount_amount').val(dfee);
 
-                                $('#sf_discount_row').css('display','table-row');
-                                $('#sf_discount_span').html(addCommas(dfee.toFixed(2)));
-                            }
-
-                            if(sf_type == 'partial'){
-                                $('#sf_discount_amount').val(sf_discount.toFixed(2));
-
-                                $('#sf_discount_row').css('display','table-row');
-                                $('#sf_discount_span').html(addCommas(sf_discount.toFixed(2)));
-                            }
-
-                            $('#couponBtn'+cid).prop('disabled',true);
-                            $('#btnCpnTxt'+cid).html('Applied');
-
-                            compute_total();
-                        } else {
-                            swal({
-                                title: '',
-                                text: "Selected delivery location is not in the coupon location.",         
-                            });
-                        } 
+                        $('#sf_discount_row').css('display','table-row');
+                        $('#sf_discount_span').html(addCommas(dfee.toFixed(2)));
                     }
-                }
+
+                    if(sf_type == 'partial'){
+                        $('#sf_discount_amount').val(sf_discount.toFixed(2));
+
+                        $('#sf_discount_row').css('display','table-row');
+                        $('#sf_discount_span').html(addCommas(sf_discount.toFixed(2)));
+                    }
+
+                    $('#couponBtn'+cid).prop('disabled',true);
+                    $('#btnCpnTxt'+cid).html('Applied');
+
+                    compute_total();
+                } else {
+                    swal({
+                        title: '',
+                        text: "Selected delivery location is not in the coupon location.",         
+                    });
+                } 
             }
         }
 
