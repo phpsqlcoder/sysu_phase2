@@ -396,18 +396,39 @@
                                 if(jQuery.inArray(coupon.id, arr_selected_coupons) !== -1){
                                     var usebtn = '<button class="btn btn-success btn-sm" disabled>Applied</button>';
                                 } else {
-                                    if(coupon.product_discount == 'specific'){
-                                        if(jQuery.inArray(parseInt(coupon.discount_product_id), arr_cart_products) !== -1){
-                                            var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_on_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                    if(coupon.amount_discount_type == 1){
+                                        if(coupon.free_product_id != null){
+                                            var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="free_product_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                         } else {
-                                            var usebtn = '<button class="btn btn-success btn-sm disabled">Use Coupon</button>';
+                                            var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_total_amount('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                         }
                                     } else {
-                                        if(coupon.amount_discount_type == 1){
-                                            if(coupon.free_product_id != null){
-                                                var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="free_product_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                        if(coupon.product_discount == 'specific' || coupon.product_discount == 'current'){
+                                            
+                                            // if(jQuery.inArray(parseInt(coupon.discount_product_id), arr_cart_products) !== -1){
+                                            //     var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_on_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                            // } else {
+                                            //     var usebtn = '<button class="btn btn-success btn-sm disabled">Use Coupon</button>';
+                                            // }
+
+                                            if(jQuery.inArray(parseInt(coupon.discount_product_id), arr_cart_products) !== -1){
+                                                var iteration = $('#iteration'+coupon.discount_product_id).val();
+                                                var cartQty = parseFloat($('#quantity'+iteration).val());
+                                                var pqty = parseFloat(coupon.purchase_qty);
+
+                                                if(pqty > 0){
+                                                    if(cartQty > pqty){
+                                                        var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_on_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                                    } else {
+                                                        var usebtn = '<button class="btn btn-success btn-sm disabled">Use Coupon</button>';
+                                                    }
+                                                } else {
+                                                    var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_on_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                                }
+                                                
+
                                             } else {
-                                                var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_total_amount('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                                var usebtn = '<button class="btn btn-success btn-sm disabled">Use Coupon</button>';
                                             }
                                         } else {
                                             var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_on_product('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
@@ -420,6 +441,8 @@
                                 '<div class="coupon-item p-2 border rounded mb-1" id="coupondiv'+coupon.id+'">'+
                                     '<div class="row no-gutters">'+
                                         '<div class="col-12">'+
+                                            '<input type="hidden" id="remainingusage'+coupon.id+'" value="'+response.remaining[key]+'">'+
+                                            '<input type="hidden" id="purchaseqty'+coupon.id+'" value="'+coupon.purchase_qty+'">'+
                                             '<input type="hidden" id="productdiscount'+coupon.id+'" value="'+coupon.product_discount+'">'+
                                             '<input type="hidden" id="discountproductid'+coupon.id+'" value="'+coupon.discount_product_id+'">'+
                                             '<input type="hidden" id="purchaseproductid'+coupon.id+'" value="'+coupon.purchase_product_id+'">'+
@@ -465,8 +488,19 @@
                             );
                         }
 
-                        if(coupon.product_discount == 'specific'){
+                        if(coupon.product_discount == 'specific' || coupon.product_discount == 'current'){
                             if(jQuery.inArray(parseInt(coupon.discount_product_id), arr_cart_products) !== -1){
+                                var iteration = $('#iteration'+coupon.discount_product_id).val();
+                                var cartQty = parseFloat($('#quantity'+iteration).val());
+                                var pqty = parseFloat(coupon.purchase_qty);
+
+                                if(pqty > 0){
+                                    if(cartQty > pqty){
+                                        
+                                    } else {
+                                        $('#coupondiv'+coupon.id).addClass('deactivate');
+                                    }
+                                }
 
                             } else {
                                 $('#coupondiv'+coupon.id).addClass('deactivate');
@@ -508,7 +542,7 @@
                 var freeproductid = $('#couponfreeproductid'+cid).val();
 
                 $('#couponList').append(
-                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                    '<div id="couponDiv'+cid+'">'+
                         '<div class="coupon-item p-2 border rounded mb-1">'+
                             '<div class="row no-gutters">'+
                                 '<div class="col-12">'+
@@ -571,7 +605,7 @@
                 $('#btnCpnTxt'+cid).html('Applied');
 
                 $('#couponList').append(
-                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                    '<div id="couponDiv'+cid+'">'+
                         '<div class="coupon-item p-2 border rounded mb-1">'+
                             '<div class="row no-gutters">'+
                                 '<div class="col-12">'+
@@ -642,17 +676,75 @@
             var terms = $('#couponterms'+cid).val();
             var pdiscount = $('#productdiscount'+cid).val();
             var discpuntproductid = parseFloat($('#discountproductid'+cid).val());
+            var remaining = parseFloat($('#remainingusage'+cid).val());
+            var purchaseqty = parseFloat($('#purchaseqty'+cid).val());
 
-            var productid = $('#purchaseproductid'+cid).val();
-            var pr = productid.slice(0,-1);
-            var p = pr.split('|');
+            var discount = 0;
 
             if(coupon_counter()){
-                $('#couponBtn'+cid).prop('disabled',true);
-                $('#btnCpnTxt'+cid).html('Applied');
-
                 if(pdiscount == 'current' || pdiscount == 'specific'){
                     var iteration = $('#iteration'+discpuntproductid).val();
+
+                    if(pdiscount == 'specific'){
+                        var sub_price = $('#sum_sub_price'+iteration).val();
+
+                        if(amount > 0){
+                            var totalDiscount = parseFloat(sub_price)-parseFloat(amount);
+                            var discount = parseFloat(amount);
+                        }
+
+                        if(percnt > 0){
+                            var percent = parseFloat(percnt)/100;
+                            var discount =  parseFloat(sub_price)*parseFloat(percent);
+
+                            var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
+                        }
+                    }
+
+                    if(pdiscount == 'current'){
+                        var price = parseFloat($('#price'+iteration).val());
+                    
+                        var totalpurchaseqty = parseFloat($('#purchaseqty'+cid).val())+1;
+                        var purchaseqty = parseFloat($('#purchaseqty'+cid).val());
+                        var cartQty = parseFloat($('#quantity'+iteration).val());
+
+                        if(cartQty % 2 == 0){
+                            var totalProductCartQty = cartQty;
+                        } else {
+                            var totalProductCartQty = cartQty-1;
+                        }
+
+                        var totalDiscountedProduct = 0;
+                        for (i = 1; i <= totalProductCartQty; i++) {
+                            if(i == purchaseqty){
+                                totalDiscountedProduct++;
+                                var purchaseqty = parseInt(purchaseqty)+totalpurchaseqty;
+                            }                                 
+                        }
+
+                        var i;
+                        var totaldiscount = 0;
+                        for (i = 1; i <= totalDiscountedProduct; i++) {
+                            if(i <= remaining){
+                                if(amount > 0){
+                                    var tdiscount = price-parseFloat(amount);
+                                }
+
+                                if(percnt > 0){
+                                    var percent = parseFloat(percnt)/100;
+                                    var discount =  price*parseFloat(percent);
+
+                                    var tdiscount = price-parseFloat(discount);
+                                } 
+
+                                totaldiscount += tdiscount;
+                            }
+                        }
+
+                        var sub_price = $('#sum_sub_price'+iteration).val();
+                        var totalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
+                    }
+                    
                 }
 
                 if(pdiscount == 'highest'){
@@ -672,70 +764,87 @@
                     });
                 }
 
-                var id = iteration;
-                var pname = $('#product_name_'+id).val();
-                var productid = $('#pp'+id).val();
 
-                $('#couponList').append(
-                    '<div class="mb-5" id="couponDiv'+cid+'">'+
-                        '<div class="coupon-item p-2 border rounded mb-1">'+
-                            '<div class="row no-gutters">'+
-                                '<div class="col-12">'+
-                                    '<div class="coupon-item-name">'+
-                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
+
+                //$('#cart_product_discount'+iteration).val(discount.toFixed(2));
+                $('#sum_sub_price'+iteration).val(totalDiscount);
+
+                $('#product_total_price'+iteration).css({'text-decoration':'line-through','color':'grey'});
+                $('#product_new_price'+iteration).css('display','block');
+                $('#product_new_price'+iteration).html('₱ '+addCommas(totalDiscount.toFixed(2))); 
+
+                $('#cart_product_reward'+iteration).val(1);
+
+                compute_grand_total();
+
+
+
+                var pname = $('#product_name_'+iteration).val();
+                var productid = $('#pp'+iteration).val();
+
+                if(pdiscount == 'current'){
+                    var i;
+                    for (i = 1; i <= totalDiscountedProduct; i++) {
+                        if(i <= remaining){
+                            $('#couponList').append(
+                                '<div id="couponDiv'+cid+'">'+
+                                    '<div class="coupon-item p-2 border rounded mb-1">'+
+                                        '<div class="row no-gutters">'+
+                                            '<div class="col-12">'+
+                                                '<div class="coupon-item-name">'+
+                                                    '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                                '</div>'+
+                                                '<div class="coupon-item-desc small mb-1">'+
+                                                    '<span>'+desc+'</span><br>'+
+                                                    '<span class="text-success">Applied On : '+pname+'</span>'+
+                                                '</div>'+
+                                                '<div class="coupon-item-btns">'+
+                                                    '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
+                                                    '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                                    '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                                    '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                                    '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
                                     '</div>'+
-                                    '<div class="coupon-item-desc small mb-1">'+
-                                        '<span>'+desc+'</span><br>'+
-                                        '<span class="text-success">Applied On : '+pname+'</span>'+
-                                    '</div>'+
-                                    '<div class="coupon-item-btns">'+
-                                        '<input type="hidden" id="productid'+cid+'" value="'+id+'">'+
-                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                                        '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
-                                        '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
-                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                '</div>'
+                            );
+
+                            $('[data-toggle="popover"]').popover();
+                        }
+                    }
+                } else {
+                    $('#couponList').append(
+                        '<div id="couponDiv'+cid+'">'+
+                            '<div class="coupon-item p-2 border rounded mb-1">'+
+                                '<div class="row no-gutters">'+
+                                    '<div class="col-12">'+
+                                        '<div class="coupon-item-name">'+
+                                            '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-desc small mb-1">'+
+                                            '<span>'+desc+'</span><br>'+
+                                            '<span class="text-success">Applied On : '+pname+'</span>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
+                                            '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                            '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                            '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                            '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                        '</div>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                        '</div>'+
-                    '</div>'
-                );
+                        '</div>'
+                    );
 
-                $('[data-toggle="popover"]').popover();
-
-                if(amount > 0){
-                    var productdiscount = 'amount|'+amount;
+                    $('[data-toggle="popover"]').popover();
                 }
-
-                if(percnt > 0){
-                    var productdiscount = 'percent|'+percnt;
-                }
-
-                var x = productdiscount.split('|');
-                var sub_price = $('#sum_sub_price'+id).val();
-
-                if(x[0] == 'amount'){
-                    var totalDiscount = parseFloat(sub_price)-parseFloat(x[1]);
-                    var discount = parseFloat(x[1]);
-                }
-
-                if(x[1] == 'percent'){
-                    var percent = parseFloat(x[1])/100;
-                    var discount =  parseFloat(sub_price)*parseFloat(percent);
-
-                    var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
-                }
-
-                $('#cart_product_discount'+id).val(discount.toFixed(2));
-                $('#sum_sub_price'+id).val(totalDiscount);
-
-                $('#product_total_price'+id).css({'text-decoration':'line-through','color':'grey'});
-                $('#product_new_price'+id).css('display','block');
-                $('#product_new_price'+id).html('₱ '+addCommas(totalDiscount.toFixed(2))); 
-
-                $('#cart_product_reward'+id).val(1);
-
-                compute_grand_total();
+                
+                $('#couponBtn'+cid).prop('disabled',true);
+                $('#btnCpnTxt'+cid).html('Applied');
             }
         }
 

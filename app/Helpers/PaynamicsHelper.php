@@ -42,9 +42,7 @@ class PaynamicsHelper
 
             if(isset($c->percentage)){
                 $percent = $c->percentage/100;
-                $discount = $totalAmount*$percent;
-
-                $discount = number_format($discount,2,'.','');
+                $discount = number_format($totalAmount*$percent,2,'.','');
             }
 
             $totalDiscount += $discount;

@@ -179,9 +179,18 @@
 						<label class="d-block">Discount Amount *</label>
 						<input name="discount_amount" type="number" class="form-control @error('discount_amount') is-invalid @enderror" value="{{ old('discount_amount') }}" placeholder="Php">
 						@hasError(['inputName' => 'discount_amount'])
-                    	@endhasError
+                    	@endhasError	
+					</div>
 
-						<div class="row" style="padding-bottom: 10px;margin-top: 20px;">
+					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if($errors->any() && old('reward') == 'discount-percentage-optn') block @else none @endif">
+						<label class="d-block">Discount Percentage % *</label>
+						<input name="discount_percentage" type="number" class="form-control @error('discount_percentage') is-invalid @enderror" placeholder="%" value="{{ old('discount_percentage') }}">
+						@hasError(['inputName' => 'discount_percentage'])
+                    	@endhasError
+					</div>
+
+					<div id="div_product_amount" style="display: none;">
+                		<div class="row" style="padding-bottom: 10px;margin-top: 20px;">
 							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" checked onclick="product_discount_amount(1)">
@@ -199,38 +208,33 @@
 						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: none;" id="discount_selection">
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onclick="product_discount('current');">
+									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')">
 									<label class="custom-control-label" for="same-product">Current Product</label>
 								</div>
 							</div>
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onclick="product_discount('highest');">
+									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')">
 									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
 								</div>
 							</div>
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="specific-product" name="product_discount" onclick="" class="custom-control-input" value="specific" onclick="product_discount('specific');">
+									<input type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')">
 									<label class="custom-control-label" for="specific-product">Specific Product</label>
 								</div>
 							</div>
 						</div>
 
-						<select class="form-control select2" name="discount_productid" id="discount_productid">
-							<option label="Choose Product"></option>
-							@foreach($products as $product)
-								<option @if(old('discount_productid') == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
-							@endforeach
-						</select>
-					</div>
-
-					<div class="mb-3 reward-option" id="discount-percentage-optn" style="display:@if($errors->any() && old('reward') == 'discount-percentage-optn') block @else none @endif">
-						<label class="d-block">Discount Percentage % *</label>
-						<input name="discount_percentage" type="number" class="form-control @error('discount_percentage') is-invalid @enderror" placeholder="%" value="{{ old('discount_percentage') }}">
-						@hasError(['inputName' => 'discount_percentage'])
-                    	@endhasError
-					</div>
+						<div style="display: none;" id="discount_productid">
+							<select class="form-control select2" name="discount_productid">
+								<option label="Choose Product"></option>
+								@foreach($products as $product)
+									<option @if(old('discount_productid') == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
+								@endforeach
+							</select>
+						</div>
+                	</div>
 
 					<div class="mb-3 reward-option" id="free-product-optn" style="display:@if($errors->any() && old('reward') == 'free-product-optn') block @else none @endif">
 						<label class="d-block">Free Product *</label>
@@ -516,7 +520,7 @@
 
 @section('customjs')
 <script>
-	function product_discount(x){
+	function productdiscount(x){
 		if(x == 'specific'){
 			$('#discount_productid').css('display','block');
 		} else {
@@ -534,6 +538,12 @@
 	$('#reward-optn').change(function(){
 		$('.reward-option').hide();
 		$('#' + $(this).val()).show();
+
+		if($(this).val() == 'discount-amount-optn' || $(this).val() == 'discount-percentage-optn'){
+			$('#div_product_amount').show();
+		} else {
+			$('#div_product_amount').hide();
+		}
 	});
 
 	function sf_discount_type(){

@@ -157,7 +157,7 @@ class CouponFrontController extends Controller
         $couponsExactTotalQty = Coupon::purchaseExactValue('purchase_qty','purchase_qty_type',$request->total_qty);
 
         // Purchase within daterange
-        $couponsDateTimePurchase = Coupon::purchaseWithinDateRange();
+        // $couponsDateTimePurchase = Coupon::purchaseWithinDateRange();
 
 
         // Purchase Products
@@ -227,7 +227,7 @@ class CouponFrontController extends Controller
     // Purchase Combination = Product ID or Product Category or Product Brand + total amount + total quantity
         $purchasedCombinationCoupons = 
         Coupon::where('status','ACTIVE')
-        ->where('purchase_combination_counter','>',0)
+        ->where('purchase_combination_counter','>',1)
         ->where('activation_type','auto')
         ->where(function ($orWhereQuery){
             $orWhereQuery->orwhereNotNull('purchase_product_id')
@@ -237,7 +237,7 @@ class CouponFrontController extends Controller
               ->orwhereNotNull('purchase_qty');
         })->get();
 
-        $combination_counter = 0;
+        $combination_counter = '';
         $arr_purchase_combination_coupons = [];
         foreach($purchasedCombinationCoupons as $coupon){
             $purchasetype = explode('|',$coupon->purchase_combination);
@@ -248,7 +248,7 @@ class CouponFrontController extends Controller
                         $products   = explode('|',$coupon->purchase_product_id);
                         foreach($products as $prodid){
                             if(in_array($prodid, $arr_products)){
-                                $combination_counter++;
+                                $combination_counter .= 'product|';
                             }
                         }
                     }
@@ -257,7 +257,7 @@ class CouponFrontController extends Controller
                         $categories = explode('|',$coupon->purchase_product_cat_id);
                         foreach($categories as $catid){
                             if(in_array($catid, $arr_categories)){
-                                $combination_counter++;
+                                $combination_counter .= 'product|';
                             }
                         }
                     }
@@ -266,7 +266,7 @@ class CouponFrontController extends Controller
                         $brands     = explode('|',$coupon->purchase_product_brand);
                         foreach($brands as $brand){
                             if(in_array($brand, $arr_brands)){
-                                $combination_counter++;
+                                $combination_counter .= 'product|';
                             }
                         }
                     }
@@ -275,50 +275,41 @@ class CouponFrontController extends Controller
                 if($type == 'amount'){
                     if($coupon->purchase_amount_type == 'min'){
                         if($request->total_amount >= $coupon->purchase_amount){
-                            $combination_counter++;
+                            $combination_counter .= 'amount|';
                         }
                     }
 
                     if($coupon->purchase_amount_type == 'max'){
                         if($request->total_amount <= $coupon->purchase_amount){
-                            $combination_counter++;
-                        }
-                    }
-
-                    if($coupon->purchase_amount_type == 'exact'){
-                        if($request->total_amount == $coupon->purchase_amount){
-                            $combination_counter++;
+                            $combination_counter .= 'amount|';
                         }
                     }
                 }
 
                 if($type == 'qty'){
+                    $cart = Cart::where('user_id',Auth::id())->where('product_id',$coupon->discount_product_id)->first();
                     if($coupon->purchase_qty_type == 'min'){
-                        if($request->total_qty >= $coupon->purchase_qty){
-                            $combination_counter++;
+                        if($cart->qty >= $coupon->purchase_qty){
+                            $combination_counter .= 'qty|';
                         }
                     }
 
                     if($coupon->purchase_qty_type == 'max'){
                         if($request->total_qty <= $coupon->purchase_qty){
-                            $combination_counter++;
-                        }
-                    }
-
-                    if($coupon->purchase_qty_type == 'exact'){
-                        if($request->total_qty == $coupon->purchase_qty){
-                            $combination_counter++;
+                            $combination_counter .= 'qty|';
                         }
                     }
                 }
             }
-
-            if($combination_counter == $coupon->purchase_combination_counter){
+            
+            if($combination_counter == $coupon->purchase_combination){
+                $combination_counter = '';
                 array_push($arr_purchase_combination_coupons, $coupon->id);
             }
         }
 
         $purchased_combined_coupons = Coupon::whereIn('id',$arr_purchase_combination_coupons)->get();
+        
     //
 
         $collectibles = collect($couponsMinTotalAmount)
@@ -327,7 +318,6 @@ class CouponFrontController extends Controller
             ->merge($couponsMinTotalQty)
             ->merge($couponsMaxTotalQty)
             ->merge($couponsExactTotalQty)
-            ->merge($couponsDateTimePurchase)
             ->merge($purchased_coupons)
             ->merge($purchased_combined_coupons);
 
@@ -380,7 +370,16 @@ class CouponFrontController extends Controller
             $allCoupons = collect($customerCoupons)->merge($coupons);
         }
 
-        return response()->json(['coupons' => $allCoupons, 'availability' => $arr_coupon_availability]);
+        // get remaining usage
+        $arr_coupon_usage_limit = [];
+        foreach($allCoupons as $coupon){
+            $totalusage = CouponSale::where('coupon_id',$coupon->id)->count();
+            $remaining = $coupon->customer_limit-$totalusage;
+
+            array_push($arr_coupon_usage_limit, $remaining);
+        }
+
+        return response()->json(['coupons' => $allCoupons, 'availability' => $arr_coupon_availability, 'remaining' => $arr_coupon_usage_limit]);
 
     }
 

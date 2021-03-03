@@ -66,7 +66,7 @@
                                     <td>{{$sale->delivery_status}}</td>
                                     <td align="right">
                                         @if($sale->status<>'CANCELLED')
-                                            <a href="#" title="Wiew Items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
+                                            <a href="#" title="View Items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                             @if ($balance > 0)
                                                 <a href="{{route('my-account.pay-again',$sale->id)}}" title="Pay Now" class="btn btn-success btn-sm mb-1"><i class="fa fa-credit-card pb-1"></i></a>&nbsp;
                                             @endif
