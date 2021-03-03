@@ -303,12 +303,23 @@
         }
 
         $('#promo_form').submit(function(){
-            if(!$("input[name='productid[]']:checked").val()) {        
-                $('#prompt-no-selected').modal('show');
-                return false;
+            var val = $('#type').val();
+            if(val == 'category'){
+                if(!$("input[name='productid[]']:checked").val()) {        
+                    $('#prompt-no-selected').modal('show');
+                    return false;
+                } else {
+                    return true;
+                }
             } else {
-                return true;
+                if(!$("input[name='brand[]']:checked").val()) {        
+                    $('#prompt-no-selected').modal('show');
+                    return false;
+                } else {
+                    return true;
+                }
             }
+            
         });
 
         /** form validations **/
