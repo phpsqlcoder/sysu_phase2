@@ -6,6 +6,9 @@ Route::get('/account-logout', 'Auth\LoginController@logout')->name('account.logo
 Route::get('/login', 'EcommerceControllers\CustomerFrontController@login')->name('customer-front.login');
 Route::post('/login', 'EcommerceControllers\CustomerFrontController@customer_login')->name('customer-front.customer_login');
 
+Route::get('/', function () {
+    return redirect(route('home'));
+});
 
 Route::get('/home', 'FrontController@home')->name('home');
 Route::get('/privacy-policy/', 'FrontController@privacy_policy')->name('privacy-policy');

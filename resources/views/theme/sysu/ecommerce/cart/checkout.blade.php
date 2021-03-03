@@ -524,7 +524,7 @@
                             var desc = $('#coupondesc'+cid).val();
                             
                             $('#couponList').append(
-                                '<div class="mb-5" id="couponDiv'+cid+'">'+
+                                '<div id="couponDiv'+cid+'">'+
                                     '<div class="coupon-item p-2 border rounded mb-1">'+
                                         '<div class="row no-gutters">'+
                                             '<div class="col-12">'+
@@ -623,7 +623,7 @@
                 $('#btnCpnTxt'+cid).html('Applied');
 
                 $('#couponList').append(
-                    '<div class="mb-5" id="couponDiv'+cid+'">'+
+                    '<div id="couponDiv'+cid+'">'+
                         '<div class="coupon-item p-2 border rounded mb-1">'+
                             '<div class="row no-gutters">'+
                                 '<div class="col-12">'+

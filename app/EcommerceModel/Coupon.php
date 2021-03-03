@@ -117,22 +117,22 @@ class Coupon extends Model
         return $coupons;
     }
     
-    public static function purchaseWithinDateRange()
-    {
-        // $coupons = 
-        //     Coupon::whereNotIn('id',function($query){
-        //         $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-        //     })->where('status','ACTIVE')
-        //     ->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
-        $coupons = 
-            Coupon::where('status','ACTIVE')
-            ->where('activation_type','auto')
-            ->where('purchase_combination_counter',1)
-            ->where(function ($orWhereQuery){
-                $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
-                ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
-            })->get();
+    // public static function purchaseWithinDateRange()
+    // {
+    //     // $coupons = 
+    //     //     Coupon::whereNotIn('id',function($query){
+    //     //         $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
+    //     //     })->where('status','ACTIVE')
+    //     //     ->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
+    //     $coupons = 
+    //         Coupon::where('status','ACTIVE')
+    //         ->where('activation_type','auto')
+    //         ->where('purchase_combination_counter',1)
+    //         ->where(function ($orWhereQuery){
+    //             $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
+    //             ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
+    //         })->get();
 
-        return $coupons;
-    }
+    //     return $coupons;
+    // }
 }
