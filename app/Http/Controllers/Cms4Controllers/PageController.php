@@ -107,7 +107,7 @@ class PageController extends Controller
             $settings = \App\Setting::find(1);
             $emails = EmailRecipient::email_list_str();
 
-            return view('admin.pages.contact-us', compact('page', 'parentPages', 'albums', 'pageAlbum', 'settings', 'emails'));
+            return view('cms4.pages.contact-us', compact('page', 'parentPages', 'albums', 'pageAlbum', 'settings', 'emails'));
         } else if ($page->is_default_page()) {
             return view('cms4.pages.default', compact('page'));
         } else if ($page->is_customize_page()) {
