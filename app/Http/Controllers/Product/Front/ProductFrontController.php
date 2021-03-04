@@ -143,7 +143,7 @@ class ProductFrontController extends Controller
         // Product Categories
         $categories = ProductCategory::select('id', 'name')->where('parent_id', 0)->where('status', 'PUBLISHED')->orderBy('name')->get();
 
-        $brands = Product::distinct()->orderBy('brand')->get(['brand']);
+        $brands = Product::whereNotNull('brand')->distinct()->orderBy('brand')->get(['brand']);
 
         $product = Product::where('status', 'PUBLISHED')->where(function($model) {
             $model->orWhere('category_id', null);

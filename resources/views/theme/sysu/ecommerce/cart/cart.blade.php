@@ -193,6 +193,7 @@
             </button>
         </form>
     </div>
+    <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
 
     @include('theme.sysu.ecommerce.cart.modal')
 @endsection
@@ -516,7 +517,7 @@
         }
 
         function coupon_counter(){
-            var limit = 3;
+            var limit = $('#coupon_limit').val();
             var counter = $('#coupon_counter').val();
 
             if(parseInt(counter) < parseInt(limit)){
@@ -762,6 +763,19 @@
                             iteration = $(this).data('id');
                         }
                     });
+
+                    var sub_price = $('#sum_sub_price'+iteration).val();
+                    if(amount > 0){
+                        var totalDiscount = parseFloat(sub_price)-parseFloat(amount);
+                        var discount = parseFloat(amount);
+                    }
+
+                    if(percnt > 0){
+                        var percent = parseFloat(percnt)/100;
+                        var discount =  parseFloat(sub_price)*parseFloat(percent);
+
+                        var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
+                    }
                 }
 
 

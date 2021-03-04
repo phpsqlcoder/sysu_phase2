@@ -40,8 +40,6 @@ class CheckoutController extends Controller
 
         $coupons = CouponCart::where('customer_id',Auth::id())->get();
         $couponUsed = $coupons->count();
-        $couponLimit = 3;
-
 
         $totalAmount = 0;
         $totalQty = 0;
@@ -104,7 +102,7 @@ class CheckoutController extends Controller
 
         $grandTotal = $product_subtotal-$amountDiscount;
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','totalAmount','totalQty','grandTotal','amountDiscount','product_subtotal','couponUsed','couponLimit','total_amount_discount_counter'));
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','totalAmount','totalQty','grandTotal','amountDiscount','product_subtotal','couponUsed','total_amount_discount_counter'));
     }
 
     public function remove_coupon($id)

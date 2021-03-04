@@ -145,6 +145,7 @@ class WebController extends Controller
         $ecommerce->delivery_collect_is_allowed = (isset($_POST['delivery_collect_is_allowed']) == '1' ? '1' : '0');
 
         $ecommerce->delivery_note = $request->delivery_note;
+        $ecommerce->coupon_limit = $request->coupon_limit;
         $ecommerce->save();
 
         if($ecommerce){

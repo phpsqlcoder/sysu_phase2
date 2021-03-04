@@ -358,6 +358,15 @@
                                             Allow product review
                                         </div>
                                     </div>
+
+                                    <h4 class="mg-t-50">Coupon Settings</h4>
+                                    <div class="form-group">
+                                        <div id="coupon_limit" class="parsley-input">      
+                                            <label>Coupon Limit *</label>                                      
+                                            <input type="number" name="coupon_limit" class="form-control" data-parsley-class-handler="#coupon_limit" value="{{ old('coupon_limit',$web->coupon_limit) }}" min="1">
+                                            <small>Number of Coupons to be used in every transaction.</small>
+                                        </div>
+                                    </div>
                                     
                                 </div>
                                 

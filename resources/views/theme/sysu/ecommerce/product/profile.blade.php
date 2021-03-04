@@ -109,11 +109,11 @@
 
                                                                 @if(Auth::check())
                                                                     <button style="display: {{ $is_fav == 0 ? 'none' : 'block' }};" id="favBtnRemove" type="button" class="btn btn-warning btn-block" data-loading-text="processing..." onclick="remove_to_favorites('{{$product->id}}')">
-                                                                        <i class="fa fa-star"></i> Remove to favorites
+                                                                        <i class="fa fa-heart"></i> Remove to favorites
                                                                     </button>
 
                                                                     <button style="display: {{ $is_fav == 1 ? 'none' : 'block' }};" id="favBtnAdd" type="button" class="btn btn-success btn-block" data-loading-text="processing..." onclick="add_to_favorites('{{$product->id}}')">
-                                                                        <i class="fa fa-star"></i> Add to favorites
+                                                                        <i class="fa fa-heart"></i> Add to favorites
                                                                     </button>
                                                                 @endif                                                                
                                                             </div>
@@ -132,11 +132,11 @@
                                         </button>
 
                                         <button style="display: {{ $is_wishlist == 0 ? 'none' : 'block' }};" id="wishlistBtnRemove" type="button" class="btn btn-warning btn-block" onclick="remove_to_wishlist('{{$product->id}}')">
-                                            <i class="fa fa-times"></i> Remove to wislist
+                                            <i class="fa fa-star"></i> Remove to wislist
                                         </button>
 
                                         <button style="display: {{ $is_wishlist == 1 ? 'none' : 'block' }};" id="wishlistBtnAdd" type="button" class="btn wishlist-btn" onclick="add_to_wishlist('{{$product->id}}')">
-                                            <i class="fa fa-heart"></i> Add to wishlist
+                                            <i class="fa fa-star"></i> Add to wishlist
                                         </button>
 
                                     @endif
