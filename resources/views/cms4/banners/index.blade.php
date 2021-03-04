@@ -133,60 +133,56 @@
                             </thead>
                             <tbody>
                             @forelse ($albums as $album)
-                                @if (!$album->is_main_banner())
-                                    <tr id="row{{$album->id}}" class="row_cb">
-                                        <th>
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input cb" id="cb{{ $album->id }}" data-id="{{ $album->id }}">
-                                                <label class="custom-control-label" for="cb{{ $album->id }}"></label>
-                                            </div>
-                                        </th>
-                                        <td style="overflow: hidden;text-overflow: ellipsis;" title="{{$album->name}}">
-                                            <strong @if($album->trashed()) style="text-decoration:line-through;" @endif title="{{ $album->name }}">{{ $album->name }}</strong>
-                                        </td>
-                                        <td>{{ $album->banners->count() }}</td>
-                                        <td>{{ Setting::date_for_listing($album->updated_at) }}</td>
-                                        <td>
-                                            @if($album->trashed())
-                                                @if (auth()->user()->has_access_to_route('albums.restore'))
-                                                    <nav class="nav table-options justify-content-end">
-                                                        <form id="form{{$album->id}}" method="post" action="{{ route('albums.restore', $album->id) }}">
-                                                            @csrf
-                                                            @method('POST')
-                                                            <a class="nav-link" href="#" title="Restore this banner" onclick="document.getElementById('form{{$album->id}}').submit()"><i data-feather="rotate-ccw"></i></a>
-                                                        </form>
-                                                    </nav>
-                                                @endif
-                                            @else
+                                <tr id="row{{$album->id}}" class="row_cb">
+                                    <th>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input cb" id="cb{{ $album->id }}" data-id="{{ $album->id }}">
+                                            <label class="custom-control-label" for="cb{{ $album->id }}"></label>
+                                        </div>
+                                    </th>
+                                    <td style="overflow: hidden;text-overflow: ellipsis;" title="{{$album->name}}">
+                                        <strong @if($album->trashed()) style="text-decoration:line-through;" @endif title="{{ $album->name }}">{{ $album->name }}</strong>
+                                    </td>
+                                    <td>{{ $album->banners->count() }}</td>
+                                    <td>{{ Setting::date_for_listing($album->updated_at) }}</td>
+                                    <td>
+                                        @if($album->trashed())
+                                            @if (auth()->user()->has_access_to_route('albums.restore'))
                                                 <nav class="nav table-options justify-content-end">
-{{--                                                    <a class="nav-link" data-toggle="modal" data-target="#preview-banner" data-id="{{$album->id}}"><i data-feather="eye"></i></a>--}}
-
-                                                    @if(auth()->user()->has_access_to_route('albums.edit'))
-                                                        <a class="nav-link" title="Edit banner" href="{{ route('albums.edit', $album->id) }}"><i data-feather="edit"></i></a>
-                                                    @endif
-
-                                                    @if (auth()->user()->has_access_to_route('albums.quick_update') || auth()->user()->has_access_to_route('albums.destroy'))
-                                                        <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <i data-feather="settings"></i>
-                                                        </a>
-                                                        <div class="dropdown-menu dropdown-menu-right">
-                                                            @if(auth()->user()->has_access_to_route('albums.quick_update'))
-                                                                <a class="dropdown-item" data-toggle="modal" data-target="#promptQuickEdit" href="#" data-id="{{ $album->id }}" data-name="{{ $album->name }}" data-transition-in="{{ $album->transition_in }}" data-transition-out="{{ $album->transition_out }}" data-transition="{{ $album->transition }}">Quick Edit</a>
-                                                            @endif
-                                                            @if(auth()->user()->has_access_to_route('albums.destroy'))
-                                                                <button type="button" class="dropdown-item" data-target="#prompt-delete" data-toggle="modal" data-animation="effect-scale" data-id="{{ $album->id }}" data-name="{{ $album->name }}">Delete</button>
-                                                                <form id="albumForm{{ $album->id }}" method="POST" action="{{ route('albums.destroy', $album->id) }}" class="d-none">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            @endif
-                                                        </div>
-                                                    @endif
+                                                    <form id="form{{$album->id}}" method="post" action="{{ route('albums.restore', $album->id) }}">
+                                                        @csrf
+                                                        @method('POST')
+                                                        <a class="nav-link" href="#" title="Restore this banner" onclick="document.getElementById('form{{$album->id}}').submit()"><i data-feather="rotate-ccw"></i></a>
+                                                    </form>
                                                 </nav>
                                             @endif
-                                        </td>
-                                    </tr>
-                                @endif
+                                        @else
+                                            <nav class="nav table-options justify-content-end">
+                                                @if(auth()->user()->has_access_to_route('albums.edit'))
+                                                    <a class="nav-link" title="Edit banner" href="{{ route('albums.edit', $album->id) }}"><i data-feather="edit"></i></a>
+                                                @endif
+
+                                                @if (auth()->user()->has_access_to_route('albums.quick_update') || auth()->user()->has_access_to_route('albums.destroy'))
+                                                    <a class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i data-feather="settings"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        @if(auth()->user()->has_access_to_route('albums.quick_update'))
+                                                            <a class="dropdown-item" data-toggle="modal" data-target="#promptQuickEdit" href="#" data-id="{{ $album->id }}" data-name="{{ $album->name }}" data-transition-in="{{ $album->transition_in }}" data-transition-out="{{ $album->transition_out }}" data-transition="{{ $album->transition }}">Quick Edit</a>
+                                                        @endif
+                                                        @if(auth()->user()->has_access_to_route('albums.destroy'))
+                                                            <button type="button" class="dropdown-item" data-target="#prompt-delete" data-toggle="modal" data-animation="effect-scale" data-id="{{ $album->id }}" data-name="{{ $album->name }}">Delete</button>
+                                                            <form id="albumForm{{ $album->id }}" method="POST" action="{{ route('albums.destroy', $album->id) }}" class="d-none">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            </nav>
+                                        @endif
+                                    </td>
+                                </tr>
                             @empty
                                 <tr>
                                     <td colspan="5" style="text-align: center;"> <p class="text-danger">No albums found.</p></td>

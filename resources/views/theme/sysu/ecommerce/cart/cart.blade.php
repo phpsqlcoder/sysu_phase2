@@ -314,6 +314,13 @@
                             }); 
                         } else {
                             if (returnData['success']) {
+                                if(returnData.coupon_details['location'] != null){
+                                    swal({
+                                        title: '',
+                                        text: "Shipping fee coupons can only be used on checkout.",         
+                                    });
+                                    return false;
+                                }
 
                                 $('#manual-coupon-details').append(
                                     '<input type="hidden" id="purchaseproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['purchase_product_id']+'">'+
@@ -528,7 +535,7 @@
             } else {
                 swal({
                     title: '',
-                    text: "Maximum of three (1) coupons only.",         
+                    text: "Maximum of "+limit+" coupon(s) only.",         
                 });
                 return false;
             }

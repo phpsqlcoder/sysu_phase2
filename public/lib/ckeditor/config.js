@@ -47,8 +47,8 @@ CKEDITOR.editorConfig = function(config) {
     }
 
     config.contentsCss = [window.location.origin + prefix + 'plugins/bootstrap/css/bootstrap.css',
-        window.location.origin + prefix + 'plugins/font-awesome/css/all.min.css',
-        window.location.origin + prefix + 'plugins/linearicon/css/linearicons.min.css',
+        window.location.origin + prefix + 'plugins/fontawesome/css/all.min.css',
+        window.location.origin + prefix + 'plugins/linearicon/linearicon.min.css',
         window.location.origin + prefix + 'plugins/responsive-tabs/css/responsive-tabs.css',
         window.location.origin + prefix + 'plugins/slick/slick.css',
         window.location.origin + prefix + 'plugins/slick/slick-theme.css',

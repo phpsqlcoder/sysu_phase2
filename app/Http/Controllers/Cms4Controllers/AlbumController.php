@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Cms4Controllers;
 
-use Facades\App\Helpers\ListingHelper;
+use Facades\App\Helpers\CMS4ListingHelper;
 use App\Http\Controllers\Controller;
 use App\Album;
 use App\Banner;
@@ -24,10 +24,10 @@ class AlbumController extends Controller
     {
         $animations = Option::where('type', 'animation')->get();
 
-        $albums = ListingHelper::simple_search(Album::class, $this->searchFields);
-
-        $filter = ListingHelper::get_filter($this->searchFields);
-
+        $listing = CMS4ListingHelper::required_condition('type', '!=', 'main_banner');
+        $albums = $listing->simple_search(Album::class, $this->searchFields);
+        
+        $filter = CMS4ListingHelper::get_filter($this->searchFields);
         $searchType = 'simple_search';
 
         $this->delete_temporary_banner_folder();

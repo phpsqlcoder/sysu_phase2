@@ -1,7 +1,9 @@
 @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/Responsive-2.2.3/css/responsive.dataTables.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 @endsection
 
 @section('content')
@@ -25,6 +27,7 @@
                 </div>
             </div>
             <div class="col-lg-9">
+
                 <span onclick="openNav()" class="filter-btn d-block d-lg-none pb-3"><i class="fa fa-list"></i> Options</span>
                 <h3 class="catalog-title">Transaction History</h3>
                 
@@ -44,8 +47,8 @@
                                 <th scope="col" class="align-middle">Order#</th>
                                 <th scope="col" class="align-middle">Date</th>
                                 <th scope="col" class="align-middle">Amount</th>
-                                <th scope="col" class="align-middle">Paid</th>
-                                <th scope="col" class="align-middle">Balance</th>
+                                <!-- <th scope="col" class="align-middle">Paid</th>
+                                <th scope="col" class="align-middle">Balance</th> -->
                                 <th scope="col" class="align-middle">Delivery Status</th>
                                 <th scope="col" class="align-middle">Action</th>
                             </tr>
@@ -61,11 +64,11 @@
                                     <td>{{$sale->order_number}}</td>
                                     <td>{{$sale->created_at}}</td>
                                     <td>{{number_format($sale->gross_amount,2)}}</td>
-                                    <td>{{number_format($paid,2)}}</td>
-                                    <td>{{number_format($balance,2)}}</td>
+                                    <!-- <td>{{number_format($paid,2)}}</td>
+                                    <td>{{number_format($balance,2)}}</td> -->
                                     <td>{{$sale->delivery_status}}</td>
                                     <td align="right">
-                                        @if($sale->status<>'CANCELLED')
+                                        @if($sale->status != 'CANCELLED')
                                             <a href="#" title="View Items" data-toggle="modal" data-target="#detail{{$sale->id}}" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
                                             @if ($balance > 0)
                                                 <a href="{{route('my-account.pay-again',$sale->id)}}" title="Pay Now" class="btn btn-success btn-sm mb-1"><i class="fa fa-credit-card pb-1"></i></a>&nbsp;
@@ -416,13 +419,10 @@
 {!!$modals!!}
 @endsection
 
-
 @section('pagejs')
     <script src="{{ asset('theme/sysu/plugins/datatables/datatables.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-    <script>   
-
-
+    <script>
         /*** Handles the Select All Checkbox ***/
         function checkbox_all(saleid){
             var status = $('#ckbox'+saleid).is(":checked") ? true : false;
