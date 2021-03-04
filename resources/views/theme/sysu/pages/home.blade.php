@@ -6,7 +6,7 @@
 @php
     $contents = $page->contents;
 
-    $featuredArticles = \App\Article::where('is_featured', 1)->where('is_published', 1)->get();
+    $featuredArticles = \App\Article::where('is_featured', 1)->where('status', 'Published')->get();
 
     if ($featuredArticles->count()) {
 
