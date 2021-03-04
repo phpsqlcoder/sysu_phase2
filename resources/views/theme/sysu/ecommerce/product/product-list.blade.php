@@ -267,7 +267,7 @@
                                         <div class="product-link border">
                                             <div class="product-card">
                                                 @if(Auth::check())
-                                                <label class="add-wishlist-btn label_wishlist{{$product->id}}" for="wishlist{{$product->id}}" data-toggle="tooltip" data-placement="left" title="@if(\App\EcommerceModel\CustomerFavorite::is_favorite($product->id) > 0) Remove @else Add @endif to Favorites">
+                                                <label class="add-wishlist-btn label_wishlist{{$product->id}}" for="wishlist{{$product->id}}" data-toggle="tooltip" data-placement="left" title="@if(\App\EcommerceModel\CustomerFavorite::is_favorite($product->id) > 0) Remove from @else Add to @endif Favorites">
                                                     <input type="checkbox" id="wishlist{{$product->id}}" class="wishlist{{$product->id}}" name="wishlist{{$product->id}}" onchange="add_to_favorites('{{$product->id}}')" @if(\App\EcommerceModel\CustomerFavorite::is_favorite($product->id) > 0) checked @endif>
                                                     <span>
                                                       <i class="far fa-heart unchecked"></i>
@@ -289,7 +289,7 @@
                                                         @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
                                                             <div class="col-12"><h3 class="product-price"><span>₱ {{ number_format($product->discountedprice,2) }}</span> | {{$product->uom}}</h3></div>
                                                             <span class="text-muted small mr-2 h6"><del>₱{{ number_format($product->price,2) }}</del></span>
-                                                            <span class="card-discount-percent small h6">-{{ $product->promodiscount }}%</span>
+                                                            <span class="card-discount-percent small h6">{{ $product->promodiscount }}% OFF</span>
                                                         @else
                                                             <div class="col-12"><h3 class="product-price">
                                                                 <span>₱ {{number_format($product->price,2)}}</span> | {{$product->uom}}</h3>
@@ -341,7 +341,7 @@
                                                         @if(Auth::check())
                                                         <a style="display: {{ $is_wishlist == 1 ? 'none' : 'block' }};" href="javascript:void(0)" class="btn btn-primary btn-sm" tabindex="-1" id="wishlistBtnAdd{{$product->id}}" onclick="add_to_wishlist('{{$product->id}}')">Add to Wishlist</a>
 
-                                                        <a style="display: {{ $is_wishlist == 0 ? 'none' : 'block' }};" href="javascript:void(0)" class="btn btn-warning btn-sm" tabindex="-1" id="wishlistBtnRemove{{$product->id}}" onclick="remove_to_wishlist('{{$product->id}}')">Remove to Wishlist</a>
+                                                        <a style="display: {{ $is_wishlist == 0 ? 'none' : 'block' }};" href="javascript:void(0)" class="btn btn-warning btn-sm" tabindex="-1" id="wishlistBtnRemove{{$product->id}}" onclick="remove_to_wishlist('{{$product->id}}')">Remove from Wishlist</a>
                                                         @else
                                                         <a href="javascript:void(0)" class="btn btn-secondary btn-sm" tabindex="-1" role="button">Out of Stock</a>
                                                         @endif

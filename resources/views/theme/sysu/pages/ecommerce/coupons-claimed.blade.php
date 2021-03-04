@@ -1,16 +1,20 @@
 @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
-   
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/Responsive-2.2.3/css/responsive.dataTables.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 @endsection
 
 @section('content')
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+</div>
+<span onclick="closeNav()" class="dark-curtain"></span>
+
 <section class="py-5">
     <div class="container">
         <div class="row">
-            <span onclick="closeNav()" class="dark-curtain"></span> 
-            <span onclick="openNav()" class="mb-4 btn btn-primary btn-bg open-nav rounded-0 d-block d-lg-none"><i class="fa fa-1x fa-th-list"></i></span>
-
             <div class="col-lg-3">                          
                 <div class="desk-cat d-none d-lg-block">
                     <div class="quick-nav">
@@ -19,19 +23,19 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-lg-9">
-                <h3 class="catalog-title">{{ $page->name }}</h3>
+                <span onclick="openNav()" class="filter-btn d-block d-lg-none pb-3"><i class="fa fa-list"></i> Options</span>
+                <h3 class="catalog-title">{{$page->name}}</h3>
                 <div class="table-history" style="overflow-x:auto;">
-                    <table class="table table-hover small text-left overflow-auto">
+                    <table id="tabless" class="table table-hover small text-center overflow-auto">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" class="align-middle text-nowrap" width="20%">Name</th>
-                                <th scope="col" class="align-middle" width="25%">Description</th>
-                                <th scope="col" class="align-middle" width="15%">T&C</th>
-                                <th scope="col" class="align-middle" width="10%">Validity</th>
-                                <th scope="col" class="align-middle" width="15%">Date Claimed</th>
-                                <th scope="col" class="align-middle" width="15%">Order #</th>
+                                <th scope="col" class="align-middle text-nowrap">Name</th>
+                                <th scope="col" class="align-middle">Description</th>
+                                <th scope="col" class="align-middle">T&C</th>
+                                <th scope="col" class="align-middle">Validity</th>
+                                <th scope="col" class="align-middle">Date Claimed</th>
+                                <th scope="col" class="align-middle">Order #</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,5 +90,5 @@
 @endsection
 
 @section('pagejs')
-    
+    <script src="{{ asset('theme/sysu/plugins/datatables/datatables.min.js') }}"></script>
 @endsection

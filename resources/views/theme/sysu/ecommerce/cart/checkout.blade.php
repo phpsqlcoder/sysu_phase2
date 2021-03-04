@@ -174,6 +174,7 @@
                                     @foreach($coupons as $coupon)
                                         @php $counter++; @endphp
                                         <div class="coupon-item p-2 border rounded mb-1" id="couponDiv{{$coupon->coupon_id}}">
+                                            <input type="hidden" name="couponid[]" value="{{$coupon->coupon_id}}">
                                             @if(isset($coupon->details->free_product_id))
                                             <input type="hidden" name="freeproductid[]" value="{{$coupon->details->free_product_id}}">
                                             @endif
@@ -370,7 +371,7 @@
         });
 
         function coupon_counter(){
-            var limit = $('#coupon_limit').val();;
+            var limit = $('#coupon_limit').val();
             var counter = $('#coupon_counter').val();
 
             if(parseInt(counter) < parseInt(limit)){
@@ -380,7 +381,7 @@
             } else {
                 swal({
                     title: '',
-                    text: "Maximum of three (1) coupons only.",         
+                    text: "Maximum of "+limit+" coupon(s) only.",        
                 });
                 return false;
             }
@@ -714,7 +715,16 @@
             $('#paying_div').show();
         }
 
-        function pay_now() {      
+        function pay_now() {   
+            if (!$("input[name='shipping_type']:checked").val()) {
+                swal({
+                    title: '',
+                    text: "Please select a delivery method!",         
+                });
+
+               return false;
+            }
+
             var st = $('input[name="shipping_type"]:checked').val(); 
             if(st == 'd2d'){
                 if($('#location').val()==''){

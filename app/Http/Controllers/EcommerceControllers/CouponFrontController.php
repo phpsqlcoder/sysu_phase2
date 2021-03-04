@@ -99,7 +99,7 @@ class CouponFrontController extends Controller
         $page = new Page();
         $page->name = 'Claimed Coupons';
 
-        $coupons = CouponSale::where('customer_id',Auth::id())->get();
+        $coupons = CouponSale::where('customer_id',Auth::id())->where('order_status','PAID')->get();
 
         return view('theme.sysu.pages.ecommerce.coupons-claimed',compact('page','coupons'));
     }
@@ -407,7 +407,7 @@ class CouponFrontController extends Controller
         if(empty($arr_customer_coupons)){
             $allCoupons = $coupons;
         } else {
-            $customerCoupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereIn('id',[$arr_customer_coupons])->get();
+            $customerCoupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereIn('id',$arr_customer_coupons)->get();
             // all or specific coupons
             $allCoupons = collect($customerCoupons)->merge($coupons);
         }

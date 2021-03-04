@@ -349,15 +349,17 @@ class CartController extends Controller
             'cancel' => route('profile.sales'),
         ];
         
-
-        if(isset($request->couponid)){
+        if($request->coupon_counter > 0){
             $data = $request->all();
             $coupons = $data['couponid'];
             foreach($coupons as $coupon){
-                CouponCart::create([
-                    'coupon_id' => $coupon,
-                    'customer_id' => Auth::id()
-                ]);
+                $exist = CouponCart::where('customer_id',Auth::id())->where('coupon_id',$coupon)->exists();
+                if(!$exist){
+                   CouponCart::create([
+                        'coupon_id' => $coupon,
+                        'customer_id' => Auth::id()
+                    ]); 
+                } 
             }
         }
 
@@ -556,28 +558,7 @@ class CartController extends Controller
                 'coupon_id' => $c,
                 'coupon_code' => $coupon->coupon_code,
                 'sales_header_id' => $salesid
-            ]);
-
-            // $totalUsage = CouponSale::where('coupon_id',$c)->count();
-            // // if coupon has set customer limit
-            // if(isset($coupon->customer_limit)){
-            //     // check if customer limit is not reach
-            //     if($totalUsage <= $coupon->customer_limit){
-            //        CouponSale::create([
-            //             'customer_id' => Auth::id(),
-            //             'coupon_id' => $c,
-            //             'coupon_code' => $coupon->coupon_code,
-            //             'sales_header_id' => $salesid
-            //         ]);
-            //     }
-            // } else {
-            //     CouponSale::create([
-            //         'customer_id' => Auth::id(),
-            //         'coupon_id' => $c,
-            //         'coupon_code' => $coupon->coupon_code,
-            //         'sales_header_id' => $salesid
-            //     ]);
-            // }    
+            ]);   
         }
     }
 }

@@ -1,8 +1,9 @@
 @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
-   <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/ion.rangeslider/css/ion.rangeSlider.css') }}">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('theme/sysu/plugins/datatables/Responsive-2.2.3/css/responsive.dataTables.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 @endsection
 
 @section('content')
@@ -46,7 +47,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="#" title="Remove Product" onclick="remove_product('{{$product->product_id}}');" class="btn btn-danger btn-sm mb-1"><i class="fa fa-times pb-1"></i></a>&nbsp;
+                                        <a href="#" title="Remove Product" onclick="remove_product('{{$product->product_id}}');" class="btn btn-danger btn-sm mb-1" style="width:33.75px;"><i class="fa fa-times pb-1"></i></a>&nbsp;
 
                                         <a href="{{route('product.front.show',$product->product_details->slug)}}" target="_blank" title="View Product Details" class="btn btn-success btn-sm mb-1"><i class="fa fa-eye pb-1"></i></a>
 
@@ -105,6 +106,7 @@
 @endsection
 
 @section('pagejs')
+    <script src="{{ asset('theme/sysu/plugins/datatables/datatables.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
     <script>
         $(document).ready(function () {
