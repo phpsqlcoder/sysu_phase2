@@ -520,6 +520,14 @@
 
 @section('customjs')
 <script>
+	$('#coupon-scope-specific').click(function(){
+		$('#coupon-customer-limit').attr('disabled',true);
+	});
+
+	$('#coupon-scope-all').click(function(){
+		$('#coupon-customer-limit').attr('disabled',false);
+	});
+
 	function productdiscount(x){
 		if(x == 'specific'){
 			$('#discount_productid').css('display','block');

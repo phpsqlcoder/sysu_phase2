@@ -468,6 +468,7 @@ class ComposerStaticInit68580dd66ca868f9e4453579cea1fb47
         'App\\EcommerceModel\\SalesHeader' => __DIR__ . '/../..' . '/app/EcommerceModel/SalesHeader.php',
         'App\\EcommerceModel\\SalesPayment' => __DIR__ . '/../..' . '/app/EcommerceModel/SalesPayment.php',
         'App\\EcommerceModel\\Wishlist' => __DIR__ . '/../..' . '/app/EcommerceModel/Wishlist.php',
+        'App\\EmailRecipient' => __DIR__ . '/../..' . '/app/EmailRecipient.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Helpers\\CMS4ListingHelper' => __DIR__ . '/../..' . '/app/Helpers/CMS4ListingHelper.php',
         'App\\Helpers\\FileHelper' => __DIR__ . '/../..' . '/app/Helpers/FileHelper.php',

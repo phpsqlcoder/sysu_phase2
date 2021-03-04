@@ -119,7 +119,7 @@
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="customer-optn" style="display:@if($coupon->customer_scope == 'specific') block @else none @endif">
 						<label class="d-block">Customer Name *</label>
-						<select class="form-control select2" name="customer">
+						<select class="form-control select2" name="customer[]">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
 								<option @if($coupon->scope_customer_id == $customer->id) selected @endif value="{{$customer->id}}">{{ $customer->name }}</option>
@@ -196,6 +196,53 @@
 						@hasError(['inputName' => 'discount_percentage'])
                     	@endhasError
 					</div>
+
+					<div id="div_product_amount" style="display: @if(isset($coupon->amount) || isset($coupon->percentage)) block @else none @endif;">
+                		<div class="row" style="padding-bottom: 10px;margin-top: 20px;">
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" onclick="product_discount_amount(1)" @if($coupon->amount_discount_type == 1) checked @endif>
+									<label class="custom-control-label" for="discount-total-amount">Total Amount</label>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="discount-product-price" name="amount_discount" class="custom-control-input" value="2" onclick="product_discount_amount(2)" @if($coupon->amount_discount_type == 2) checked @endif>
+									<label class="custom-control-label" for="discount-product-price">Product Price</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: @if($coupon->amount_discount_type == 2) flex @else none @endif;" id="discount_selection">
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')" @if($coupon->product_discount == 'current') checked @endif>
+									<label class="custom-control-label" for="same-product">Current Product</label>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')" @if($coupon->product_discount == 'highest') checked @endif>
+									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
+								</div>
+							</div>
+							<div class="col-4">
+								<div class="custom-control custom-radio">
+									<input type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')" @if($coupon->product_discount == 'specific') checked @endif>
+									<label class="custom-control-label" for="specific-product">Specific Product</label>
+								</div>
+							</div>
+						</div>
+
+						<div style="display: @if($coupon->product_discount == 'specific') block @else none @endif;" id="discount_productid">
+							<select class="form-control select2" name="discount_productid">
+								<option label="Choose Product"></option>
+								@foreach($products as $product)
+									<option @if($coupon->discount_product_id == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
+								@endforeach
+							</select>
+						</div>
+                	</div>
 
 					<div class="mb-3 reward-option" id="free-product-optn" style="display:@if(isset($coupon->free_product_id)) block @else none @endif">
 						<label class="d-block">Free Product</label>
@@ -408,20 +455,6 @@
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
 							</div>
-
-							<!-- Appy reward on total amount / product price -->
-							<div class="col-md-6 mt-3">
-								<div class="custom-control custom-radio">
-									<input type="radio" id="qty-total-amount" name="amount_discount" class="custom-control-input" value="1" @if($coupon->amount_discount_type == 1) checked @endif>
-									<label class="custom-control-label" for="qty-total-amount">Total Amount</label>
-								</div>
-							</div>
-							<div class="col-md-6 mt-3">
-								<div class="custom-control custom-radio">
-									<input type="radio" id="qty-product-price" name="amount_discount" class="custom-control-input" value="2" @if($coupon->amount_discount_type == 2) checked @endif>
-									<label class="custom-control-label" for="qty-product-price">Product Price</label>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -435,7 +468,7 @@
 				<div class="form-row border rounded p-3">
 					<div class="col-12">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit" onclick="myFunction()" @if(isset($coupon->customer_limit)) checked @endif>
+							<input type="checkbox" class="custom-control-input" id="coupon-customer-limit" name="customer_limit" onclick="myFunction()" @if($coupon->customer_scope == 'specific') disabled @else  @if(isset($coupon->customer_limit)) checked @endif @endif>
 							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit &nbsp;&nbsp;<span style="font-style: italic;">Maximum number of customers who can use the coupon.</span></label>
 						</div>
 
@@ -466,8 +499,8 @@
 
 					<div class="col-12 mt-3">
 						<div class="custom-control custom-checkbox">
-							<input {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-customer-transaction" name="combination">
-							<label class="custom-control-label" for="coupon-customer-transaction">Coupon Combination &nbsp;&nbsp;<span style="font-style: italic;">Can be used together with other coupons.</span></label>
+							<input {{ (old("combination") == "ON" || $coupon->combination == 1 ? "checked":"") }} type="checkbox" class="custom-control-input" id="coupon-combination" name="combination">
+							<label class="custom-control-label" for="coupon-combination">Coupon Combination &nbsp;&nbsp;<span style="font-style: italic;">Can be used together with other coupons.</span></label>
 						</div>
 					</div>
 				</div>
@@ -524,9 +557,40 @@
 
 @section('customjs')
 <script>
+	$('#coupon-scope-specific').click(function(){
+		$('#coupon-customer-limit').prop('checked',false);
+		$('#coupon-customer-limit-form').hide();
+		$('#coupon-customer-limit').attr('disabled',true);
+	});
+
+	$('#coupon-scope-all').click(function(){
+		$('#coupon-customer-limit').attr('disabled',false);
+	});
+
+	function productdiscount(x){
+		if(x == 'specific'){
+			$('#discount_productid').css('display','block');
+		} else {
+			$('#discount_productid').css('display','none');
+		}
+	}
+	function product_discount_amount(x){
+		if(x == 2){
+			$('#discount_selection').css('display','flex');
+		} else {
+			$('#discount_selection').css('display','none');
+		}
+	}
+
 	$('#reward-optn').change(function(){
 		$('.reward-option').hide();
 		$('#' + $(this).val()).show();
+
+		if($(this).val() == 'discount-amount-optn' || $(this).val() == 'discount-percentage-optn'){
+			$('#div_product_amount').show();
+		} else {
+			$('#div_product_amount').hide();
+		}
 	});
 
 	function sf_discount_type(){
@@ -828,10 +892,6 @@
 		var autoManual= document.getElementById("coupon-activate-auto");
 		var couponCodeAuto = document.getElementById("coupon-code");
 		couponCodeAuto.style.display = autoManual.checked ? "none" : "block";
-
-		var couponMultiUse = document.getElementById("coupon-multi-use");
-		var couponMultiUseForm = document.getElementById("coupon-multi-use-form");
-		couponMultiUseForm.style.display = couponMultiUse.checked ? "block" : "none";
 	};
 
 // Points Earned start --------------------->
