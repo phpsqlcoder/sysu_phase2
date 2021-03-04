@@ -486,7 +486,7 @@
 										$customerLimit = 1; 
 									}
 								@endphp
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$customerLimit)}}" min="1">
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',$customerLimit)}}" min="1" max="100000">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-plus"></span>
@@ -661,8 +661,31 @@
 	});
 
 	$('#category_opt').change(function(){
-		var value = $(this).val();
+		var selected = '';
+		$('#category_opt :selected').each(function(){
+		    selected += $(this).val()+'|';
+		});
 
+		$.ajax({
+            type: "GET",
+            url: "{{ route('display.product-brands') }}",
+            data: { 
+                'categories' : selected,
+            },
+            success: function(response) {
+            	$('#brand_opt').empty();
+
+            	if(response['success']){
+            		$.each(response.brands, function(key, value) {
+	            		$('#brand_opt').append(
+	            			'<option value="'+value.brand+'">'+value.brand+'</option>'
+	            		);
+            		});
+            	}
+            }
+        });
+
+		var value = parseInt($(this).val());
 		if(value != ''){
 			$('#product_opt').attr("disabled", true);
 		} else {

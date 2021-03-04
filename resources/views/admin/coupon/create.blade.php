@@ -448,7 +448,7 @@
 										<span class="fa fa-minus"></span>
 									</button>
 								</span>
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1">
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="100000">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-plus"></span>
