@@ -263,7 +263,7 @@
     <input type="hidden" id="totalQty" value="{{$totalQty}}">
 
     <div id="manual-coupon-details"></div>
-
+    <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
     @include('theme.sysu.ecommerce.cart.modal')
 
 @endsection
@@ -370,7 +370,7 @@
         });
 
         function coupon_counter(){
-            var limit = 3;
+            var limit = $('#coupon_limit').val();;
             var counter = $('#coupon_counter').val();
 
             if(parseInt(counter) < parseInt(limit)){
