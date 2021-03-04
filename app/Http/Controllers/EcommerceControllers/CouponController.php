@@ -197,19 +197,21 @@ class CouponController extends Controller
             'description' => 'required',
             'terms_and_conditions' => 'required',
             'reward' => 'required',
-            'code' => $request->coupon_activation[0] == 'manual' ? 'required' : '',
+            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
             'shipping_fee_discount_amount' => ($request->reward == 'free-shipping-optn' && $request->discount_type == 'partial') ? 'required' : '',
             'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
             'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
             'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
+
         ])->validate();
 
         $data = $request->all();
 
         $loc = '';
         if($request->reward == 'free-shipping-optn'){
+          
             $locations = $data['location'];
             $loc_discount_type = $request->discount_type;
             $loc_discount_amount = $request->shipping_fee_discount_amount;
@@ -231,6 +233,20 @@ class CouponController extends Controller
             }
         }
 
+        $amount_discount = 1;
+        if($request->reward == 'discount-amount-optn' || $request->reward == 'discount-percentage-optn'){
+            $amount_discount = $request->amount_discount;
+        }
+
+        $discount_productid = NULL;
+        if($request->product_discount == 'current'){
+            $discount_productid = $request->product_name[0];
+        }
+
+        if($request->product_discount == 'specific'){
+            $discount_productid = $request->discount_productid;
+        }
+
         Coupon::find($coupon->id)->update([
             'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : $coupon->coupon_code,
             'name' => $request->name,
@@ -246,6 +262,9 @@ class CouponController extends Controller
             'percentage' => $request->reward == 'discount-percentage-optn' ? $request->discount_percentage : NULL,
             'free_product_id' => $request->free_product_id,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
+            'amount_discount_type' => $amount_discount,
+            'product_discount' => $request->amount_discount == 2 ? $request->product_discount : NULL,
+            'discount_product_id' => $discount_productid,
             // 'availability' => ($request->has('availability')) ? 1 : 0,
             'user_id' => Auth::id(),
         ]);

@@ -35,6 +35,7 @@ return array(
     'App\\EcommerceModel\\SalesHeader' => $baseDir . '/app/EcommerceModel/SalesHeader.php',
     'App\\EcommerceModel\\SalesPayment' => $baseDir . '/app/EcommerceModel/SalesPayment.php',
     'App\\EcommerceModel\\Wishlist' => $baseDir . '/app/EcommerceModel/Wishlist.php',
+    'App\\EmailRecipient' => $baseDir . '/app/EmailRecipient.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Helpers\\CMS4ListingHelper' => $baseDir . '/app/Helpers/CMS4ListingHelper.php',
     'App\\Helpers\\FileHelper' => $baseDir . '/app/Helpers/FileHelper.php',
