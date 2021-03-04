@@ -433,7 +433,6 @@
 									<option value="">Choose One</option>
 									<option @if($coupon->purchase_amount_type == 'min') selected @endif value="min">Minimum</option>
 									<option @if($coupon->purchase_amount_type == 'max') selected @endif value="max">Maximum</option>
-									<option @if($coupon->purchase_amount_type == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanAmountOpt" style="display: none;" class="text-danger"></small>
 							</div>
@@ -451,7 +450,6 @@
 									<option value="">Choose One</option>
 									<option @if($coupon->purchase_qty_type == 'min') selected @endif value="min">Minimum</option>
 									<option @if($coupon->purchase_qty_type == 'max') selected @endif value="max">Maximum</option>
-									<option @if($coupon->purchase_qty_type == 'exact') selected @endif value="exact">Exact</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
 							</div>
