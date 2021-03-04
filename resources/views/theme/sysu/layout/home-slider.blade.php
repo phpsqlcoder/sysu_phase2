@@ -5,11 +5,6 @@
                 <div id="banner" class="slick-slider">
                     @foreach ($page->album->banners as $banner)
                         <div class="hero-slide">
-                            <div class="banner-overlay">
-                                <div class="banner-overlay-img" style="background:url({{ $banner->image_path }})">
-                                    <div class="banner-overlay-layer"></div>
-                                </div>
-                            </div>
                             <img src="{{ $banner->image_path }}">
                             <div class="banner-caption">
                                 <div class="container">
