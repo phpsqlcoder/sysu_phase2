@@ -185,6 +185,10 @@ class CouponFrontController extends Controller
             $couponsExactTotalQty = Coupon::purchaseExactValue('purchase_qty','purchase_qty_type',$request->total_qty);
         //
 
+        // Coupon Events
+            $couponEvents = Coupon::whereNotNull('event_date')->where('event_date',today())->get();
+        //
+
         // Cart Products
             $arr_coupons = [];
             $arr_brands = [];
@@ -382,7 +386,8 @@ class CouponFrontController extends Controller
             ->merge($couponsMaxTotalQty)
             ->merge($couponsExactTotalQty)
             ->merge($purchased_coupons)
-            ->merge($purchased_combined_coupons);
+            ->merge($purchased_combined_coupons)
+            ->merge($couponEvents);
 
 
         $arr_coupon_availability = [];
