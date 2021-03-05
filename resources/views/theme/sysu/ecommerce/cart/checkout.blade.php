@@ -312,6 +312,14 @@
                 type: "post",
                 url: "{{route('add-manual-coupon')}}",
                 success: function(returnData) {
+                    if(returnData['not_allowed']){
+                        swal({
+                            title: '',
+                            text: "Sorry, you are not authorized to use this coupon.",         
+                        });
+                        return false;
+                    }
+                    
                     if(returnData['exist']){
                         swal({
                             title: '',
