@@ -120,28 +120,49 @@ class CouponFrontController extends Controller
         if($coupon->exists()){
             $c = $coupon->first();
 
-            $couponCart = CouponCart::where('customer_id',Auth::id())->where('coupon_id',$c->id)->exists();
-            if($couponCart){
-                return response()->json([
-                    'exist' => true,               
-                ]);
-            } else {
-                if($c->status == 'EXPIRED' || $c->status == 'INACTIVE'){
-                    return response()->json([
-                        'expired' => true,               
-                    ]);
-                } else {
-                    
-                    // CouponCart::create([
-                    //     'customer_id' => Auth::id(),
-                    //     'coupon_id' => $c->id
-                    // ]);
+            if($c->customer_scope == 'specific'){
+                $customer_id = explode('|',$c->scope_customer_id);
+                $arr_customer_id = [];
+                foreach($customer_id as $id){
+                    array_push($arr_customer_id, $id);
+                }
 
+                if(in_array(Auth::id(), $arr_customer_id)){
                     return response()->json([
                         'success' => true, 
                         'coupon_details' => $c              
                     ]);
+                } else {
+                    return response()->json([
+                        'not_allowed' => true,               
+                    ]);
                 }
+
+            } else {
+                $couponCart = CouponCart::where('customer_id',Auth::id())->where('coupon_id',$c->id)->exists();
+                if($couponCart){
+                    return response()->json([
+                        'exist' => true,               
+                    ]);
+                } else {
+                    if($c->status == 'EXPIRED' || $c->status == 'INACTIVE'){
+                        return response()->json([
+                            'expired' => true,               
+                        ]);
+                    } else {
+                        
+                        // CouponCart::create([
+                        //     'customer_id' => Auth::id(),
+                        //     'coupon_id' => $c->id
+                        // ]);
+
+                        return response()->json([
+                            'success' => true, 
+                            'coupon_details' => $c              
+                        ]);
+                    }
+                }
+
             }
         } else {
             return response()->json([

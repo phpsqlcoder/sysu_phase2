@@ -301,50 +301,59 @@
                 url: "{{route('add-manual-coupon')}}",
                 success: function(returnData) {
 
+                    if(returnData['not_allowed']){
+                        swal({
+                            title: '',
+                            text: "Sorry, you are not authorized to use this coupon.",         
+                        });
+                        return false;
+                    }
+
                     if(returnData['not_exist']){
                         swal({
                             title: '',
                             text: "Coupon not found.",         
-                        }); 
-                    } else {
-                        if(returnData['expired']){
+                        });
+                        return false; 
+                    }
+
+                    if(returnData['expired']){
+                        swal({
+                            title: '',
+                            text: "Coupon is already expired.",         
+                        });
+                        return false;
+                    }
+                    if (returnData['success']) {
+                        if(returnData.coupon_details['location'] != null){
                             swal({
                                 title: '',
-                                text: "Coupon is already expired.",         
-                            }); 
-                        } else {
-                            if (returnData['success']) {
-                                if(returnData.coupon_details['location'] != null){
-                                    swal({
-                                        title: '',
-                                        text: "Shipping fee coupons can only be used on checkout.",         
-                                    });
-                                    return false;
-                                }
-
-                                $('#manual-coupon-details').append(
-                                    '<input type="hidden" id="purchaseproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['purchase_product_id']+'">'+
-                                    '<input type="hidden" id="discountpercentage'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['percentage']+'">'+
-                                    '<input type="hidden" id="discountamount'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['amount']+'">'+
-                                    '<input type="hidden" id="couponname'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['name']+'">'+
-                                    '<input type="hidden" id="couponcode'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['coupon_code']+'">'+
-                                    '<input type="hidden" id="couponterms'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['terms_and_conditions']+'">'+
-                                    '<input type="hidden" id="coupondesc'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['description']+'">'+
-                                    '<input type="hidden" id="couponfreeproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['free_product_id']+'">'
-                                );
-
-                                if(returnData.coupon_details['amount_discount_type'] == 1){
-                                    if(returnData.coupon_details['free_product_id'] != null){
-                                        free_product_coupon(returnData.coupon_details['id']);
-                                    } else {
-                                        use_coupon_total_amount(returnData.coupon_details['id']);
-                                    }
-                                } else {
-                                    use_coupon_on_product(returnData.coupon_details['id']);
-                                }
-                            }  
+                                text: "Shipping fee coupons can only be used on checkout.",         
+                            });
+                            return false;
                         }
-                    }
+
+                        $('#manual-coupon-details').append(
+                            '<input type="hidden" id="purchaseproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['purchase_product_id']+'">'+
+                            '<input type="hidden" id="discountpercentage'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['percentage']+'">'+
+                            '<input type="hidden" id="discountamount'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['amount']+'">'+
+                            '<input type="hidden" id="couponname'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['name']+'">'+
+                            '<input type="hidden" id="couponcode'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['coupon_code']+'">'+
+                            '<input type="hidden" id="couponterms'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['terms_and_conditions']+'">'+
+                            '<input type="hidden" id="coupondesc'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['description']+'">'+
+                            '<input type="hidden" id="couponfreeproductid'+returnData.coupon_details['id']+'" value="'+returnData.coupon_details['free_product_id']+'">'
+                        );
+
+                        if(returnData.coupon_details['amount_discount_type'] == 1){
+                            if(returnData.coupon_details['free_product_id'] != null){
+                                free_product_coupon(returnData.coupon_details['id']);
+                            } else {
+                                use_coupon_total_amount(returnData.coupon_details['id']);
+                            }
+                        } else {
+                            use_coupon_on_product(returnData.coupon_details['id']);
+                        }
+                    }  
                 }
             });
         });
