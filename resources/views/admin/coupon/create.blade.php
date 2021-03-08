@@ -117,7 +117,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="mb-3 reward-option" id="customer-optn" style="display:none">
+					<div class="mb-3" id="customer-optn" style="display:none">
 						<label class="d-block">Customer Name *</label>
 						<select class="form-control select2" name="customer[]" multiple="multiple">
 							<option label="Choose one"></option>
@@ -127,6 +127,8 @@
 						</select>
 					</div>
 				</div>
+
+
 				<div class="form-group">
 					<label class="d-block">Reward *</label>
 					<select class="custom-select @error('reward') is-invalid @enderror" id="reward-optn" name="reward">
@@ -519,10 +521,12 @@
 @section('customjs')
 <script>
 	$('#coupon-scope-specific').click(function(){
+		$('#customer-optn').show();
 		$('#coupon-customer-limit').attr('disabled',true);
 	});
 
 	$('#coupon-scope-all').click(function(){
+		$('#customer-optn').hide();
 		$('#coupon-customer-limit').attr('disabled',false);
 	});
 
@@ -862,15 +866,6 @@
 		var couponCustom = document.getElementById("coupon-custom");
 		var couponCustomForm = document.getElementById("coupon-custom-form");
 		couponCustomForm.style.display = couponCustom.checked ? "block" : "none";
-
-
-		var scopeSpecific = document.getElementById("coupon-scope-specific");
-		var customerOption = document.getElementById("customer-optn");
-		customerOption.style.display = scopeSpecific.checked ? "block" : "none";
-
-		var scopeAll= document.getElementById("coupon-scope-all");
-		var customerOptionAll = document.getElementById("customer-optn");
-		customerOptionAll.style.display = scopeAll.checked ? "none" : "block";
 
 		var activateManual= document.getElementById("coupon-activate-manual");
 		var couponCodeManual = document.getElementById("coupon-code");
