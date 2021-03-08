@@ -86,40 +86,33 @@
                                         <input name="enddate" type="date" id="enddate" style="font-size:12px;width: 150px;" class="form-control"
                                         value="@if(isset($_GET['enddate'])  && strlen($_GET['enddate'])>1 ){{ date('Y-m-d',strtotime($_GET['enddate'])) }}@endif">
                                     </div>
-                             
+                                    &nbsp;
                                     <div class="mg-b-10">
-                                        
-                                      
-                                            <select name="del_status" id="del_status" class="form-control" style="font-size:12px;width: 150px;">
-                                                <option value="">Delivery Status</option>
-                                                <option value="Waiting for Payment">Waiting for Payment</option>
-                                                <option value="Scheduled for Processing">Scheduled for Processing</option>
-                                                <option value="Processing">Processing</option>
-                                                <option value="Ready For delivery">Ready For delivery</option>
-                                                <option value="In Transit">In Transit</option>
-                                                <option value="Delivered">Delivered</option>
-                                                <option value="Returned">Returned</option>
-                                                <option value="Cancelled">Cancelled</option>
-                                                @if(isset($_GET['del_status']) && strlen($_GET['del_status'])>1)
-                                                    <option value="{{$_GET['del_status']}}" selected="selected">{{$_GET['del_status']}}</option>
-                                                @endif 
-                                            </select>
-                                  
-                                        
+                                        <select name="del_status" id="del_status" class="form-control" style="font-size:12px;width: 150px;">
+                                            <option value="">Delivery Status</option>
+                                            <option value="Waiting for Payment">Waiting for Payment</option>
+                                            <option value="Scheduled for Processing">Scheduled for Processing</option>
+                                            <option value="Processing">Processing</option>
+                                            <option value="Ready For delivery">Ready For delivery</option>
+                                            <option value="In Transit">In Transit</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Returned">Returned</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                            @if(isset($_GET['del_status']) && strlen($_GET['del_status'])>1)
+                                                <option value="{{$_GET['del_status']}}" selected="selected">{{$_GET['del_status']}}</option>
+                                            @endif 
+                                        </select>
                                     </div>
+                                    &nbsp;
                                     <div class="mg-b-10 mg-r-5">
-                                        
-                                        
-                                            <select name="customer_filter" id="customer_filter" class="form-control" style="font-size:12px;width: 150px;">
+                                        <select name="customer_filter" id="customer_filter" class="form-control" style="font-size:12px;width: 150px;">
                                                 <option value="">Customer</option>
                                                 @foreach($sales->unique('customer_name')->sortBy('customer_name') as $cname)
                                                     <option value="{{$cname->customer_name}}"
                                                     @if(isset($_GET['customer_filter']) and $_GET['customer_filter']==$cname->customer_name) selected="selected" @endif 
                                                         >{{$cname->customer_name}}</option>
                                                 @endforeach
-                                            </select>
-                                        
-                                        
+                                        </select>
                                     </div>
                                     
 
