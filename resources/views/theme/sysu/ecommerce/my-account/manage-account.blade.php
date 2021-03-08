@@ -12,16 +12,19 @@
     <section class="py-5">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3">                          
-                    <div class="desk-cat d-none d-lg-block">
-                        <div class="quick-nav">
-                            <h3 class="catalog-title">{{ $page->name }}</h3>
+                <div id="col1" class="col-lg-3">  
+                    <nav class="rd-navbar rd-navbar-listing">
+                        <div class="listing-filter-wrap">
+                            <div class="rd-navbar-listing-close-toggle rd-navbar-static--hidden toggle-original"><span class="lnr lnr-cross"></span> Close</div>
+                            <h3 class="subpage-heading">Options</h3>
                             @include('theme.sysu.layout.sidebar-menu')
                         </div>
-                    </div>
+                    </nav>
                 </div>
-                <div class="col-lg-9">
-                    <span onclick="openNav()" class="filter-btn d-block d-lg-none pb-3"><i class="fa fa-list"></i> Options</span>
+                <div id="col2" class="col-lg-9">
+                    <nav class="rd-navbar">
+                        <div class="rd-navbar-listing-toggle rd-navbar-static--hidden toggle-original" data-rd-navbar-toggle=".listing-filter-wrap"><span class="lnr lnr-list"></span> Options</div>
+                    </nav>
                     <div id="res-tabs-account">
 
                         <nav>
