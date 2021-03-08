@@ -82,140 +82,132 @@
                 
                 <div class="gap-20"></div>
                 <div class="row">
-                    
-                    <div class="col-lg-3">
-                        
-                            <div class="desk-cat pb-5 d-none d-lg-block">
-                                
+                    <div id="col1" class="col-lg-3">  
+                        <nav class="rd-navbar rd-navbar-listing">
+                            <div class="listing-filter-wrap">
+                                <div class="rd-navbar-listing-close-toggle rd-navbar-static--hidden toggle-original"><span class="lnr lnr-cross"></span> Close</div>
                                 <div class="catalog-category">   
-                                    
-                                    <a href="#" class="btn btn-success btn-sm" onclick="$('#filter_form').submit();">Apply Filter</a>
-                                    <a href="#" class="btn btn-success btn-sm" onclick="reset_form();">Clear All</a>
+                                    <a href="#" class="btn btn-success btn-sm text-white" onclick="$('#filter_form').submit();">Apply Filter</a>
+                                    <a href="#" class="btn btn-success btn-sm text-white" onclick="reset_form();">Clear All</a>
                                     <div class="gap-20"></div> 
                                     <form action="{{ route('product.front.list') }}" id="filter_form" method="GET" class="row">
                                         @csrf
                                         <input type="hidden" name="sort" id="sort" value="@if(request()->has('sort')) {{$request->sort}}  @endif">
                                         <input type="hidden" name="limit" id="limit" value="@if(request()->has('limit')) {{$request->limit}} @else 16 @endif">
                                         <input type="hidden" name="search" value="on">                                    
-                                    <div class="catalog-top">
-                                        <h3 class="catalog-title">Product Categories</h3>                                       
-                                        <fieldset>
-                                            
-                                            
-                                            @if ($categories->count())
-                                        
-                                                <ul class="catalog-top">
-                                                    @foreach ($categories as $category)
-                                                        <li>
-                                                            <div class="checkbox checkbox-info">
-                                                                <input id="category-{{$category->id}}" name="category[]" class="parent-category" value="{{$category->id}}" type="checkbox" 
-                                                                @if(request()->has('category') && in_array($category->id, $request->category)) checked="checked" @endif>
-                                                                <label for="category-{{$category->id}}" class="small">{{$category->name}}</label>
-                                                            </div>
-                                                            
-                                                            @php $subCategories = $category->child_categories; @endphp
-                                                            @if ($subCategories && $subCategories->count())
-                                                                <span class="fa fa-chevron-down text-center small"></span>
+                                        <div class="catalog-top">
+                                            <h3 class="catalog-title">Product Categories</h3>                                       
+                                            <fieldset>
+                                                @if ($categories->count())
+                                                    <ul class="catalog-top">
+                                                        @foreach ($categories as $category)
+                                                            <li>
+                                                                <div class="checkbox checkbox-info">
+                                                                    <input id="category-{{$category->id}}" name="category[]" class="parent-category" value="{{$category->id}}" type="checkbox" 
+                                                                    @if(request()->has('category') && in_array($category->id, $request->category)) checked="checked" @endif>
+                                                                    <label for="category-{{$category->id}}" class="small">{{$category->name}}</label>
+                                                                </div>
+                                                                
+                                                                @php $subCategories = $category->child_categories; @endphp
+                                                                @if ($subCategories && $subCategories->count())
+                                                                    <span class="fa fa-chevron-down text-center small"></span>
 
-                                                                <ul>
-                                                                    @foreach ($subCategories as $subCategory)
-                                                                        <li>
-                                                                            <div class="checkbox checkbox-info">
-                                                                                <input id="subcategory-{{$category->id}}-{{$subCategory->id}}" name="category[]" class="child-{{$category->id}} child" type="checkbox" value="{{$subCategory->id}}" 
-                                                                                @if(request()->has('category') && in_array($subCategory->id, $request->category)) checked="checked" @endif>
-                                                                                <label for="subcategory-{{$category->id}}-{{$subCategory->id}}" class="small">{{$subCategory->name}}</label>
-                                                                            </div>
-                                                                        </li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            @endif
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                              
-                                            @endif                                  
-                                                 
-                                        </fieldset>
-                                    </div>
-                                    <div class="catalog-top">
-                                        <h3 class="catalog-title">Brand</h3>
-                                        <fieldset>                                        
-                                            @if ($brands->count())
-                                            
+                                                                    <ul>
+                                                                        @foreach ($subCategories as $subCategory)
+                                                                            <li>
+                                                                                <div class="checkbox checkbox-info">
+                                                                                    <input id="subcategory-{{$category->id}}-{{$subCategory->id}}" name="category[]" class="child-{{$category->id}} child" type="checkbox" value="{{$subCategory->id}}" 
+                                                                                    @if(request()->has('category') && in_array($subCategory->id, $request->category)) checked="checked" @endif>
+                                                                                    <label for="subcategory-{{$category->id}}-{{$subCategory->id}}" class="small">{{$subCategory->name}}</label>
+                                                                                </div>
+                                                                            </li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif                                    
+                                            </fieldset>
+                                        </div>
+                                        <div class="catalog-top">
+                                            <h3 class="catalog-title">Brand</h3>
+                                            <fieldset>                                        
+                                                @if ($brands->count())
+                                                    <ul class="catalog-top">
+                                                        @foreach ($brands as $brand)
+                                                            <li>                                                        
+                                                                <div class="checkbox checkbox-info">
+                                                                    <input id="brand-{{$brand->brand}}" name="brand[]" type="checkbox" value="{{$brand->brand}}" 
+                                                                    @if(request()->has('brand') && in_array($brand->brand, $request->brand)) checked="checked" @endif>
+                                                                    <label for="brand-{{$brand->brand}}" class="small">{{$brand->brand}}</label>
+                                                                </div>                                                  
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </fieldset>
+                                        </div>
+                                        <div class="catalog-top">
+                                            <h3 class="catalog-title">Price</h3>
+                                            <fieldset>
                                                 <ul class="catalog-top">
-                                                    @foreach ($brands as $brand)
-                                                        <li>                                                        
-                                                            <div class="checkbox checkbox-info">
-                                                                <input id="brand-{{$brand->brand}}" name="brand[]" type="checkbox" value="{{$brand->brand}}" 
-                                                                @if(request()->has('brand') && in_array($brand->brand, $request->brand)) checked="checked" @endif>
-                                                                <label for="brand-{{$brand->brand}}" class="small">{{$brand->brand}}</label>
-                                                            </div>                                                  
-                                                        </li>
-                                                    @endforeach
+                                                    <li>
+                                                        <div class="checkbox checkbox-info">
+                                                            <input name="price[]" id="price1" type="checkbox" value="0-500"
+                                                            @if(request()->has('price') && in_array('0-500', $request->price)) checked="checked" @endif
+                                                            >
+                                                            <label for="price1" class="small">₱ 0 - ₱ 500.00</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="checkbox checkbox-info">
+                                                            <input name="price[]" id="price2" type="checkbox" value="501-1000"
+                                                            @if(request()->has('price') && in_array('501-1000', $request->price)) checked="checked" @endif>
+                                                            <label for="price2" class="small">₱ 501.00 - ₱ 1000.00</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="checkbox checkbox-info">
+                                                            <input name="price[]" id="price3" type="checkbox" value="1001-1500">
+                                                            <label for="price3" class="small">₱ 1001.00 - ₱ 1500.00</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="checkbox checkbox-info">
+                                                            <input name="price[]" id="price4" type="checkbox" value="1501-2000"
+                                                            @if(request()->has('price') && in_array('1501-2000', $request->price)) checked="checked" @endif>
+                                                            <label for="price4" class="small">₱ 1501.00 - ₱ 2000.00</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="checkbox checkbox-info">
+                                                            <input name="price[]" id="price5" type="checkbox" value="2001-100000000"
+                                                            @if(request()->has('price') && in_array('2001-100000000', $request->price)) checked="checked" @endif>
+                                                            <label for="price5" class="small">₱ 2001.00 > </label>
+                                                        </div>
+                                                    </li>
                                                 </ul>
-                                              
-                                            @endif
-                                        </fieldset>
-                                    </div>
-                                    <div class="catalog-top">
-                                        <h3 class="catalog-title">Price</h3>
-                                        <fieldset>
-                                            <ul class="catalog-top">
-                                                <li>
-                                                    <div class="checkbox checkbox-info">
-                                                        <input name="price[]" id="price1" type="checkbox" value="0-500"
-                                                        @if(request()->has('price') && in_array('0-500', $request->price)) checked="checked" @endif
-                                                        >
-                                                        <label for="price1" class="small">₱ 0 - ₱ 500.00</label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="checkbox checkbox-info">
-                                                        <input name="price[]" id="price2" type="checkbox" value="501-1000"
-                                                        @if(request()->has('price') && in_array('501-1000', $request->price)) checked="checked" @endif>
-                                                        <label for="price2" class="small">₱ 501.00 - ₱ 1000.00</label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="checkbox checkbox-info">
-                                                        <input name="price[]" id="price3" type="checkbox" value="1001-1500">
-                                                        <label for="price3" class="small">₱ 1001.00 - ₱ 1500.00</label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="checkbox checkbox-info">
-                                                        <input name="price[]" id="price4" type="checkbox" value="1501-2000"
-                                                        @if(request()->has('price') && in_array('1501-2000', $request->price)) checked="checked" @endif>
-                                                        <label for="price4" class="small">₱ 1501.00 - ₱ 2000.00</label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="checkbox checkbox-info">
-                                                        <input name="price[]" id="price5" type="checkbox" value="2001-100000000"
-                                                        @if(request()->has('price') && in_array('2001-100000000', $request->price)) checked="checked" @endif>
-                                                        <label for="price5" class="small">₱ 2001.00 > </label>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </fieldset>
-                                    </div>
+                                            </fieldset>
+                                        </div>
                                     </form>
-                                    <a href="#" class="btn btn-success btn-sm" onclick="$('#filter_form').submit();">Apply Filter</a>
-                                    <a href="#" class="btn btn-success btn-sm" onclick="reset_form();">Clear All</a>
+                                    <a href="#" class="btn btn-success btn-sm text-white" onclick="$('#filter_form').submit();">Apply Filter</a>
+                                    <a href="#" class="btn btn-success btn-sm text-white" onclick="reset_form();">Clear All</a>
                                 </div>
-                               
-                            </div>    
-                                            
+                            </div>
+                        </nav>
                     </div>
                     
                     <div class="col-lg-9">
                         <div class="filter-product">
                             <div class="form-row">
                                 <div id="col2" class="col-6">
-                                
-                                    <p class="text-left"><span class="d-none d-lg-block">&nbsp;</span>
+                                    <nav class="rd-navbar">
+                                        <div class="rd-navbar-listing-toggle rd-navbar-static--hidden toggle-original" data-rd-navbar-toggle=".listing-filter-wrap"><span class="fa fa-list"></span> Filter</div>
+                                    </nav>
+                                    <!-- <p class="text-left"><span class="d-none d-lg-block">&nbsp;</span>
                                         <span onclick="openNav()" class="filter-btn d-block d-lg-none"><i class="fa fa-list"></i> Filter</span>
-                                    </p>
+                                    </p> -->
                                     <div class="gap-10"></div>
                                     <div class="btn-group">
                                         <p class="filter-item-count">Sort: </p>                                        
@@ -355,16 +347,14 @@
                                 @empty
                                     No Product Found..
                                 @endforelse
-
-
-                                
-                                
                             </div>
                         </div>
                         
+                        
+
                         {{ $products->onEachSide(1)->appends($_GET)->links() }}
-                       
-                        <ul class="pagination" style="display:none;">
+                       <!-- 
+                        <ul class="pagination">
                             <li class="page-item">
                                 <a class="page-link" href="#" title="Back"><i class="lnr lnr-chevron-left"></i></a>
                             </li>
@@ -383,7 +373,7 @@
                             <li class="page-item">
                                 <a class="page-link" href="#" title="Next"><i class="lnr lnr-chevron-right"></i></a>
                             </li>
-                        </ul>
+                        </ul> -->
                     </div>
                 </div>
             </div>
