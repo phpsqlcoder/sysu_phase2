@@ -82,6 +82,12 @@
                                 <thead>
                                 <tr>
                                     <td width="50%"><strong>Select Brands</strong></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="brand_checkbox_all">
+                                            <label class="custom-control-label" for="brand_checkbox_all"></label>
+                                        </div>
+                                    </td>
                                 </tr>
                                 </thead>
                             </table>
@@ -100,11 +106,7 @@
                                 <tr>
                                     <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $brand->brand }}</p></td>
                                     <td class="text-right">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input cb_brand" data-toggle="collapse" data-target="#product_brands{{str_replace(' ','_',$brand->brand) }}" id="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}">
-                                            
-                                            <label class="custom-control-label" for="ptoggleBrand{{str_replace(' ','_',$brand->brand) }}"></label>
-                                        </div>
+                                        <a href="" title="View Products" data-toggle="collapse" data-target="#product_brands{{str_replace(' ','_',$brand->brand) }}"><i class="fa fa-list"></i></a>
                                     </td>
                                 </tr>
                                 <tr>
@@ -115,12 +117,21 @@
                                                     <table class="table">
                                                         <thead></thead>
                                                         <tbody>
+                                                            <tr>
+                                                                <td colspan="2" class="text-right">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input cb_brand brand_{{str_replace(' ','_',$brand->brand) }}" id="pbrand{{str_replace(' ','_',$brand->brand) }}" data-brand="{{str_replace(' ','_',$brand->brand) }}">
+                                                                        
+                                                                        <label class="custom-control-label" for="pbrand{{str_replace(' ','_',$brand->brand) }}"></label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                             @forelse($products as $product)
                                                                 <tr>
                                                                     <td>{{ $product->name }}</td>
                                                                     <td class="text-right">
                                                                         <div class="custom-control custom-checkbox">
-                                                                            <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cbbrand" id="pbrand{{$product->id}}">
+                                                                            <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cbbrand brand_{{str_replace(' ','_',$brand->brand) }}" id="pbrand{{$product->id}}">
                                                                             <label class="custom-control-label" for="pbrand{{$product->id}}"></label>
                                                                         </div>
                                                                     </td>
@@ -148,6 +159,12 @@
                                 <thead>
                                 <tr>
                                     <td width="50%"><strong>Select Categories</strong></td>
+                                    <td class="text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="checkbox_all">
+                                            <label class="custom-control-label" for="checkbox_all"></label>
+                                        </div>
+                                    </td>
                                 </tr>
                                 </thead>
                             </table>
@@ -162,25 +179,32 @@
                                 <tr>
                                     <td width="50%"><p class="mg-0 pd-t-5 pd-b-5 tx-uppercase tx-semibold tx-primary">{{ $category->name }}</p></td>
                                     <td class="text-right">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input category" data-toggle="collapse" data-target="#product_category{{$category->id}}"  id="cat{{$category->id}}">
-                                            <label class="custom-control-label" for="cat{{$category->id}}"></label>
-                                        </div>
+                                        <a href="" title="View Products" data-toggle="collapse" data-target="#product_category{{$category->id}}"><i class="fa fa-list"></i></a>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="hiddenRow">
-                                        <div class="accordian-body collapse" id="product_category{{$category->id}}">
+                                        <div class="accordian-body collapse div_products" id="product_category{{$category->id}}">
                                             <div>
                                                 <table class="table" cellpadding="0">
                                                     <thead></thead>
                                                     <tbody>
+                                                        <tr>
+                                                            <td>Select All</td>
+                                                            <td class="text-right">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input category category_{{$category->id}}" id="cat{{$category->id}}" data-category="{{$category->id}}">
+                                                                    
+                                                                    <label class="custom-control-label" for="cat{{$category->id}}"></label>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                         @forelse($category->published_products as $product)
                                                             <tr>
                                                                 <td>{{ $product->name }}</td>
                                                                 <td class="text-right">
                                                                     <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb" id="pcategory{{$product->id}}">
+                                                                        <input type="checkbox" name="productid[]" value="{{$product->id}}" class="custom-control-input cb category_{{$product->category_id}}" id="pcategory{{$product->id}}">
                                                                         <label class="custom-control-label" for="pcategory{{$product->id}}"></label>
                                                                     </div>
                                                                 </td>
@@ -239,6 +263,50 @@
     <script src="{{ asset('lib/select2/js/select2.min.js') }}"></script>
 
     <script>
+        /*** Handles the Select All Checkbox ***/
+        $("#checkbox_all").click(function(){
+            $('.cb').not(this).prop('checked', this.checked);
+            $('.category').not(this).prop('checked', this.checked);
+
+            if($('#checkbox_all').is(':checked')){
+                $('.div_products').addClass('show');
+            } else {
+                $('.div_products').removeClass('show'); 
+            }
+        });
+
+        /*** Handles the Select All Checkbox ***/
+        $("#brand_checkbox_all").click(function(){
+            $('.cbbrand').not(this).prop('checked', this.checked);
+            $('.cb_brand').not(this).prop('checked', this.checked);
+
+            if($('#brand_checkbox_all').is(':checked')){
+                $('.div_brand').addClass('show');
+            } else {
+                $('.div_brand').removeClass('show'); 
+            }
+            
+        });
+
+        $('.cb_brand').on('click', function() {
+            let brand = $(this).data('brand');
+            let checked = $(this).is(':checked');
+            let objectName = '.brand_'+brand;
+            $(objectName).each(function() {
+                this.checked = checked;
+            });
+        });
+        
+
+        $('.category').on('click', function() {
+            let category = $(this).data('category');
+            let checked = $(this).is(':checked');
+            let objectName = '.category_'+category;
+            $(objectName).each(function() {
+                this.checked = checked;
+            });
+        });
+
         function promo_type(){
             var val = $('#type').val();
 

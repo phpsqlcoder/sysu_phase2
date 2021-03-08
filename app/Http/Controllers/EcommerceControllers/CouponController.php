@@ -46,7 +46,7 @@ class CouponController extends Controller
     public function create()
     {
         $products = Product::where('status','PUBLISHED')->get();
-        $categories =  ProductCategory::where('status','PUBLISHED')->get();
+        $categories =  ProductCategory::has('published_products')->where('status','PUBLISHED')->get();
         $brands = Product::distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
@@ -173,7 +173,7 @@ class CouponController extends Controller
     public function edit(Coupon $coupon)
     {
         $products = Product::where('status','PUBLISHED')->get();
-        $categories =  ProductCategory::where('status','PUBLISHED')->get();
+        $categories =  ProductCategory::has('published_products')->where('status','PUBLISHED')->get();
         $brands = Product::distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
