@@ -457,7 +457,9 @@ class CouponFrontController extends Controller
 
         $arr_categories = []; 
         foreach($categories as $category) {
-            array_push($arr_categories, $category);
+            if($category != ''){
+                array_push($arr_categories, $category);    
+            }
         }
 
         $brands = Product::whereNotNull('brand')->whereIn('category_id',$arr_categories)->distinct()->get(['brand']);
