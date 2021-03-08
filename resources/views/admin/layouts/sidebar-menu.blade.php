@@ -74,7 +74,7 @@
             @endif
 
             @if (auth()->user()->has_access_to_audit_logs_module())
-                <li style="display:none;" @if (\Route::current()->getName() == 'audit-logs.index') class="active" @endif><a href="{{ route('audit-logs.index') }}">Audit Trail</a></li>
+                <li @if (\Route::current()->getName() == 'audit-logs.index') class="active" @endif><a href="{{ route('audit-logs.index') }}">Audit Trail</a></li>
             @endif
         </ul>
     </li>
