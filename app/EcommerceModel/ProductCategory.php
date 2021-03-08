@@ -18,7 +18,7 @@ class ProductCategory extends Model
     }
 
     public function child_categories() {
-        return  $this->hasMany(ProductCategory::class, 'parent_id');
+        return  $this->hasMany(ProductCategory::class, 'parent_id')->where('status','PUBLISHED');
     }
 
     public function products()
