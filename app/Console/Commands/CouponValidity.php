@@ -47,7 +47,7 @@ class CouponValidity extends Command
         foreach($coupons as $coupon){
 
             if(isset($coupon->endtime)){
-                $time = $coupon->end_time.':00';
+                $time = $coupon->end_time;
             } else {
                 $time = '00:00:00';
             }
