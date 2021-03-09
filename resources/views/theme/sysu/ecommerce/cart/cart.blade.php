@@ -194,6 +194,7 @@
         </form>
     </div>
     <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
+    <input type="hidden" id="solo_coupon_counter" value="0">
 
     @include('theme.sysu.ecommerce.cart.modal')
 @endsection
@@ -458,6 +459,7 @@
                                 '<div class="coupon-item p-2 border rounded mb-1" id="coupondiv'+coupon.id+'">'+
                                     '<div class="row no-gutters">'+
                                         '<div class="col-12">'+
+                                            '<input type="hidden" id="couponcombination'+coupon.id+'" value="'+coupon.combination+'">'+
                                             '<input type="hidden" id="remainingusage'+coupon.id+'" value="'+response.remaining[key]+'">'+
                                             '<input type="hidden" id="purchaseqty'+coupon.id+'" value="'+coupon.purchase_qty+'">'+
                                             '<input type="hidden" id="productdiscount'+coupon.id+'" value="'+coupon.product_discount+'">'+
@@ -532,14 +534,42 @@
             });
         }
 
-        function coupon_counter(){
+        function coupon_counter(cid){
             var limit = $('#coupon_limit').val();
             var counter = $('#coupon_counter').val();
+            var solo_coupon_counter = $('#solo_coupon_counter').val();
+
+            var combination = $('#couponcombination'+cid).val();
 
             if(parseInt(counter) < parseInt(limit)){
 
-                $('#coupon_counter').val(parseInt(counter)+1);
-                return true;
+                if(combination == 0){
+                    if(counter > 0){
+                        swal({
+                            title: '',
+                            text: "Coupon cannot be used together with other coupons.",         
+                        });
+                        return false;
+                    } else {
+                        $('#solo_coupon_counter').val(1);
+                        $('#coupon_counter').val(parseInt(counter)+1);
+                        return true;
+                    }
+                } else {
+                    if(solo_coupon_counter > 0){
+                        swal({
+                            title: '',
+                            text: "Unable to use this coupon. A coupon that cannot be used together with other coupon is already been selected.",         
+                        });
+                        return false;
+                    } else {
+                        $('#coupon_counter').val(parseInt(counter)+1);
+                        return true;
+                    }
+                }
+
+                // $('#coupon_counter').val(parseInt(counter)+1);
+                // return true;
 
             } else {
                 swal({
@@ -552,11 +582,12 @@
 
     // coupon free products
         function free_product_coupon(cid){
-            if(coupon_counter()){
+            if(coupon_counter(cid)){
                 var name  = $('#couponname'+cid).val();
                 var terms = $('#couponterms'+cid).val();
                 var desc = $('#coupondesc'+cid).val();
                 var freeproductid = $('#couponfreeproductid'+cid).val();
+                var combination = $('#couponcombination'+cid).val();
 
                 $('#couponList').append(
                     '<div id="couponDiv'+cid+'">'+
@@ -570,6 +601,7 @@
                                         '<span>'+desc+'</span>'+
                                     '</div>'+
                                     '<div class="coupon-item-btns">'+
+                                        '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                         '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                         '<input type="hidden" name="coupon_productid[]" value="0">'+
                                         '<input type="hidden" name="coupon_freeproductid[]" value="'+freeproductid+'">'+
@@ -593,6 +625,11 @@
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
 
+            var combination = $('#coupon_combination'+id).val();
+            if(combination == 0){
+                $('#solo_coupon_counter').val(0);
+            }
+
             $('#couponDiv'+id+'').remove();   
         });
     //
@@ -603,8 +640,9 @@
             var name  = $('#couponname'+cid).val();
             var desc = $('#coupondesc'+cid).val();
             var terms = $('#couponterms'+cid).val();
+            var combination = $('#couponcombination'+cid).val();
 
-            if(coupon_counter()){
+            if(coupon_counter(cid)){
                 if(parseInt(totalAmountDiscountCounter) == 1){
                     swal({
                         title: '',
@@ -633,6 +671,7 @@
                                         '<span>'+desc+'</span>'+
                                     '</div>'+
                                     '<div class="coupon-item-btns">'+
+                                        '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                         '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                         '<input type="hidden" name="coupon_productid[]" value="0">'+
                                         '<button type="button" class="btn btn-danger btn-sm couponRemove" id="'+cid+'">Remove</button>&nbsp;'+
@@ -676,6 +715,11 @@
             $('#total_amount_discount_counter').val(parseInt(total_amount_counter)-1);
             $('#total_amount_discount').val(0);
 
+            var combination = $('#coupon_combination'+id).val();
+            if(combination == 0){
+                $('#solo_coupon_counter').val(0);
+            }
+
             $('#couponDiv'+id+'').remove(); 
 
             compute_grand_total();
@@ -698,7 +742,7 @@
 
             var discount = 0;
 
-            if(coupon_counter()){
+            if(coupon_counter(cid)){
                 if(pdiscount == 'current' || pdiscount == 'specific'){
                     var iteration = $('#iteration'+discpuntproductid).val();
 
@@ -760,8 +804,7 @@
 
                         var sub_price = $('#sum_sub_price'+iteration).val();
                         var totalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
-                    }
-                    
+                    } 
                 }
 
                 if(pdiscount == 'highest'){
@@ -795,7 +838,6 @@
                 }
 
 
-
                 //$('#cart_product_discount'+iteration).val(discount.toFixed(2));
                 $('#sum_sub_price'+iteration).val(totalDiscount);
 
@@ -811,11 +853,14 @@
 
                 var pname = $('#product_name_'+iteration).val();
                 var productid = $('#pp'+iteration).val();
+                var combination = $('#couponcombination'+cid).val();
 
                 if(pdiscount == 'current'){
                     var i;
                     for (i = 1; i <= totalDiscountedProduct; i++) {
+                        console.log(remaining);
                         if(i <= remaining){
+                            console.log('sasa');
                             $('#couponList').append(
                                 '<div id="couponDiv'+cid+'">'+
                                     '<div class="coupon-item p-2 border rounded mb-1">'+
@@ -829,6 +874,7 @@
                                                     '<span class="text-success">Applied On : '+pname+'</span>'+
                                                 '</div>'+
                                                 '<div class="coupon-item-btns">'+
+                                                    '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                                     '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
                                                     '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                                     '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
@@ -843,6 +889,7 @@
 
                             $('[data-toggle="popover"]').popover();
                         }
+
                     }
                 } else {
                     $('#couponList').append(
@@ -858,6 +905,7 @@
                                             '<span class="text-success">Applied On : '+pname+'</span>'+
                                         '</div>'+
                                         '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                             '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
                                             '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                             '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
@@ -892,6 +940,11 @@
             $('#coupon_counter').val(parseInt(counter)-1);
 
             $('#cart_product_reward'+pid).val(0);
+
+            var combination = $('#coupon_combination'+id).val();
+            if(combination == 0){
+                $('#solo_coupon_counter').val(0);
+            }
 
             $('#couponDiv'+id+'').remove(); 
 
