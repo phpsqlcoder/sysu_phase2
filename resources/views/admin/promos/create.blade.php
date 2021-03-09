@@ -20,8 +20,8 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb breadcrumb-style1 mg-b-10">
-                    <li class="breadcrumb-item" aria-current="page">CMS</li>
-                    <li class="breadcrumb-item" aria-current="page">Promos</li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">CMS</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('promos.index') }}">Promos</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Create Promo</li>
                 </ol>
             </nav>
@@ -118,7 +118,8 @@
                                                         <thead></thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td colspan="2" class="text-right">
+                                                                <td>Select All</td>
+                                                                <td class="text-right">
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox" value="{{ $brand->brand }}" class="custom-control-input cb_brand brand_{{str_replace(' ','_',$brand->brand) }}" id="pbrand{{str_replace(' ','_',$brand->brand) }}" data-brand="{{str_replace(' ','_',$brand->brand) }}">
                                                                         

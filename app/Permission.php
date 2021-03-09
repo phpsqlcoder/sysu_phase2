@@ -57,22 +57,26 @@ class Permission extends Model
     public static function modules()
     {
         return [
-            'page' => 'Page',
-            'banner' => 'Banner',
-            'file_manager' => 'File Manager',
+            'page' => 'Pages',
+            'banner' => 'Banners',
+            'file_manager' => 'Files',
             'menu' => 'Menu',
             'news' => 'News',
             'news_category' => 'News Category',
             'website_settings' => 'Website Settings',
-            'audit_logs' => 'Audit Logs',
-            'user' => 'User',
-            'product' => 'Product',
+            'audit_logs' => 'Audit Trail',
+            'user' => 'Users',
+            'product' => 'Products',
             'product_category' => 'Product Category',
             'product_reviews' => 'Product Reviews',
-            'customer' => 'Customer',
+            'favorites' => 'Favorites',
+            'wishlist' => 'Wishlist',
+            'customer' => 'Customers',
             'sales_transaction' => 'Sales Transaction',
             'inventory' => 'Inventory',
-            'delivery_flat_rate' => "Delivery Flat Rate"
+            'promos' => "Promos",
+            'coupons' => "Coupons",
+            'reports' => 'Reports',
         ];
     }
 }
