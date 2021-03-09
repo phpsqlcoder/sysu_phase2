@@ -441,7 +441,7 @@ class CouponFrontController extends Controller
         // get remaining usage
         $arr_coupon_usage_limit = [];
         foreach($allCoupons as $coupon){
-            $totalusage = CouponSale::where('coupon_id',$coupon->id)->count();
+            $totalusage = CouponSale::where('order_status','PAID')->where('coupon_id',$coupon->id)->count();
             $remaining = $coupon->customer_limit-$totalusage;
 
             array_push($arr_coupon_usage_limit, $remaining);
