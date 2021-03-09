@@ -34,15 +34,15 @@ class PaynamicsHelper
         $coupons = CouponCart::where('customer_id',Auth::id())->get();
         $totalDiscount = 0;
         $totalSfDiscount = 0;
-        $sfDiscount = 0;
+        // $sfDiscount = 0;
         foreach($coupons as $coupon){
             $c = Coupon::find($coupon->coupon_id);
 
             if(isset($c->location)){
                 if($c->location_discount_type == 'partial'){
-                    $sfDiscount += number_format($c->location_discount_amount,2,'.','');
+                    $sfDiscount = number_format($c->location_discount_amount,2,'.','');
                 } else {
-                    $sfDiscount += number_format($deliveryFee,2,'.','');
+                    $sfDiscount = $deliveryFee;
                 }
                 $totalSfDiscount += $sfDiscount;
             } else {
@@ -70,8 +70,14 @@ class PaynamicsHelper
             // $totalSfDiscount += $sfDiscount;
         }
 
-        $itemXml = $itemXml . "<Items><itemname>Delivery Discount</itemname><quantity>1</quantity><amount>-{$totalSfDiscount}</amount></Items>";
-        $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$totalDiscount}</amount></Items>";
+        if($totalSfDiscount > 0){
+            $itemXml = $itemXml . "<Items><itemname>Delivery Discount</itemname><quantity>1</quantity><amount>-{$totalSfDiscount}</amount></Items>";    
+        }
+
+        if($totalDiscount > 0){
+            $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$totalDiscount}</amount></Items>";    
+        }
+        
         
         $_mid = $merchant['id']; //<-- your merchant id
         $_requestid = $requestId;
