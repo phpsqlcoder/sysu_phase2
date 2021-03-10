@@ -858,9 +858,7 @@
                 if(pdiscount == 'current'){
                     var i;
                     for (i = 1; i <= totalDiscountedProduct; i++) {
-                        console.log(remaining);
                         if(i <= remaining){
-                            console.log('sasa');
                             $('#couponList').append(
                                 '<div id="couponDiv'+cid+'">'+
                                     '<div class="coupon-item p-2 border rounded mb-1">'+
@@ -889,7 +887,6 @@
 
                             $('[data-toggle="popover"]').popover();
                         }
-
                     }
                 } else {
                     $('#couponList').append(

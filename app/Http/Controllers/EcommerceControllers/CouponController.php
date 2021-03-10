@@ -378,7 +378,7 @@ class CouponController extends Controller
     public function update_coupon_rule_settings($couponID,$request)
     {
         Coupon::find($couponID)->update([
-            'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : NULL,
+            'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : 1000000,
             // 'usage_limit' => isset($request->usage_limit) ? $request->usage_limit[0] : NULL,
             // 'usage_limit_no' => $request->usage_limit[0] == 'multiple_use' ? $request->multi_usage_limit_qty : NULL,
             'combination' => ($request->has('combination')) ? 1 : 0,
