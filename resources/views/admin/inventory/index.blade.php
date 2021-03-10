@@ -97,44 +97,44 @@ Manage Inventory
                         <table class="table mg-b-0 table-light table-hover" style="table-layout: fixed;word-wrap: break-word;">
                             <thead>
                                 <tr>
-                                    <th style="width: 10%;overflow: hidden;">Ref#</th>
+                                    <th style="width: 10%;overflow: hidden;">&nbsp;&nbsp;&nbsp;Reference #</th>
                                     <th style="width: 15%">Status</th>
-                                    <th style="width: 15%" align="center">Created</th>
-                                    <th style="width: 15%" align="center">Posted</th>
-                                    <th style="width: 15%" align="center">Cancelled</th>
-                                    <th style="width: 15%" align="center">Options</th>
+                                    <th style="width: 15%">Created</th>
+                                    <th style="width: 15%">Posted</th>
+                                    <th style="width: 15%">Cancelled</th>
+                                    <th style="width: 15%">Options</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($lists as $list)
                                     <tr id="row{{$list->id}}" class="row_cb">
                                         <td style="overflow: hidden;" title="{{$list->name}}">
-                                            <strong> {{$list->id}}</strong>
+                                            <strong>&nbsp;&nbsp;&nbsp;{{$list->id}}</strong>
                                         </td>
 
                                         <td>
                                             {{$list->status}}
                                         </td>
-                                        <td align="center">
-                                            {{date('Y-m-d h:i A',strtotime($list->created_at))  ?? ''}}<br>
-                                            <strong>{{$list->user->name ?? ''}}</strong>
+                                        <td>
+                                            <strong>{{$list->user->name ?? ''}}</strong><br>
+                                            {{date('Y-m-d h:i A',strtotime($list->created_at))  ?? ''}}
                                         </td>
-                                        <td align="center">
+                                        <td>
                                             @if(!empty($list->posted_at))
-                                            {{date('Y-m-d h:i A',strtotime($list->posted_at))  ?? ''}}<br>
-                                            {{$list->posted->name ?? ''}}
+                                                <strong>{{$list->posted->name ?? ''}}</strong><br>
+                                                {{date('Y-m-d h:i A',strtotime($list->posted_at))  ?? ''}}
                                             @endif
                                         </td>
-                                        <td align="center">
+                                        <td>
                                             @if(!empty($list->cancelled_at))
-                                            {{date('Y-m-d h:i A',strtotime($list->cancelled_at))  ?? ''}}<br>
-                                            {{$list->cancelled->name ?? ''}}
+                                                <strong>{{$list->cancelled->name ?? ''}}</strong><br>
+                                                {{date('Y-m-d h:i A',strtotime($list->cancelled_at))  ?? ''}}
                                             @endif
                                         </td>
 
                                         <td>
                                             @if($list->status=='SAVED')
-                                                <nav class="nav table-options justify-content-end">
+                                                <nav class="nav table-options">
                                                     @if (auth()->user()->has_access_to_route('inventory.post'))
                                                         <a class="nav-link" href="{{route('inventory.post',$list->id)}}" title="Post this inventory"><i data-feather="send"></i></a>
                                                     @endif
@@ -145,7 +145,7 @@ Manage Inventory
                                                     <a class="nav-link" target="_blank" href="{{route('inventory.view',$list->id)}}" title="View items"><i data-feather="eye"></i></a>
                                                 </nav>
                                             @else
-                                                <nav class="nav table-options justify-content-end">
+                                                <nav class="nav table-options">
                                                     <a class="nav-link" target="_blank" href="{{route('inventory.view',$list->id)}}" title="View items"><i data-feather="eye"></i></a>
                                                 </nav>
                                             @endif

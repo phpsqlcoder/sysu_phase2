@@ -331,7 +331,7 @@
             	autoUpdateInput: false,
             	timePicker: true,
             	locale: {
-		          	format: 'MM/DD/YYYY h:mm A',
+		          	format: 'YYYY-MM-DD H:mm',
 		          	cancelLabel: 'Clear'
 		        },
                 minDate: dateToday,
