@@ -20,16 +20,65 @@ class PaynamicsHelper
         //$_amount = $totalAmount;
 
         $itemXml = "";
+        $product_total_discount = 0;
+        $product_subtotal = 0;
         foreach ($cart as $product) {
             $price = number_format($product->product->discountedprice, 2, '.', '');
             $pqty = (int)$product->qty;
             $itemXml = $itemXml . "<Items><itemname>{$product->product->name}</itemname><quantity>{$pqty}</quantity><amount>{$price}</amount></Items>";
+
+
+
+            $couponCart = CouponCart::where('customer_id',Auth::id())->where('product_id',$product->product_id);;
+
+            if($couponCart->count()){
+                $remainingQty = $product->qty-$couponCart->count();
+
+                $productsub = $product->product->discountedprice*$couponCart->count();
+
+                $product_subtotal += $product->product->discountedprice*$remainingQty;
+                // get total product discount amount
+                $coupon = $couponCart->first();
+
+                if(isset($coupon->details->amount)){
+                    $product_total_discount += $coupon->details->amount*$couponCart->count();
+                    $product_subtotal += $productsub-($coupon->details->amount*$couponCart->count());
+                }   
+
+                if(isset($coupon->details->percentage)){
+                    $percent = $coupon->details->percentage/100;
+                    $discount = ($product->product->discountedprice*$percent)*$couponCart->count();
+                    
+                    $product_total_discount += $discount;
+                    $product_subtotal += $productsub-$discount;
+                }
+            } else {
+                $product_subtotal += $product->product->discountedprice*$product->qty;
+            }
+        }
+        // get total amount discount
+        $totalAmountCoupons = CouponCart::where('customer_id',Auth::id())->whereNull('product_id')->get();
+        foreach($totalAmountCoupons as $c){
+            $coupon = Coupon::find($c->coupon_id);
+            if($coupon->amount_discount_type == 1){
+
+                if(isset($coupon->amount)){
+                    $product_total_discount += $coupon->amount;
+                }
+
+                if(isset($coupon->percentage)){
+                    $percent = $coupon->percentage/100;
+                    $discount = number_format($product_subtotal*$percent,2,'.','');
+
+                    $product_total_discount += $discount;
+                }
+            }
         }
 
-        if ($deliveryFee > 0) {
-            $deliveryFee = number_format($deliveryFee, 2, '.', '');
-            $itemXml = $itemXml . "<Items><itemname>Delivery Fee</itemname><quantity>1</quantity><amount>{$deliveryFee}</amount></Items>";
+        if($product_total_discount > 0){
+            $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$product_total_discount}</amount></Items>";    
         }
+
 
         $coupons = CouponCart::where('customer_id',Auth::id())->get();
         $totalDiscount = 0;
@@ -45,38 +94,20 @@ class PaynamicsHelper
                     $sfDiscount = $deliveryFee;
                 }
                 $totalSfDiscount += $sfDiscount;
-            } else {
-                if(isset($c->amount)){
-                    $discount = number_format($c->amount,2,'.','');
-                }
-
-                if(isset($c->percentage)){
-                    $percent = $c->percentage/100;
-                    $discount = number_format($totalAmount*$percent,2,'.','');
-                }
-
-                $totalDiscount += $discount;
             }
             
-            
+        }
 
-            // if(isset($c->location)){
-            //     if($c->location_discount_type == 'partial'){
-            //         $sfDiscount += number_format($c->location_discount_amount,2,'.','');
-            //     } else {
-            //         $sfDiscount += number_format($deliveryFee,2,'.','');
-            //     }
-            // }
-            // $totalSfDiscount += $sfDiscount;
+        if ($deliveryFee > 0) {
+            $deliveryFee = number_format($deliveryFee, 2, '.', '');
+            $itemXml = $itemXml . "<Items><itemname>Delivery Fee</itemname><quantity>1</quantity><amount>{$deliveryFee}</amount></Items>";
         }
 
         if($totalSfDiscount > 0){
             $itemXml = $itemXml . "<Items><itemname>Delivery Discount</itemname><quantity>1</quantity><amount>-{$totalSfDiscount}</amount></Items>";    
         }
 
-        if($totalDiscount > 0){
-            $itemXml = $itemXml . "<Items><itemname>Order Discount</itemname><quantity>1</quantity><amount>-{$totalDiscount}</amount></Items>";    
-        }
+        
         
         
         $_mid = $merchant['id']; //<-- your merchant id

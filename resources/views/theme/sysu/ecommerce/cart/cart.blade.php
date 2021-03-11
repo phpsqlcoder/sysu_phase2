@@ -76,7 +76,7 @@
                                                     </div>
                                                     <small>Total</small>
                                                     <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">₱ {{number_format($order->product->discountedprice*$order->qty,2)}}</div>
-                                                    <div class="prod-total" id="product_new_price{{$loop->iteration}}" style="font-weight:bold;"></div>
+                                                    <div class="prod-total prod_new_price" id="product_new_price{{$loop->iteration}}" style="font-weight:bold;"></div>
                                                     
                                                     <input type="hidden" class="loop-iteration" id="cart_product_{{$loop->iteration}}" value="{{$loop->iteration}}">
                                                     <input type="hidden" id="cart_product_reward{{$loop->iteration}}" value="0">
@@ -129,8 +129,11 @@
 
                             <div id="couponList">
                                 <div id="manual-coupon-details"></div>
-                                <input type="hidden" id="coupon_counter" name="coupon_counter" value="0">
                             </div>
+                            <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
+                            <input type="hidden" id="coupon_counter" name="coupon_counter" value="0">
+                            <input type="hidden" id="solo_coupon_counter" value="0">
+                            <input type="hidden" id="total_amount_discount_counter" value="0">
                             
                             <div class="mb-5">
                                 <h3 class="catalog-title">Summary</h3>
@@ -145,7 +148,7 @@
                                         </div>
                                     </div>
 
-                                    <input type="hidden" id="total_amount_discount_counter" value="0">
+                                    
                                     <div class="cart-table-row promotionDiv" style="display: none;">
                                         <div class="cart-table-row">
                                             <div class="cart-table-2-col">
@@ -193,8 +196,6 @@
             </button>
         </form>
     </div>
-    <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
-    <input type="hidden" id="solo_coupon_counter" value="0">
 
     @include('theme.sysu.ecommerce.cart.modal')
 @endsection
@@ -284,7 +285,14 @@
                 }
                 
             });
-          
+            
+            $('#couponList').empty();
+            $('.prod_new_price').hide();
+            $('#coupon_counter').val(0);
+            $('#solo_coupon_counter').val(0);
+            $('#total_amount_discount_counter').val(0);
+            
+
             update_sub_total_price_per_item(id);
 
             compute_grand_total();
@@ -567,10 +575,6 @@
                         return true;
                     }
                 }
-
-                // $('#coupon_counter').val(parseInt(counter)+1);
-                // return true;
-
             } else {
                 swal({
                     title: '',
@@ -736,57 +740,99 @@
             var desc = $('#coupondesc'+cid).val();
             var terms = $('#couponterms'+cid).val();
             var pdiscount = $('#productdiscount'+cid).val();
-            var discpuntproductid = parseFloat($('#discountproductid'+cid).val());
+            var discountproductid = parseFloat($('#discountproductid'+cid).val());
             var remaining = parseFloat($('#remainingusage'+cid).val());
             var purchaseqty = parseFloat($('#purchaseqty'+cid).val());
 
             var discount = 0;
 
             if(coupon_counter(cid)){
-                if(pdiscount == 'current' || pdiscount == 'specific'){
-                    var iteration = $('#iteration'+discpuntproductid).val();
+                var iteration = $('#iteration'+discountproductid).val();
 
-                    if(pdiscount == 'specific'){
-                        var sub_price = $('#sum_sub_price'+iteration).val();
+                var total_cart_reward = $('#cart_product_reward'+iteration).val();
 
-                        if(amount > 0){
-                            var totalDiscount = parseFloat(sub_price)-parseFloat(amount);
-                            var discount = parseFloat(amount);
-                        }
+                var pname = $('#product_name_'+iteration).val();
+                var productid = $('#pp'+iteration).val();
+                var combination = $('#couponcombination'+cid).val();
 
-                        if(percnt > 0){
-                            var percent = parseFloat(percnt)/100;
-                            var discount =  parseFloat(sub_price)*parseFloat(percent);
+                if(pdiscount == 'specific'){
+                    var sub_price = $('#sum_sub_price'+iteration).val();
 
-                            var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
-                        }
+                    if(amount > 0){
+                        var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(amount);
+                        var discount = parseFloat(amount);
                     }
 
-                    if(pdiscount == 'current'){
-                        var price = parseFloat($('#price'+iteration).val());
-                    
-                        var totalpurchaseqty = parseFloat($('#purchaseqty'+cid).val())+1;
-                        var purchaseqty = parseFloat($('#purchaseqty'+cid).val());
-                        var cartQty = parseFloat($('#quantity'+iteration).val());
+                    if(percnt > 0){
+                        var percent = parseFloat(percnt)/100;
+                        var discount =  parseFloat(sub_price)*parseFloat(percent);
 
-                        if(cartQty % 2 == 0){
-                            var totalProductCartQty = cartQty;
-                        } else {
-                            var totalProductCartQty = cartQty-1;
-                        }
+                        var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(discount);
+                    }
 
-                        var totalDiscountedProduct = 0;
-                        for (i = 1; i <= totalProductCartQty; i++) {
-                            if(i == purchaseqty){
-                                totalDiscountedProduct++;
-                                var purchaseqty = parseInt(purchaseqty)+totalpurchaseqty;
-                            }                                 
-                        }
+                    $('#couponList').append(
+                        '<div id="couponDiv'+cid+'">'+
+                            '<div class="coupon-item p-2 border rounded mb-1">'+
+                                '<div class="row no-gutters">'+
+                                    '<div class="col-12">'+
+                                        '<div class="coupon-item-name">'+
+                                            '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-desc small mb-1">'+
+                                            '<span>'+desc+'</span><br>'+
+                                            '<span class="text-success">Applied On : '+pname+'</span>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" id="coupon_discount'+cid+'" value="'+discount+'">'+
+                                            '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
+                                            '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
+                                            '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                            '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                            '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                            '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'
+                    );
 
-                        var i;
-                        var totaldiscount = 0;
-                        for (i = 1; i <= totalDiscountedProduct; i++) {
-                            if(i <= remaining){
+                    $('[data-toggle="popover"]').popover();
+                    total_cart_reward++;
+                }
+
+                if(pdiscount == 'current'){
+                    var price = parseFloat($('#price'+iteration).val());
+                
+                    var totalpurchaseqty = parseFloat($('#purchaseqty'+cid).val())+1;
+                    var purchaseqty = parseFloat($('#purchaseqty'+cid).val());
+                    var cartQty = parseFloat($('#quantity'+iteration).val());
+
+                    if(cartQty % 2 == 0){
+                        var totalProductCartQty = cartQty;
+                    } else {
+                        var totalProductCartQty = cartQty-1;
+                    }
+
+                    var totalDiscountedProduct = 0;
+                    for (i = 1; i <= totalProductCartQty; i++) {
+                        if(i == purchaseqty){
+                            totalDiscountedProduct++;
+                            var purchaseqty = parseInt(purchaseqty)+totalpurchaseqty;
+                        }                                 
+                    }
+
+                    var i;
+                    var totaldiscount = 0;
+                    var counter = parseInt($('#coupon_counter').val());
+                    console.log(counter);
+                    var limit = $('#coupon_limit').val();
+
+                    for (i = 1; i <= totalDiscountedProduct; i++) {
+                        if(i <= remaining){
+                            if(counter <= limit){
+                                console.log('3122132');
+
                                 if(amount > 0){
                                     var tdiscount = price-parseFloat(amount);
                                 }
@@ -799,12 +845,45 @@
                                 } 
 
                                 totaldiscount += tdiscount;
+
+                                $('#couponList').append(
+                                    '<div id="couponDiv'+cid+'">'+
+                                        '<div class="coupon-item p-2 border rounded mb-1">'+
+                                            '<div class="row no-gutters">'+
+                                                '<div class="col-12">'+
+                                                    '<div class="coupon-item-name">'+
+                                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                                    '</div>'+
+                                                    '<div class="coupon-item-desc small mb-1">'+
+                                                        '<span>'+desc+'</span><br>'+
+                                                        '<span class="text-success">Applied On : '+pname+'</span>'+
+                                                    '</div>'+
+                                                    '<div class="coupon-item-btns">'+
+                                                        '<input type="hidden" id="coupon_discount'+cid+'" value="'+tdiscount+'">'+
+                                                        '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
+                                                        '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
+                                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                                        '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                                        '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                                    '</div>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'
+                                );
+
+                                $('[data-toggle="popover"]').popover();
+                                total_cart_reward++;
+                                counter++;
                             }
                         }
+                    }
 
-                        var sub_price = $('#sum_sub_price'+iteration).val();
-                        var totalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
-                    } 
+                    $('#coupon_counter').val(counter-1);
+
+                    var sub_price = $('#sum_sub_price'+iteration).val();
+                    var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
                 }
 
                 if(pdiscount == 'highest'){
@@ -825,7 +904,7 @@
 
                     var sub_price = $('#sum_sub_price'+iteration).val();
                     if(amount > 0){
-                        var totalDiscount = parseFloat(sub_price)-parseFloat(amount);
+                        var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(amount);
                         var discount = parseFloat(amount);
                     }
 
@@ -833,62 +912,9 @@
                         var percent = parseFloat(percnt)/100;
                         var discount =  parseFloat(sub_price)*parseFloat(percent);
 
-                        var totalDiscount = parseFloat(sub_price)-parseFloat(discount);
+                        var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(discount);
                     }
-                }
 
-
-                //$('#cart_product_discount'+iteration).val(discount.toFixed(2));
-                $('#sum_sub_price'+iteration).val(totalDiscount);
-
-                $('#product_total_price'+iteration).css({'text-decoration':'line-through','color':'grey'});
-                $('#product_new_price'+iteration).css('display','block');
-                $('#product_new_price'+iteration).html('₱ '+addCommas(totalDiscount.toFixed(2))); 
-
-                $('#cart_product_reward'+iteration).val(1);
-
-                compute_grand_total();
-
-
-
-                var pname = $('#product_name_'+iteration).val();
-                var productid = $('#pp'+iteration).val();
-                var combination = $('#couponcombination'+cid).val();
-
-                if(pdiscount == 'current'){
-                    var i;
-                    for (i = 1; i <= totalDiscountedProduct; i++) {
-                        if(i <= remaining){
-                            $('#couponList').append(
-                                '<div id="couponDiv'+cid+'">'+
-                                    '<div class="coupon-item p-2 border rounded mb-1">'+
-                                        '<div class="row no-gutters">'+
-                                            '<div class="col-12">'+
-                                                '<div class="coupon-item-name">'+
-                                                    '<h5 class="m-0">'+name+' <span></span></h5>'+
-                                                '</div>'+
-                                                '<div class="coupon-item-desc small mb-1">'+
-                                                    '<span>'+desc+'</span><br>'+
-                                                    '<span class="text-success">Applied On : '+pname+'</span>'+
-                                                '</div>'+
-                                                '<div class="coupon-item-btns">'+
-                                                    '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
-                                                    '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
-                                                    '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                                                    '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
-                                                    '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
-                                                    '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
-                                                '</div>'+
-                                            '</div>'+
-                                        '</div>'+
-                                    '</div>'+
-                                '</div>'
-                            );
-
-                            $('[data-toggle="popover"]').popover();
-                        }
-                    }
-                } else {
                     $('#couponList').append(
                         '<div id="couponDiv'+cid+'">'+
                             '<div class="coupon-item p-2 border rounded mb-1">'+
@@ -902,6 +928,7 @@
                                             '<span class="text-success">Applied On : '+pname+'</span>'+
                                         '</div>'+
                                         '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" id="coupon_discount'+cid+'" value="'+discount+'">'+
                                             '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                             '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
                                             '<input type="hidden" name="couponid[]" value="'+cid+'">'+
@@ -916,8 +943,22 @@
                     );
 
                     $('[data-toggle="popover"]').popover();
+                    total_cart_reward++;
                 }
+
+                // Total Summary Computation
+                    //$('#cart_product_discount'+iteration).val(discount.toFixed(2));
+                    $('#sum_sub_price'+iteration).val(productSubTotalDiscount.toFixed(2));
+
+                    $('#product_total_price'+iteration).css({'text-decoration':'line-through','color':'grey'});
+                    $('#product_new_price'+iteration).css('display','block');
+                    $('#product_new_price'+iteration).html('₱ '+addCommas(productSubTotalDiscount.toFixed(2))); 
+
+
+                    compute_grand_total();
+                //
                 
+                $('#cart_product_reward'+iteration).val(total_cart_reward);
                 $('#couponBtn'+cid).prop('disabled',true);
                 $('#btnCpnTxt'+cid).html('Applied');
             }
@@ -927,16 +968,27 @@
             var id = $(this).attr('id'); // coupon id
             var pid = $('#productid'+id).val(); // product iteration id
 
-            var pr = parseFloat($('#quantity'+pid).val()) * parseFloat($('#price'+pid).val());
+            var product_subtotal = parseFloat($('#sum_sub_price'+pid).val());
+            var total_reward_on_product = $('#cart_product_reward'+pid).val();
+            var discount = $('#coupon_discount'+id).val();
 
-            $('#sum_sub_price'+pid).val(pr);
-            $('#product_new_price'+pid).css('display','none');
-            $('#product_total_price'+pid).css({'text-decoration':'','color':'black'});
+            if(total_reward_on_product > 1){
+                var pr = product_subtotal+parseFloat(discount);
+
+                $('#sum_sub_price'+pid).val(pr);
+                $('#product_new_price'+pid).html('₱ '+addCommas(pr.toFixed(2))); 
+
+                $('#cart_product_reward'+pid).val(total_reward_on_product-1);
+            } else {
+                var pr = parseFloat($('#quantity'+pid).val()) * parseFloat($('#price'+pid).val());
+
+                $('#sum_sub_price'+pid).val(pr);
+                $('#product_new_price'+pid).css('display','none');
+                $('#product_total_price'+pid).css({'text-decoration':'','color':'black'});
+            }
 
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
-
-            $('#cart_product_reward'+pid).val(0);
 
             var combination = $('#coupon_combination'+id).val();
             if(combination == 0){

@@ -196,7 +196,7 @@
                                                         @endif
                                                     </div>
                                                     <div class="coupon-item-btns">
-                                                        <a href="{{ route('checkout.remove-coupon',$coupon->coupon_id) }}" class="btn btn-danger btn-sm text-white">Remove</a>
+                                                        <a href="{{ route('checkout.remove-coupon',$coupon->id) }}" class="btn btn-danger btn-sm text-white">Remove</a>
                                                         <button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="{{ $coupon->details->terms_and_conditions }}">Terms & Conditions</button>
                                                     </div>
                                                 </div>
@@ -293,15 +293,6 @@
                 return false;
             }
 
-            // check if has selected delivery location
-            if (!$("input[name='shipping_type']:checked").val()) {
-                swal({
-                    title: '',
-                    text: "Please select a delivery option!",         
-                });
-                return false;
-            }
-
             // check if selected coupon applicable on selected delivery location
             var option = $('input[name="shipping_type"]:checked').val();
             if(option == 'storepickup'){
@@ -373,7 +364,7 @@
                                 if(returnData.coupon_details['free_product_id'] != null){
                                     free_product_coupon(returnData.coupon_details['id']);
                                 } else {
-                                    use_coupon(returnData.coupon_details['id']);
+                                    use_coupon_total_amount(returnData.coupon_details['id']);
                                 }
                             } else {
                                 choose_product(returnData.coupon_details['id']);
@@ -385,23 +376,6 @@
                 }
             });
         });
-
-        // function coupon_counter(){
-        //     var limit = $('#coupon_limit').val();
-        //     var counter = $('#coupon_counter').val();
-
-        //     if(parseInt(counter) < parseInt(limit)){
-        //         $('#coupon_counter').val(parseInt(counter)+1);
-        //         return true;
-
-        //     } else {
-        //         swal({
-        //             title: '',
-        //             text: "Maximum of "+limit+" coupon(s) only.",        
-        //         });
-        //         return false;
-        //     }
-        // }
 
         function coupon_counter(cid){
             var limit = $('#coupon_limit').val();
@@ -436,10 +410,6 @@
                         return true;
                     }
                 }
-
-                // $('#coupon_counter').val(parseInt(counter)+1);
-                // return true;
-
             } else {
                 swal({
                     title: '',
@@ -486,7 +456,7 @@
                                 var usebtn = '<button class="btn btn-success btn-sm" disabled>Applied</button>';
                             } else {
                                 if(coupon.location == null){
-                                    var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
+                                    var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_coupon_total_amount('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                 } else {
                                     var usebtn = '<button class="btn btn-success btn-sm" id="couponBtn'+coupon.id+'" onclick="use_sf_coupon('+coupon.id+')"><span id="btnCpnTxt'+coupon.id+'">Use Coupon</span></button>';
                                 }
@@ -548,56 +518,163 @@
                 }
             });
         }
+        
+        // shipping fee coupon rewards
+            function use_sf_coupon(cid){
+                // check total use shipping fee coupons
+                var sfcoupon = parseFloat($('#sf_discount_coupon').val());
 
-        function use_sf_coupon(cid){
-            // check total use shipping fee coupons
-            var sfcoupon = parseFloat($('#sf_discount_coupon').val());
-            if(sfcoupon == 1){
-                swal({
-                    title: '',
-                    text: "Only one (1) coupon for shipping fee discount.",         
-                });
-                return false;
+                if(sfcoupon == 1){
+                    swal({
+                        title: '',
+                        text: "Only one (1) coupon for shipping fee discount.",         
+                    });
+                    return false;
+                }
+
+                // check if has selected delivery location
+                if (!$("input[name='shipping_type']:checked").val()) {
+                    swal({
+                        title: '',
+                        text: "Please select a delivery option!",         
+                    });
+                    return false;
+                }
+
+                // check if selected coupon applicable on selected delivery location
+                var option = $('input[name="shipping_type"]:checked').val();
+                if(option == 'storepickup'){
+                    swal({
+                        title: '',
+                        text: "Shipping fee coupon discount is only applicable on Delivery option!",         
+                    });
+                    return false;
+                }
+                
+                if(coupon_counter(cid)){
+                    var selectedLocation = $('#location').val();
+                    var loc = selectedLocation.split('|');
+
+                    var couponLocation = $('#sflocation'+cid).val();
+                    var cLocation = couponLocation.split('|');
+
+                    var arr_coupon_location = [];
+                    $.each(cLocation, function(key, value) {
+                        arr_coupon_location.push(value);
+                    });
+
+                    if(jQuery.inArray(loc[0], arr_coupon_location) !== -1 || jQuery.inArray('all', arr_coupon_location) !== -1){
+
+                        var name  = $('#couponname'+cid).val();
+                        var terms = $('#couponterms'+cid).val();
+                        var desc = $('#coupondesc'+cid).val();
+                        var combination = $('#couponcombination'+cid).val();
+                        
+                        $('#couponList').append(
+                            '<div id="couponDiv'+cid+'">'+
+                                '<div class="coupon-item p-2 border rounded mb-1">'+
+                                    '<div class="row no-gutters">'+
+                                        '<div class="col-12">'+
+                                            '<div class="coupon-item-name">'+
+                                                '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                            '</div>'+
+                                            '<div class="coupon-item-desc small mb-1">'+
+                                                '<span>'+desc+'</span>'+
+                                            '</div>'+
+                                            '<div class="coupon-item-btns">'+
+                                                '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
+                                                '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                                '<input type="hidden" name="coupon_productid[]" value="0">'+
+                                                '<button type="button" class="btn btn-danger btn-sm sfCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                                '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'
+                        );
+
+                        $('#sf_discount_coupon').val(1);
+                        var sf_type = $('#sfdiscounttype'+cid).val();
+                        var sf_discount = parseFloat($('#sfdiscountamount'+cid).val());
+
+                        if(sf_type == 'full'){
+                            dfee = parseFloat($('#delivery_fee').val());
+
+                            $('#sf_discount_amount').val(dfee);
+
+                            $('#sf_discount_row').css('display','table-row');
+                            $('#sf_discount_span').html(addCommas(dfee.toFixed(2)));
+                        }
+
+                        if(sf_type == 'partial'){
+                            $('#sf_discount_amount').val(sf_discount.toFixed(2));
+
+                            $('#sf_discount_row').css('display','table-row');
+                            $('#sf_discount_span').html(addCommas(sf_discount.toFixed(2)));
+                        }
+
+                        $('#couponBtn'+cid).prop('disabled',true);
+                        $('#btnCpnTxt'+cid).html('Applied');
+
+                        compute_total();
+                    } else {
+                        swal({
+                            title: '',
+                            text: "Selected delivery location is not in the coupon location.",         
+                        });
+                    } 
+                }
             }
 
-            // check if has selected delivery location
-            if (!$("input[name='shipping_type']:checked").val()) {
-                swal({
-                    title: '',
-                    text: "Please select a delivery option!",         
-                });
-                return false;
-            }
+            $(document).on('click', '.sfCouponRemove', function(){  
+                var id = $(this).attr("id");  
 
-            // check if selected coupon applicable on selected delivery location
-            var option = $('input[name="shipping_type"]:checked').val();
-            if(option == 'storepickup'){
-                swal({
-                    title: '',
-                    text: "Shipping fee coupon discount is only applicable on Delivery option!",         
-                });
-                return false;
-            }
-            
-            if(coupon_counter(cid)){
-                var selectedLocation = $('#location').val();
-                var loc = selectedLocation.split('|');
+                $('#sf_discount_row').css('display','none');
+                
+                $('#sf_discount_amount').val(0);
+                var totalsfdiscoutcounter = $('#sf_discount_coupon').val();
+                $('#sf_discount_coupon').val(parseInt(totalsfdiscoutcounter)-1);
 
-                var couponLocation = $('#sflocation'+cid).val();
-                var cLocation = couponLocation.split('|');
+                var counter = $('#coupon_counter').val();
+                $('#coupon_counter').val(parseInt(counter)-1);
 
-                var arr_coupon_location = [];
-                $.each(cLocation, function(key, value) {
-                    arr_coupon_location.push(value);
-                });
+                var combination = $('#coupon_combination'+id).val();
+                if(combination == 0){
+                    $('#solo_coupon_counter').val(0);
+                }
 
-                if(jQuery.inArray(loc[0], arr_coupon_location) !== -1){
+                $('#couponDiv'+id+'').remove();
 
-                    var name  = $('#couponname'+cid).val();
-                    var terms = $('#couponterms'+cid).val();
-                    var desc = $('#coupondesc'+cid).val();
-                    var combination = $('#couponcombination'+cid).val();
-                    
+                compute_total();
+            });
+        //
+
+        // total amount coupon rewards
+            function use_coupon_total_amount(cid){
+                var totalAmountDiscountCounter = $('#total_amount_discount_counter').val();
+                var name  = $('#couponname'+cid).val();
+                var desc = $('#coupondesc'+cid).val();
+                var terms = $('#couponterms'+cid).val();
+                var combination = $('#couponcombination'+cid).val();
+
+                if(coupon_counter(cid)){
+                    if(parseInt(totalAmountDiscountCounter) == 1){
+                        swal({
+                            title: '',
+                            text: "Only one (1) coupon with discount amount/percentage per transaction.",         
+                        });
+
+                        var counter = $('#coupon_counter').val();
+                        $('#coupon_counter').val(parseInt(counter)-1);
+
+                        return false;
+                    }
+
+                    $('#total_amount_discount_counter').val(1);
+                    $('#couponBtn'+cid).prop('disabled',true);
+                    $('#btnCpnTxt'+cid).html('Applied');
+
                     $('#couponList').append(
                         '<div id="couponDiv'+cid+'">'+
                             '<div class="coupon-item p-2 border rounded mb-1">'+
@@ -613,7 +690,7 @@
                                             '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                             '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                             '<input type="hidden" name="coupon_productid[]" value="0">'+
-                                            '<button type="button" class="btn btn-danger btn-sm sfCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                            '<button type="button" class="btn btn-danger btn-sm couponRemove" id="'+cid+'">Remove</button>&nbsp;'+
                                             '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
                                         '</div>'+
                                     '</div>'+
@@ -622,153 +699,49 @@
                         '</div>'
                     );
 
-                    $('#sf_discount_coupon').val(1);
-                    var sf_type = $('#sfdiscounttype'+cid).val();
-                    var sf_discount = parseFloat($('#sfdiscountamount'+cid).val());
+                    $('[data-toggle="popover"]').popover();
 
-                    if(sf_type == 'full'){
-                        dfee = parseFloat($('#delivery_fee').val());
-
-                        $('#sf_discount_amount').val(dfee);
-
-                        $('#sf_discount_row').css('display','table-row');
-                        $('#sf_discount_span').html(addCommas(dfee.toFixed(2)));
+                    var grandTotal = $('#total_amount').val();
+                    var amount = $('#discountamount'+cid).val();
+                    var percnt= $('#discountpercentage'+cid).val();
+                    if(amount > 0){ 
+                        var amountdiscount = parseFloat(amount);
                     }
 
-                    if(sf_type == 'partial'){
-                        $('#sf_discount_amount').val(sf_discount.toFixed(2));
+                    if(percnt > 0){
+                        var percent  = parseFloat(percnt)/100;
+                        var discount = parseFloat(grandTotal)*percent;
 
-                        $('#sf_discount_row').css('display','table-row');
-                        $('#sf_discount_span').html(addCommas(sf_discount.toFixed(2)));
+                        var amountdiscount = parseFloat(discount);
                     }
 
-                    $('#couponBtn'+cid).prop('disabled',true);
-                    $('#btnCpnTxt'+cid).html('Applied');
-
+                    $('#total_amount_discount').val(amountdiscount.toFixed(2));
                     compute_total();
-                } else {
-                    swal({
-                        title: '',
-                        text: "Selected delivery location is not in the coupon location.",         
-                    });
-                } 
-            }
-        }
-
-        $(document).on('click', '.sfCouponRemove', function(){  
-            var id = $(this).attr("id");  
-
-            $('#sf_discount_row').css('display','none');
-            
-            $('#sf_discount_amount').val(0);
-            var totalsfdiscoutcounter = $('#sf_discount_coupon').val();
-            $('#sf_discount_coupon').val(parseInt(totalsfdiscoutcounter)-1);
-
-            var counter = $('#coupon_counter').val();
-            $('#coupon_counter').val(parseInt(counter)-1);
-
-            var combination = $('#coupon_combination'+id).val();
-            if(combination == 0){
-                $('#solo_coupon_counter').val(0);
+                }
             }
 
-            $('#couponDiv'+id+'').remove();
+            $(document).on('click', '.couponRemove', function(){  
+                var id = $(this).attr("id");  
 
-            compute_total();
-        });
+                $('#promotion').css('display','none');
+                $('#total_amount_discount').val(0);
 
+                var totaldiscoutcounter = $('#total_amount_discount_counter').val();
+                $('#total_amount_discount_counter').val(parseInt(totaldiscoutcounter)-1);
 
-        function use_coupon(cid){
-            var totalAmountDiscountCounter = $('#total_amount_discount_counter').val();
-            var name  = $('#couponname'+cid).val();
-            var desc = $('#coupondesc'+cid).val();
-            var terms = $('#couponterms'+cid).val();
-            var combination = $('#couponcombination'+cid).val();
+                var counter = $('#coupon_counter').val();
+                $('#coupon_counter').val(parseInt(counter)-1);
 
-            if(coupon_counter(cid)){
-                if(parseInt(totalAmountDiscountCounter) == 1){
-                    swal({
-                        title: '',
-                        text: "Only one (1) coupon with discount amount/percentage per transaction.",         
-                    });
-
-                    var counter = $('#coupon_counter').val();
-                    $('#coupon_counter').val(parseInt(counter)-1);
-
-                    return false;
+                var combination = $('#coupon_combination'+id).val();
+                if(combination == 0){
+                    $('#solo_coupon_counter').val(0);
                 }
 
-                $('#total_amount_discount_counter').val(1);
-                $('#couponBtn'+cid).prop('disabled',true);
-                $('#btnCpnTxt'+cid).html('Applied');
+                $('#couponDiv'+id+'').remove();
 
-                $('#couponList').append(
-                    '<div id="couponDiv'+cid+'">'+
-                        '<div class="coupon-item p-2 border rounded mb-1">'+
-                            '<div class="row no-gutters">'+
-                                '<div class="col-12">'+
-                                    '<div class="coupon-item-name">'+
-                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
-                                    '</div>'+
-                                    '<div class="coupon-item-desc small mb-1">'+
-                                        '<span>'+desc+'</span>'+
-                                    '</div>'+
-                                    '<div class="coupon-item-btns">'+
-                                        '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
-                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                                        '<input type="hidden" name="coupon_productid[]" value="0">'+
-                                        '<button type="button" class="btn btn-danger btn-sm couponRemove" id="'+cid+'">Remove</button>&nbsp;'+
-                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+
-                        '</div>'+
-                    '</div>'
-                );
-
-                $('[data-toggle="popover"]').popover();
-
-                var grandTotal = $('#grandTotal').val();
-                var amount= $('#discountamount'+cid).val();
-                var percnt= $('#discountpercentage'+cid).val();
-
-                if(amount > 0){ 
-                    var amountdiscount = amount;
-                }
-
-                if(percnt > 0){
-                    var percent  = parseFloat(percnt)/100;
-                    var discount = parseFloat(grandTotal)*percent;
-
-                    var amountdiscount = discount;
-                }
-
-                $('#total_amount_discount').val(amountdiscount);
                 compute_total();
-            }
-        }
-
-        $(document).on('click', '.couponRemove', function(){  
-            var id = $(this).attr("id");  
-
-            $('#promotion').css('display','none');
-            $('#total_amount_discount').val(0);
-
-            var totaldiscoutcounter = $('#total_amount_discount_counter').val();
-            $('#total_amount_discount_counter').val(parseInt(totaldiscoutcounter)-1);
-
-            var counter = $('#coupon_counter').val();
-            $('#coupon_counter').val(parseInt(counter)-1);
-
-            var combination = $('#coupon_combination'+id).val();
-            if(combination == 0){
-                $('#solo_coupon_counter').val(0);
-            }
-
-            $('#couponDiv'+id+'').remove();
-
-            compute_total();
-        });
+            });
+        //
 
 
         $("input[name='shipping_type']").click(function(){
@@ -882,7 +855,7 @@
                 }
 
                 $('#promotion').css('display','table-row');
-                $('#total_deduction').html('₱ '+addCommas(amountDiscount.toFixed(2)));
+                $('#total_deduction').html('₱ '+addCommas(amountDiscount));
             } else {
                 var total = total_a;
                 var gtotal = total;

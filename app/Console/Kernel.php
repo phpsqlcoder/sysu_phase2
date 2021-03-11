@@ -31,6 +31,10 @@ class Kernel extends ConsoleKernel
         // Check Promo validity every minute.
         $schedule->command('promo_validity:cron')
                  ->everyMinute();
+
+        // Check Coupon Event validity every minute.
+        $schedule->command('event_validity:cron')
+                 ->everyMinute();
     }
 
     /**

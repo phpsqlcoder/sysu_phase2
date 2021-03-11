@@ -52,29 +52,29 @@ class CheckoutController extends Controller
 
             if($couponCart->count()){
                 $remainingQty = $p->qty-$couponCart->count();
+                $productsub = $p->product->discountedprice*$couponCart->count();
                 // get product subtotal of remaining qty
+
                 $product_subtotal += $p->product->discountedprice*$remainingQty;
 
                 // get total discount amount
                 $coupon = $couponCart->first();
 
                 if(isset($coupon->details->amount)){
-                    $productsub = $p->product->discountedprice*$couponCart->count();
-                    $product_subtotal += $productsub*($coupon->details->amount*$couponCart->count());
+                    $product_subtotal += $productsub-($coupon->details->amount*$couponCart->count());
                 }   
 
                 if(isset($coupon->details->percentage)){
-                    $productsub = $p->product->discountedprice*$couponCart->count();
-                    $percent = ($coupon->details->percentage*$couponCart->count())/100;
-                    $discount = $productsub*$percent;
-
+                    $percent = $coupon->details->percentage/100;
+                    $discount = ($p->product->discountedprice*$percent)*$couponCart->count();
+                    
                     $product_subtotal += $productsub-$discount;
+                    
                 }
 
             } else {
                 $product_subtotal += $p->product->discountedprice*$p->qty;
             }
-
         }
 
 
@@ -107,7 +107,7 @@ class CheckoutController extends Controller
 
     public function remove_coupon($id)
     {
-        CouponCart::where('customer_id',Auth::id())->where('coupon_id',$id)->delete();
+        CouponCart::find($id)->delete();
 
         return back()->with('success','Coupon has been removed.');
     }
