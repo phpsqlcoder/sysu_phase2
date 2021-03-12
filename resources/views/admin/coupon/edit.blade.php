@@ -77,20 +77,20 @@
 					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation')) || $coupon->activation_type == 'manual') checked @else checked @endif>
-								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
-							</div>
-							<small style="font-style: italic;">Customer inputs a code to redeem coupon reward.</small>
-						</div>
-						<div class="col-6">
-							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" onclick="ShowHideDiv();" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation')) || $coupon->activation_type == 'auto') checked @endif>
+								<input @if(old('coupon_activation') == 'auto' || $coupon->activation_type == 'auto') checked @endif type="radio" id="coupon-activate-auto" name="coupon_activation" class="custom-control-input" value="auto"  onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-activate-auto">Automatically Enabled</label>
 							</div>
 							<small style="font-style: italic;">Coupon is automatically enabled after customer completes an activity.</small>
 						</div>
+						<div class="col-6">
+							<div class="custom-control custom-radio">
+								<input @if(old('coupon_activation') == 'manual' || $coupon->activation_type == 'manual') checked @endif type="radio" id="coupon-activate-manual" name="coupon_activation" class="custom-control-input" value="manual" onclick="ShowHideDiv()">
+								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
+							</div>
+							<small style="font-style: italic;">Customer inputs a code to redeem coupon reward.</small>
+						</div>
 					</div>
-					<div class="mb-3" id="coupon-code" style="display: @if($coupon->activation_type == 'manual') block @else none @endif">
+					<div class="mb-3" id="coupon-code" style="display: @if(old('coupon_activation') == 'manual' || $coupon->activation_type == 'manual') block @else none @endif;">
 						<label class="d-block">Coupon Code</label>
 						<input type="text" name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code',$coupon->coupon_code) }}">
 						@hasError(['inputName' => 'code'])
@@ -119,12 +119,14 @@
 				<div class="form-group">
 					<div class="mb-3 reward-option" id="customer-optn" style="display:@if($coupon->customer_scope == 'specific') block @else none @endif">
 						<label class="d-block">Customer Name *</label>
-						<select class="form-control select2" name="customer[]">
+						<select class="form-control select2" name="customer[]" multiple="multiple">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
 								<option @if($coupon->scope_customer_id == $customer->id) selected @endif value="{{$customer->id}}">{{ $customer->name }}</option>
 							@endforeach
 						</select>
+						@hasError(['inputName' => 'customer'])
+                    	@endhasError
 					</div>
 				</div>
 				<div class="form-group">
@@ -470,7 +472,7 @@
 							<label class="custom-control-label" for="coupon-customer-limit">Customer Limit &nbsp;&nbsp;<span style="font-style: italic;">Maximum number of customers who can use the coupon.</span></label>
 						</div>
 
-						<div class="mt-3" id="coupon-customer-limit-form" style="display:@if(isset($coupon->customer_limit)) block @else none @endif;">
+						<div class="mt-3" id="coupon-customer-limit-form" style="display:@if($coupon->customer_scope == 'specific') none @else @if(isset($coupon->customer_limit)) block @else none @endif @endif;">
 							<div class="input-group border rounded">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="coupon_customer_limit_qty">
@@ -478,7 +480,7 @@
 									</button>
 								</span>
 								@php
-									if(isset($coupon->customer_limit)){
+									if($coupon->customer_scope == 'all'){
 										$customerLimit = $coupon->customer_limit;
 									} else {
 										$customerLimit = 1; 

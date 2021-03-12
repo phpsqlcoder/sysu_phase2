@@ -76,20 +76,20 @@
 					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-manual" name="coupon_activation[]" class="custom-control-input" value="manual" @if(is_array(old('coupon_activation')) && in_array('manual', old('coupon_activation'))) checked @else checked @endif onclick="ShowHideDiv()">
-								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
-							</div>
-							<small style="font-style: italic;">Customer inputs a code to redeem coupon reward.</small>
-						</div>
-						<div class="col-6">
-							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-activate-auto" name="coupon_activation[]" class="custom-control-input" value="auto" @if(is_array(old('coupon_activation')) && in_array('auto', old('coupon_activation'))) checked @endif onclick="ShowHideDiv()">
+								<input @if(old('coupon_activation') == 'auto') checked @endif checked type="radio" id="coupon-activate-auto" name="coupon_activation" class="custom-control-input" value="auto"  onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-activate-auto">Automatically Enabled</label>
 							</div>
 							<small style="font-style: italic;">Coupon is automatically enabled after customer completes an activity.</small>
 						</div>
+						<div class="col-6">
+							<div class="custom-control custom-radio">
+								<input @if(old('coupon_activation') == 'manual') checked @endif type="radio" id="coupon-activate-manual" name="coupon_activation" class="custom-control-input" value="manual" onclick="ShowHideDiv()">
+								<label class="custom-control-label" for="coupon-activate-manual">Manual</label>
+							</div>
+							<small style="font-style: italic;">Customer inputs a code to redeem coupon reward.</small>
+						</div>
 					</div>
-					<div class="mb-3" id="coupon-code">
+					<div class="mb-3" id="coupon-code" style="display: @if(old('coupon_activation') == 'manual') block @else none @endif;">
 						<label class="d-block">Coupon Code *</label>
 						<input type="text" name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code') }}">
 						@hasError(['inputName' => 'code'])
@@ -102,14 +102,14 @@
 					<div class="row" style="padding-bottom: 10px;">
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" checked onclick="ShowHideDiv()">
+								<input @if(old('coupon_scope') == 'all') checked @endif checked type="radio" id="coupon-scope-all" name="coupon_scope" class="custom-control-input" value="all" checked onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-all">All</label>
 							</div>
 							<small style="font-style: italic;">Coupon will be applicable to all customers who completed an activity.</small>
 						</div>
 						<div class="col-6">
 							<div class="custom-control custom-radio">
-								<input type="radio" id="coupon-scope-specific" name="coupon_scope" class="custom-control-input" value="specific" onclick="ShowHideDiv()">
+								<input @if(old('coupon_scope') == 'specific') checked @endif type="radio" id="coupon-scope-specific" name="coupon_scope" class="custom-control-input" value="specific" onclick="ShowHideDiv()">
 								<label class="custom-control-label" for="coupon-scope-specific">Specific</label>
 							</div>
 							<small style="font-style: italic;">Only the specific customer will be able to use and claim the coupon reward.</small>
@@ -117,14 +117,16 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="mb-3" id="customer-optn" style="display:none">
+					<div class="mb-3" id="customer-optn" style="display: @if(old('coupon_scope') == 'specific') block @else none @endif;">
 						<label class="d-block">Customer Name *</label>
 						<select class="form-control select2" name="customer[]" multiple="multiple">
 							<option label="Choose one"></option>
 							@foreach($customers as $customer)
-								<option value="{{$customer->id}}">{{ $customer->name }}</option>
+								<option @if(is_array(old('customer')) && in_array($customer->id, old('customer'))) selected @endif value="{{$customer->id}}">{{ $customer->name }}</option>
 							@endforeach
 						</select>
+						@hasError(['inputName' => 'customer'])
+                    	@endhasError
 					</div>
 				</div>
 
@@ -159,20 +161,20 @@
 						<div class="row" style="padding-bottom: 10px;">
 							<div class="col-6">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="coupon-discount-type-partial" name="discount_type" class="custom-control-input" value="partial" checked onchange="sf_discount_type()">
+									<input @if(old('discount_type') == 'partial') checked @endif checked type="radio" id="coupon-discount-type-partial" name="discount_type" class="custom-control-input" value="partial" onchange="sf_discount_type()">
 									<label class="custom-control-label" for="coupon-discount-type-partial">Partial</label>
 								</div>
 							</div>
 							<div class="col-6">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="coupon-discount-type-full" name="discount_type" class="custom-control-input" value="full" onchange="sf_discount_type()">
+									<input @if(old('discount_type') == 'full') checked @endif type="radio" id="coupon-discount-type-full" name="discount_type" class="custom-control-input" value="full" onchange="sf_discount_type()">
 									<label class="custom-control-label" for="coupon-discount-type-full">Full</label>
 								</div>
 							</div>
 						</div>
 
-						<label id="discount_amount_label">Shipping Fee Discount Amount *</label>
-						<input type="number" name="shipping_fee_discount_amount" class="form-control @error('shipping_fee_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('shipping_fee_discount_amount') }}">
+						<label id="discount_amount_label" style="display: @if(old('discount_type') == 'full') none @else block @endif;">Shipping Fee Discount Amount *</label>
+						<input style="display: @if(old('discount_type') == 'full') none @else block @endif;" type="number" name="shipping_fee_discount_amount" class="form-control @error('shipping_fee_discount_amount') is-invalid @enderror" id="discount_amount_input" value="{{ old('shipping_fee_discount_amount') }}">
 						@hasError(['inputName' => 'shipping_fee_discount_amount'])
                     	@endhasError
 					</div>
@@ -191,44 +193,44 @@
                     	@endhasError
 					</div>
 
-					<div id="div_product_amount" style="display: none;">
+					<div id="div_product_amount" style="display: @if(old('reward') == 'discount-amount-optn' || old('reward') == 'discount-percentage-optn') block @else none @endif;">
                 		<div class="row" style="padding-bottom: 10px;margin-top: 20px;">
 							<div class="col-6">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" checked onclick="product_discount_amount(1)">
+									<input @if(old('amount_discount') == 1) checked @endif checked type="radio" id="discount-total-amount" name="amount_discount" class="custom-control-input" value="1" onclick="product_discount_amount(1)">
 									<label class="custom-control-label" for="discount-total-amount">Total Amount</label>
 								</div>
 							</div>
 							<div class="col-6">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="discount-product-price" name="amount_discount" class="custom-control-input" value="2" onclick="product_discount_amount(2)">
+									<input @if(old('amount_discount') == 2) checked @endif type="radio" id="discount-product-price" name="amount_discount" class="custom-control-input" value="2" onclick="product_discount_amount(2)">
 									<label class="custom-control-label" for="discount-product-price">Product Price</label>
 								</div>
 							</div>
 						</div>
 
-						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: none;" id="discount_selection">
+						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: @if(old('amount_discount') == 2) flex @else none @endif;" id="discount_selection">
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')">
+									<input @if(old('product_discount') == 'current') checked @endif type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')">
 									<label class="custom-control-label" for="same-product">Current Product</label>
 								</div>
 							</div>
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')">
+									<input @if(old('product_discount') == 'highest') checked @endif type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')">
 									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
 								</div>
 							</div>
 							<div class="col-4">
 								<div class="custom-control custom-radio">
-									<input type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')">
+									<input @if(old('product_discount') == 'specific') checked @endif type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')">
 									<label class="custom-control-label" for="specific-product">Specific Product</label>
 								</div>
 							</div>
 						</div>
 
-						<div style="display: none;" id="discount_productid">
+						<div style="display: @if(old('product_discount') == 'specific') block @else none @endif;" id="discount_productid">
 							<select class="form-control select2" name="discount_productid">
 								<option label="Choose Product"></option>
 								@foreach($products as $product)
@@ -243,7 +245,7 @@
 						<select class="form-control select2" name="free_product_id" style="min-height: 32px;">
 							<option label="Choose one"></option>
 							@foreach($free_products as $product)
-								<option value="{{$product->id}}">{{ $product->name }}</option>
+								<option @if(old('free_product_id') == $product->id) selected @endif value="{{$product->id}}">{{ $product->name }}</option>
 							@endforeach
 						</select>
 						@hasError(['inputName' => 'free_product_id'])
@@ -448,7 +450,7 @@
 										<span class="fa fa-minus"></span>
 									</button>
 								</span>
-								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="1" min="1" max="100000">
+								<input type="text" name="coupon_customer_limit_qty" class="form-control input-number border border-top-0 border-bottom-0" value="{{ old('coupon_customer_limit_qty',1) }}" min="1" max="100000">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default btn-number" data-type="plus" data-field="coupon_customer_limit_qty">
 										<span class="fa fa-plus"></span>
@@ -474,8 +476,8 @@
 				<div class="form-group">
 					<label class="d-block">Status</label>
 					<div class="custom-control custom-switch">
-						<input type="checkbox" class="custom-control-input" id="enableSwitch1" name="status">
-						<label class="custom-control-label" for="enableSwitch1" id="label_status">Inactive</label>
+						<input type="checkbox" class="custom-control-input" id="enableSwitch1" name="status" {{ (old("status") ? "checked":"") }}>
+						<label class="custom-control-label" for="enableSwitch1" id="label_status">@if(old('status')) Active @else Inactive @endif</label>
 					</div>
 				</div>
 			</div>

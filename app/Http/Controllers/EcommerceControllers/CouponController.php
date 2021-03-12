@@ -68,8 +68,9 @@ class CouponController extends Controller
             'name' => 'required|max:150',
             'description' => 'required',
             'terms_and_conditions' => 'required',
+            'customer' => $request->coupon_scope == 'specific' ? 'required' : '',
             'reward' => 'required',
-            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
+            'code' => $request->coupon_activation == 'manual' ? 'required|unique:coupons,coupon_code' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
             'shipping_fee_discount_amount' => ($request->reward == 'free-shipping-optn' && $request->discount_type == 'partial') ? 'required' : '',
@@ -120,11 +121,11 @@ class CouponController extends Controller
         }
 
         $coupon = Coupon::create([
-            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : Coupon::generate_unique_code(),
+            'coupon_code' => $request->coupon_activation == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms_and_conditions,
-            'activation_type' => $request->coupon_activation[0],
+            'activation_type' => $request->coupon_activation,
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
             'location' => $loc,
@@ -196,11 +197,12 @@ class CouponController extends Controller
             'name' => 'required|max:150',
             'description' => 'required',
             'terms_and_conditions' => 'required',
+            'customer' => $request->coupon_scope == 'specific' ? 'required' : '',
             'reward' => 'required',
-            'code' => $request->coupon_activation[0] == 'manual' ? 'required|unique:coupons,coupon_code' : '',
+            'code' => $request->coupon_activation == 'manual' ? 'required' : '',
             'reward' => 'required',
             'location' => $request->reward == 'free-shipping-optn' ? 'required' : '',
-            'shipping_fee_discount_amount' => ($request->reward == 'free-shipping-optn' && $request->discount_type == 'partial') ? 'required' : '',
+            'shipping_fee_discount_amount' => ($request->reward == 'free-shipping-optn' && $request->discount_type == 'partial') ? 'required|min:1' : '',
             'discount_amount' => $request->reward == 'discount-amount-optn' ? 'required' : '',
             'discount_percentage' => $request->reward == 'discount-percentage-optn' ? 'required' : '',
             'free_product_id' => $request->reward == 'free-product-optn' ? 'required' : '',
@@ -248,11 +250,11 @@ class CouponController extends Controller
         }
 
         Coupon::find($coupon->id)->update([
-            'coupon_code' => $request->coupon_activation[0] == 'manual' ? $request->code : $coupon->coupon_code,
+            'coupon_code' => $request->coupon_activation == 'manual' ? $request->code : Coupon::generate_unique_code(),
             'name' => $request->name,
             'description' => $request->description,
             'terms_and_conditions' => $request->terms_and_conditions,
-            'activation_type' => $request->coupon_activation[0],
+            'activation_type' => $request->coupon_activation,
             'customer_scope' => $request->coupon_scope,
             'scope_customer_id' => $request->coupon_scope == 'specific' ? $customernames : NULL,
             'location' => $loc,
