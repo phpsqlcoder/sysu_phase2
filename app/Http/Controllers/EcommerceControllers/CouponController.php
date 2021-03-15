@@ -47,7 +47,7 @@ class CouponController extends Controller
     {
         $products = Product::where('status','PUBLISHED')->get();
         $categories =  ProductCategory::has('published_products')->where('status','PUBLISHED')->get();
-        $brands = Product::distinct()->get(['brand']);
+        $brands = Product::whereNotNull('brand')->distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
 
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
@@ -175,9 +175,8 @@ class CouponController extends Controller
     {
         $products = Product::where('status','PUBLISHED')->get();
         $categories =  ProductCategory::has('published_products')->where('status','PUBLISHED')->get();
-        $brands = Product::distinct()->get(['brand']);
+        $brands = Product::whereNotNull('brand')->distinct()->get(['brand']);
         $customers = User::where('role_id',6)->where('is_active',1)->get();
-
         $locations = Deliverablecities::where('status','PUBLISHED')->get();
         $free_products = Product::where('category_id',87)->get();
 
@@ -380,7 +379,7 @@ class CouponController extends Controller
     public function update_coupon_rule_settings($couponID,$request)
     {
         Coupon::find($couponID)->update([
-            'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : 1000000,
+            'customer_limit' => isset($request->customer_limit) ? $request->coupon_customer_limit_qty : 100000,
             // 'usage_limit' => isset($request->usage_limit) ? $request->usage_limit[0] : NULL,
             // 'usage_limit_no' => $request->usage_limit[0] == 'multiple_use' ? $request->multi_usage_limit_qty : NULL,
             'combination' => ($request->has('combination')) ? 1 : 0,
