@@ -362,7 +362,7 @@
 					</div>
 					<div class="col-md-3">
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" id="coupon-quantity" name="purchase_total_qty" class="custom-control-input" onclick="total_qty_purchase()" @if(isset($coupon->purchase_qty)) checked @endif>
+							<input type="checkbox" id="coupon-quantity" name="purchase_total_qty" class="custom-control-input" onclick="total_amount_purchase()" @if(isset($coupon->purchase_qty)) checked @endif>
 							<label class="custom-control-label" for="coupon-quantity">Total Quantity</label>
 						</div>
 					</div>
@@ -606,36 +606,30 @@
 	}
 
 	function total_amount_purchase(){
-		if($('#coupon-amount').is(':checked')){
+		if($('#coupon-amount').is(':checked') || $('#coupon-quantity').is(':checked')){
 			$('#coupon-amount-form').css('display','block');
+		} else {
+			$('#coupon-amount-form').css('display','none');
+		}
+
+		if($('#coupon-amount').is(':checked')){
 			$('#total-amount-div').css('display','block');
 			$('#total-amount-input').css('display','block');
 			$('#total-amount-select').css('display','block');
 		} else {
-			if($('#coupon-quantity').is(':checked')){
-				$('#total-amount-div').css('display','none');
-				$('#total-amount-input').css('display','none');
-				$('#total-amount-select').css('display','none');
-			} else {
-				$('#coupon-amount-form').css('display','none');
-			}
+			$('#total-amount-div').css('display','none');
+			$('#total-amount-input').css('display','none');
+			$('#total-amount-select').css('display','none');
 		}
-	}
 
-	function total_qty_purchase(){
 		if($('#coupon-quantity').is(':checked')){
-			$('#coupon-amount-form').css('display','block');
 			$('#total-quantity-div').css('display','block');
 			$('#total-quantity-input').css('display','block');
 			$('#total-quantity-select').css('display','block');
 		} else {
-			if($('#coupon-amount').is(':checked')){
-				$('#total-quantity-div').css('display','none');
-				$('#total-quantity-input').css('display','none');
-				$('#total-quantity-select').css('display','none');
-			} else {
-				$('#coupon-amount-form').css('display','none');
-			}
+			$('#total-quantity-div').css('display','none');
+			$('#total-quantity-input').css('display','none');
+			$('#total-quantity-select').css('display','none');
 		}
 	}
 
