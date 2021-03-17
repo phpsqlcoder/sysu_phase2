@@ -118,7 +118,11 @@
                                                 </div>
                                             </div>
                                             <div class="field_wrapper_coupon"></div>
+                                            @if(Auth::check())
                                             <a href="#" class="small mb-2" onclick="collectibles()"> or click here to  Select from My Coupons</a>
+                                            @else
+                                            <a href="#" class="small mb-2" onclick="login_modal()"> or click here to  Select from My Coupons</a>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="cart-table-row">
@@ -375,6 +379,10 @@
                 }
             });
         });
+
+        function login_modal(){
+            $('#modalLoginLink').modal('show');
+        }
 
         function collectibles(){
             var hasProduct = $('#cproducts').val();
