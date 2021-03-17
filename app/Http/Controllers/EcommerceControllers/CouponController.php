@@ -113,7 +113,7 @@ class CouponController extends Controller
 
         $discount_productid = NULL;
         if($request->product_discount == 'current'){
-            $discount_productid = $request->product_name[0];
+            $discount_productid = NULL;
         }
 
         if($request->product_discount == 'specific'){
@@ -241,7 +241,7 @@ class CouponController extends Controller
 
         $discount_productid = NULL;
         if($request->product_discount == 'current'){
-            $discount_productid = $request->product_name[0];
+            $discount_productid = NULL;
         }
 
         if($request->product_discount == 'specific'){

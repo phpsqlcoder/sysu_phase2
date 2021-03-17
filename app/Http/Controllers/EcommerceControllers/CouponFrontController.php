@@ -210,6 +210,12 @@ class CouponFrontController extends Controller
             $arr_products = [];
             $arr_categories = [];
 
+            $assoc_arr_category = [];
+            $asoc_arr_category_qty = [];
+
+            $assoc_arr_brands = [];
+            $asoc_arr_brand_qty = [];
+
             $cartProducts = Cart::where('user_id',Auth::id())->get();
             foreach ($cartProducts as $p) {
                 $product = Product::find($p->product_id);
@@ -219,6 +225,33 @@ class CouponFrontController extends Controller
 
                 if(isset($product->brand)){
                     array_push($arr_brands, $product->brand);
+                }
+
+                
+                // get total cart qty per category
+                if(in_array($product->category_id, $assoc_arr_category)) {
+                    if(false !== $key = array_search($product->category_id, $assoc_arr_category)) {
+                        // $arr_qty = $asoc_arr_category_qty[$key];
+                        $qty = $asoc_arr_category_qty[$key]+$p->qty;
+                        $asoc_arr_category_qty[$key] = $qty;
+                    }
+                } else {
+                    array_push($assoc_arr_category, $product->category_id);
+                    array_push($asoc_arr_category_qty, $p->qty);
+                }
+
+                // get total cart qty per brand
+                if($product->brand != ''){
+                    if(in_array($product->brand, $assoc_arr_brands)) {
+                        if(false !== $key = array_search($product->brand, $assoc_arr_brands)) {
+                            // $arr_qty = $asoc_arr_brand_qty[$key];
+                            $qty = $asoc_arr_brand_qty[$key]+$p->qty;
+                            $asoc_arr_brand_qty[$key] = $qty;
+                        }
+                    } else {
+                        array_push($assoc_arr_brands, $product->brand);
+                        array_push($asoc_arr_brand_qty, $p->qty);
+                    }
                 }
             }
         //
@@ -354,8 +387,8 @@ class CouponFrontController extends Controller
                         $cartData = Cart::where('user_id',Auth::id())->where('product_id',$prod->id);
                         // check if product exist on cart
                         if($cartData->exists()){
-                            $cart = $cartData->first();
 
+                            $cart = $cartData->first();
                             if($coupon->purchase_qty_type == 'min'){
                                 if($cart->qty >= $coupon->purchase_qty){
                                     $combination_counter .= 'qty|';
@@ -476,8 +509,16 @@ class CouponFrontController extends Controller
             array_push($arr_coupon_usage_limit, $remaining);
         }
 
-        return response()->json(['coupons' => $allCoupons, 'availability' => $arr_coupon_availability, 'remaining' => $arr_coupon_usage_limit]);
 
+        return response()->json([
+            'coupons' => $allCoupons, 
+            'availability' => $arr_coupon_availability, 
+            'remaining' => $arr_coupon_usage_limit,
+            'cart_per_brand' => $assoc_arr_brands,
+            'cart_qty_per_brand' => $asoc_arr_brand_qty,
+            'cart_per_category' => $assoc_arr_category,
+            'cart_qty_per_category' => $asoc_arr_category_qty
+        ]);
     }
 
     public function get_brands(Request $request)

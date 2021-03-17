@@ -216,19 +216,19 @@
 						</div>
 
 						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: @if($coupon->amount_discount_type == 2) flex @else none @endif;" id="discount_selection">
-							<div class="col-4">
+							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')" @if($coupon->product_discount == 'current') checked @endif>
 									<label class="custom-control-label" for="same-product">Current Product</label>
 								</div>
 							</div>
-							<div class="col-4">
+							<!-- <div class="col-4">
 								<div class="custom-control custom-radio">
 									<input type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')" @if($coupon->product_discount == 'highest') checked @endif>
 									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
 								</div>
-							</div>
-							<div class="col-4">
+							</div> -->
+							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')" @if($coupon->product_discount == 'specific') checked @endif>
 									<label class="custom-control-label" for="specific-product">Specific Product</label>

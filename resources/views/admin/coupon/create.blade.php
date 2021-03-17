@@ -210,19 +210,19 @@
 						</div>
 
 						<div class="row" style="padding-bottom: 10px;margin-top: 20px;display: @if(old('amount_discount') == 2) flex @else none @endif;" id="discount_selection">
-							<div class="col-4">
+							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input @if(old('product_discount') == 'current') checked @endif type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')">
 									<label class="custom-control-label" for="same-product">Current Product</label>
 								</div>
 							</div>
-							<div class="col-4">
+							<!-- <div class="col-4">
 								<div class="custom-control custom-radio">
 									<input @if(old('product_discount') == 'highest') checked @endif type="radio" id="product-highest-price" name="product_discount" class="custom-control-input" value="highest" onchange="productdiscount('highest')">
 									<label class="custom-control-label" for="product-highest-price">Highest Price</label>
 								</div>
-							</div>
-							<div class="col-4">
+							</div> -->
+							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input @if(old('product_discount') == 'specific') checked @endif type="radio" id="specific-product" name="product_discount" class="custom-control-input" value="specific" onchange="productdiscount('specific')">
 									<label class="custom-control-label" for="specific-product">Specific Product</label>
