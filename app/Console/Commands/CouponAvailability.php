@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use \App\EcommerceModel\Coupon;
+use \Carbon\Carbon;
+
 class CouponAvailability extends Command
 {
     /**
