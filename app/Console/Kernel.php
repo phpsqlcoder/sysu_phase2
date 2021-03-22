@@ -35,6 +35,12 @@ class Kernel extends ConsoleKernel
         // Check Coupon Event validity every minute.
         $schedule->command('event_validity:cron')
                  ->everyMinute();
+
+        // Check Coupon start date then set availabity value into 1 (active).
+        $schedule->command('coupon_availability:cron')
+                 ->everyMinute();
+
+                 
     }
 
     /**
