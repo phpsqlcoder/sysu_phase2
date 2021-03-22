@@ -186,11 +186,23 @@ class CouponFrontController extends Controller
         //
 
         // Coupon All Customer Events
-            $couponEvents = Coupon::where('status','ACTIVE')->whereNotNull('event_date')->where('customer_scope','all')->where('event_date',today())->get();
+            $couponEvents = Coupon::where('status','ACTIVE')
+                ->where('availability',1)
+                ->whereNotNull('event_date')
+                ->where('customer_scope','all')
+                ->where('event_date',today())
+                ->get();
         //
 
         // Coupon All Customer Events
-            $couponEventSpecific = Coupon::where('status','ACTIVE')->whereNotNull('event_date')->where('customer_scope','specific')->where('event_date',today())->get();
+            $couponEventSpecific = 
+                Coupon::where('status','ACTIVE')
+                ->where('availability',1)
+                ->whereNotNull('event_date')
+                ->where('customer_scope','specific')
+                ->where('event_date',today())
+                ->get();
+
             $arr_coupon_event_specific = [];
             foreach($couponEventSpecific as $c){
                 $customers = explode('|',$c->scope_customer_id);
@@ -259,6 +271,7 @@ class CouponFrontController extends Controller
     // Purchase Product, Category, Brand Only
         $purchasedCoupons = 
             Coupon::where('status','ACTIVE')
+            ->where('availability',1)
             ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->where(function ($orWhereQuery){
@@ -302,6 +315,7 @@ class CouponFrontController extends Controller
     // Purchase Combination = Product ID or Product Category or Product Brand + total amount + total quantity
         $purchasedCombinationCoupons = 
         Coupon::where('status','ACTIVE')
+        ->where('availability',1)
         ->where('purchase_combination_counter','>',1)
         ->where('activation_type','auto')
         ->where(function ($orWhereQuery){
@@ -457,10 +471,10 @@ class CouponFrontController extends Controller
             array_push($arr_coupon_availability,$coupon->id);
         }
 
-        $coupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','all');
+        $coupons = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','all');
         if($request->page_name == 'cart'){
             $coupons = $coupons->whereNull('location')->orderBy('name','asc');
-            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->whereNull('location')->get();
+            $coupon_customer = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','specific')->whereNull('location')->get();
         } else {
             $coupons = $coupons->where('amount_discount_type',1)->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('location')
@@ -468,7 +482,7 @@ class CouponFrontController extends Controller
                     ->orwhereNotNull('percentage');
                 })->orderBy('name','asc');
 
-            $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->where('amount_discount_type',1)->where(function ($orWhereQuery){
+            $coupon_customer = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','specific')->where('amount_discount_type',1)->where(function ($orWhereQuery){
                 $orWhereQuery->orwhereNotNull('location')
                     ->orwhereNotNull('amount')
                     ->orwhereNotNull('percentage');
@@ -477,7 +491,7 @@ class CouponFrontController extends Controller
 
         $coupons = $coupons->get();
 
-        $coupon_customer = Coupon::where('status','ACTIVE')->where('activation_type','auto')->where('customer_scope','specific')->get();
+        $coupon_customer = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','specific')->get();
 
         $arr_customer_coupons = [];
         $arr_customer_id = [];
@@ -495,7 +509,7 @@ class CouponFrontController extends Controller
         if(empty($arr_customer_coupons)){
             $allCoupons = $coupons;
         } else {
-            $customerCoupons = Coupon::where('status','ACTIVE')->where('activation_type','auto')->whereIn('id',$arr_customer_coupons)->get();
+            $customerCoupons = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->whereIn('id',$arr_customer_coupons)->get();
             // all or specific coupons
             $allCoupons = collect($customerCoupons)->merge($coupons);
         }

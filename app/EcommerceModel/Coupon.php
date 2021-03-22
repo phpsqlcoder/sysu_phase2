@@ -88,6 +88,7 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
+            ->where('availability',1)
             ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'min')->where($purchase_field,'<=',$purchase_value)->get();
@@ -99,6 +100,7 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
+            ->where('availability',1)
             ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'max')->where($purchase_field,'>=',$purchase_value)->get();
@@ -110,29 +112,11 @@ class Coupon extends Model
     {
         $coupons = 
             Coupon::where('status','ACTIVE')
+            ->where('availability',1)
             ->where('purchase_combination_counter',1)
             ->where('activation_type','auto')
             ->whereNotNull($purchase_field)->where($purchase_type,'exact')->where($purchase_field,$purchase_value)->get();
 
         return $coupons;
     }
-    
-    // public static function purchaseWithinDateRange()
-    // {
-    //     // $coupons = 
-    //     //     Coupon::whereNotIn('id',function($query){
-    //     //         $query->select('coupon_id')->from('customer_coupons')->where('customer_id',Auth::id());
-    //     //     })->where('status','ACTIVE')
-    //     //     ->where('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'))->get();
-    //     $coupons = 
-    //         Coupon::where('status','ACTIVE')
-    //         ->where('activation_type','auto')
-    //         ->where('purchase_combination_counter',1)
-    //         ->where(function ($orWhereQuery){
-    //             $orWhereQuery->orwhere('event_date',Carbon::today()->format('Y-m-d'))
-    //             ->orwhere('end_date','>=',Carbon::today()->format('Y-m-d'))->where('end_time','>=',Carbon::now()->format('H:i'));
-    //         })->get();
-
-    //     return $coupons;
-    // }
 }
