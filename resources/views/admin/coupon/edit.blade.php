@@ -219,7 +219,7 @@
 							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')" @if($coupon->product_discount == 'current') checked @endif>
-									<label class="custom-control-label" for="same-product">Current Product</label>
+									<label class="custom-control-label" for="same-product">Same Product</label>
 								</div>
 							</div>
 							<!-- <div class="col-4">
