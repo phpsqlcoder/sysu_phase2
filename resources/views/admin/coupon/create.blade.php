@@ -213,7 +213,7 @@
 							<div class="col-6">
 								<div class="custom-control custom-radio">
 									<input @if(old('product_discount') == 'current') checked @endif type="radio" id="same-product" name="product_discount" class="custom-control-input" value="current" onchange="productdiscount('current')">
-									<label class="custom-control-label" for="same-product">Current Product</label>
+									<label class="custom-control-label" for="same-product">Same Product</label>
 								</div>
 							</div>
 							<!-- <div class="col-4">
