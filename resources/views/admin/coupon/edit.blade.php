@@ -449,9 +449,7 @@
 							</div>
 							<div class="col-md-6" id="total-quantity-select" style="display:@if(isset($coupon->purchase_qty)) block @else none @endif;">
 								<select class="custom-select" name="qty_opt" id="qty_opt">
-									<option value="">Choose One</option>
-									<option @if($coupon->purchase_qty_type == 'min') selected @endif value="min">Minimum</option>
-									<option @if($coupon->purchase_qty_type == 'max') selected @endif value="max">Maximum</option>
+									<option value="min">Minimum</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
 							</div>
