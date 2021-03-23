@@ -8,7 +8,7 @@ use App\EcommerceModel\Coupon;
 class CouponCart extends Model
 {
 	protected $table = 'coupon_cart';
-    protected $fillable = [ 'coupon_id','product_id','customer_id'];
+    protected $fillable = [ 'coupon_id','product_id','customer_id','total_usage'];
     public $timestamps = true;
 
     public function details()
