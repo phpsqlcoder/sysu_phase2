@@ -781,7 +781,7 @@
                                         '<span>'+desc+'</span>'+
                                     '</div>'+
                                     '<div class="coupon-item-btns">'+
-                                        '<input type="text" name="couponUsage[]" value="0">'+
+                                        '<input type="hidden" name="couponUsage[]" value="0">'+
                                         '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                         '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                         '<input type="hidden" name="coupon_productid[]" value="0">'+
@@ -852,7 +852,7 @@
                                         '<span>'+desc+'</span>'+
                                     '</div>'+
                                     '<div class="coupon-item-btns">'+
-                                        '<input type="text" name="couponUsage[]" value="0">'+
+                                        '<input type="hidden" name="couponUsage[]" value="0">'+
                                         '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                         '<input type="hidden" name="couponid[]" value="'+cid+'">'+
                                         '<input type="hidden" name="coupon_productid[]" value="0">'+
@@ -960,7 +960,7 @@
                                             '<span class="text-success">Applied On : '+pname+'</span>'+
                                         '</div>'+
                                         '<div class="coupon-item-btns">'+
-                                            '<input type="text" name="couponUsage[]" value="1">'+
+                                            '<input type="hidden" name="couponUsage[]" value="1">'+
                                             '<input type="hidden" id="coupon_discount'+cid+'" value="'+discount+'">'+
                                             '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
                                             '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
