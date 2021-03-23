@@ -1137,65 +1137,52 @@
 
                     var i;
                     var totaldiscount = 0;
-                    var counter = parseInt($('#coupon_counter').val());
-                    var limit = $('#coupon_limit').val();
 
                     var pname = $('#product_name_'+iteration).val();
                     var productid = $('#pp'+iteration).val();
                     var combination = $('#couponcombination'+cid).val();
 
                     for (i = 1; i <= totalDiscountedProduct; i++) {
-                        if(i <= remaining){
-                            if(counter <= limit){
-
-                                if(amount > 0){
-                                    var tdiscount = price-parseFloat(amount);
-                                }
-
-                                if(percnt > 0){
-                                    var percent = parseFloat(percnt)/100;
-                                    var discount =  price*parseFloat(percent);
-
-                                    var tdiscount = price-parseFloat(discount);
-                                } 
-
-                                totaldiscount += tdiscount;
-
-                                $('#couponList').append(
-                                    '<div id="couponDiv'+cid+'">'+
-                                        '<div class="coupon-item p-2 border rounded mb-1">'+
-                                            '<div class="row no-gutters">'+
-                                                '<div class="col-12">'+
-                                                    '<div class="coupon-item-name">'+
-                                                        '<h5 class="m-0">'+name+' <span></span></h5>'+
-                                                    '</div>'+
-                                                    '<div class="coupon-item-desc small mb-1">'+
-                                                        '<span>'+desc+'</span><br>'+
-                                                        '<span class="text-success">Applied On : '+pname+'</span>'+
-                                                    '</div>'+
-                                                    '<div class="coupon-item-btns">'+
-                                                        '<input type="hidden" id="coupon_discount'+cid+'" value="'+tdiscount+'">'+
-                                                        '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
-                                                        '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
-                                                        '<input type="hidden" name="couponid[]" value="'+cid+'">'+
-                                                        '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
-                                                        '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
-                                                        '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
-                                                    '</div>'+
-                                                '</div>'+
-                                            '</div>'+
-                                        '</div>'+
-                                    '</div>'
-                                );
-
-                                $('[data-toggle="popover"]').popover();
-                                total_cart_reward++;
-                                counter++;
-                            }
+                        if(amount > 0){
+                            var tdiscount = price-parseFloat(amount);
                         }
+
+                        if(percnt > 0){
+                            var percent = parseFloat(percnt)/100;
+                            var discount =  price*parseFloat(percent);
+
+                            var tdiscount = price-parseFloat(discount);
+                        } 
+
+                        totaldiscount += tdiscount;
                     }
 
-                    $('#coupon_counter').val(counter-1);
+                    $('#couponList').append(
+                        '<div id="couponDiv'+cid+'">'+
+                            '<div class="coupon-item p-2 border rounded mb-1">'+
+                                '<div class="row no-gutters">'+
+                                    '<div class="col-12">'+
+                                        '<div class="coupon-item-name">'+
+                                            '<h5 class="m-0">'+name+' <span></span></h5>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-desc small mb-1">'+
+                                            '<span>'+desc+'</span><br>'+
+                                            '<span class="text-success">Applied On : '+pname+'</span>'+
+                                        '</div>'+
+                                        '<div class="coupon-item-btns">'+
+                                            '<input type="hidden" id="coupon_discount'+cid+'" value="'+tdiscount+'">'+
+                                            '<input type="hidden" id="coupon_combination'+cid+'" value="'+combination+'">'+
+                                            '<input type="hidden" id="productid'+cid+'" value="'+iteration+'">'+
+                                            '<input type="hidden" name="couponid[]" value="'+cid+'">'+
+                                            '<input type="hidden" name="coupon_productid[]" value="'+productid+'">'+
+                                            '<button type="button" class="btn btn-danger btn-sm productCouponRemove" id="'+cid+'">Remove</button>&nbsp;'+
+                                            '<button type="button" class="btn btn-info btn-sm" data-toggle="popover" title="Terms & Condition" data-content="'+terms+'">Terms & Conditions</button>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'
+                    );
 
                     var sub_price = $('#sum_sub_price'+iteration).val();
                     var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
