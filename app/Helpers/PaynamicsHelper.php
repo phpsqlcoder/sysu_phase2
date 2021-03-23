@@ -32,22 +32,24 @@ class PaynamicsHelper
             $couponCart = CouponCart::where('customer_id',Auth::id())->where('product_id',$product->product_id);;
 
             if($couponCart->count()){
-                $remainingQty = $product->qty-$couponCart->count();
+                $coupon = $couponCart->first();
+                
+                $remainingQty = $product->qty-$coupon->total_usage;
 
-                $productsub = $product->product->discountedprice*$couponCart->count();
+                $productsub = $product->product->discountedprice*$coupon->total_usage;
 
                 $product_subtotal += $product->product->discountedprice*$remainingQty;
                 // get total product discount amount
-                $coupon = $couponCart->first();
+                
 
                 if(isset($coupon->details->amount)){
-                    $product_total_discount += $coupon->details->amount*$couponCart->count();
-                    $product_subtotal += $productsub-($coupon->details->amount*$couponCart->count());
+                    $product_total_discount += $coupon->details->amount*$coupon->total_usage;
+                    $product_subtotal += $productsub-($coupon->details->amount*$coupon->total_usage);
                 }   
 
                 if(isset($coupon->details->percentage)){
                     $percent = $coupon->details->percentage/100;
-                    $discount = ($product->product->discountedprice*$percent)*$couponCart->count();
+                    $discount = ($product->product->discountedprice*$percent)*$coupon->total_usage;
                     
                     $product_total_discount += $discount;
                     $product_subtotal += $productsub-$discount;

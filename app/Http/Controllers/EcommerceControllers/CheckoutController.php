@@ -51,22 +51,24 @@ class CheckoutController extends Controller
             $couponCart = CouponCart::where('customer_id',Auth::id())->where('product_id',$p->product_id);;
 
             if($couponCart->count()){
-                $remainingQty = $p->qty-$couponCart->count();
-                $productsub = $p->product->discountedprice*$couponCart->count();
+
+                $coupon = $couponCart->first();
+
+                $remainingQty = $p->qty-$coupon->total_usage;
+                $productsub = $p->product->discountedprice*$coupon->total_usage;
                 // get product subtotal of remaining qty
 
                 $product_subtotal += $p->product->discountedprice*$remainingQty;
 
                 // get total discount amount
-                $coupon = $couponCart->first();
 
                 if(isset($coupon->details->amount)){
-                    $product_subtotal += $productsub-($coupon->details->amount*$couponCart->count());
+                    $product_subtotal += $productsub-($coupon->details->amount*$coupon->total_usage);
                 }   
 
                 if(isset($coupon->details->percentage)){
                     $percent = $coupon->details->percentage/100;
-                    $discount = ($p->product->discountedprice*$percent)*$couponCart->count();
+                    $discount = ($p->product->discountedprice*$percent)*$coupon->total_usage;
                     
                     $product_subtotal += $productsub-$discount;
                     
@@ -91,7 +93,7 @@ class CheckoutController extends Controller
                     $amountDiscount += $coupon->amount;
                 }
 
-                if(isset($counpon->percentage)){
+                if(isset($coupon->percentage)){
                     $percent = $coupon->percentage/100;
                     $discount = $product_subtotal*$percent;
 

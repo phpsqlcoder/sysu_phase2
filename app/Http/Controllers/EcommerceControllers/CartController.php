@@ -194,11 +194,12 @@ class CartController extends Controller
               
             }
 
-            $refreshCustomerCouponCart = CouponCart::where('customer_id',Auth::id())->delete();
+            CouponCart::where('customer_id',Auth::id())->delete();
             if($request->coupon_counter > 0){
                 $data = $request->all();
                 $coupons = $data['couponid'];
                 $product = $data['coupon_productid'];
+                $usage = $data['couponUsage'];
 
                 foreach($coupons as $key => $c){
                     $coupon = Coupon::find($c);
@@ -207,7 +208,8 @@ class CartController extends Controller
                         CouponCart::create([
                             'coupon_id' => $coupon->id,
                             'product_id' => $product[$key] == 0 ? NULL : $product[$key],
-                            'customer_id' => Auth::id()
+                            'customer_id' => Auth::id(),
+                            'total_usage' => $usage[$key]
                         ]);
                     }
                 }
@@ -311,13 +313,13 @@ class CartController extends Controller
             $totalQty += $cart->qty;
 
             $product = $cart->product;
-            $gross_amount = ($product->price * $cart->qty) + ($cart->paella_price * $cart->qty);
+            $gross_amount = ($product->discountedprice * $cart->qty) + ($cart->paella_price * $cart->qty);
             $tax_amount = $gross_amount - ($gross_amount/1.12);
             $grand_gross += $gross_amount;
             $grand_tax += $tax_amount;
 
 
-            $data['price'] = $product->price;
+            $data['price'] = $product->discountedprice;
             $data['tax'] = $data['price'] - ($data['price']/1.12);
             $data['other_cost'] = 0;
             $data['net_price'] = $data['price'] - ($data['tax'] + $data['other_cost']);
@@ -327,7 +329,7 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'product_category' => $product->category_id,
-                'price' => $product->price,              
+                'price' => $product->discountedprice,              
                 'tax_amount' => $tax_amount,
                 'promo_id' => 0,
                 'promo_description' => '',
@@ -553,11 +555,27 @@ class CartController extends Controller
         $coupons = $data['couponid'];
         foreach($coupons as $c){
             $coupon = Coupon::find($c);
+
+            $cart = CouponCart::where('customer_id',Auth::id())->where('coupon_id',$coupon->id);
+
+            if($cart->exists()){
+                $ct = $cart->first();
+
+                if(isset($ct->product_id)){
+                    $productid = $ct->product_id;
+                } else {
+                    $productid = NULL;
+                }            
+            } else {
+                $productid = NULL;
+            }
+
             CouponSale::create([
                 'customer_id' => Auth::id(),
                 'coupon_id' => $c,
                 'coupon_code' => $coupon->coupon_code,
-                'sales_header_id' => $salesid
+                'sales_header_id' => $salesid,
+                'product_id' => $productid
             ]);   
         }
     }
