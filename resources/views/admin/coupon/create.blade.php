@@ -420,9 +420,7 @@
 							</div>
 							<div class="col-md-6" id="total-quantity-select" style="display: {{ (old('purchase_total_qty') ? 'block':'none') }};">
 								<select class="custom-select" name="qty_opt" id="qty_opt">
-									<option selected value="">Choose One</option>
-									<option @if(old('qty_opt') == 'min') selected @endif value="min">Minimum</option>
-									<option @if(old('qty_opt') == 'max') selected @endif value="max">Maximum</option>
+									<option value="min">Minimum</option>
 								</select>
 								<small id="spanQtyOpt" style="display: none;" class="text-danger"></small>
 							</div>
