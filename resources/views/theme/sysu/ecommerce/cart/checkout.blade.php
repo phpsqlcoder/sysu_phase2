@@ -833,6 +833,31 @@
                     }
                 }        
             }
+
+            var sf_counter = $('#sf_discount_coupon').val();
+
+            if(sf_counter > 0){
+
+                var id = $('.sfCouponRemove').attr("id");
+
+                $('#sf_discount_row').css('display','none');
+                
+                $('#sf_discount_amount').val(0);
+                var totalsfdiscoutcounter = $('#sf_discount_coupon').val();
+                $('#sf_discount_coupon').val(parseInt(totalsfdiscoutcounter)-1);
+
+                var counter = $('#coupon_counter').val();
+                $('#coupon_counter').val(parseInt(counter)-1);
+
+                var combination = $('#coupon_combination'+id).val();
+                if(combination == 0){
+                    $('#solo_coupon_counter').val(0);
+                }
+
+                $('#couponDiv'+id+'').remove();
+
+            }
+
             compute_total();
         });
 
