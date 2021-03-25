@@ -57,6 +57,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Type *</label>
+                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
+                        <option selected disabled value="">Choose One</option>
+                        <option value="brand">Brand</option>
+                        <option value="category">Category</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="d-block">Status</label>
                     <div class="custom-control custom-switch @error('status') is-invalid @enderror">
                         <input type="checkbox" class="custom-control-input" name="status" {{ (old("status") ? "checked":"") }} id="customSwitch1">
@@ -64,15 +73,6 @@
                         @hasError(['inputName' => 'status'])
                         @endhasError
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Type *</label>
-                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
-                        <option selected disabled value="">Choose One</option>
-                        <option value="brand">Brand</option>
-                        <option value="category">Category</option>
-                    </select>
                 </div>
 
                 <div style="display: none;" id="tbl_brand">

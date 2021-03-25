@@ -58,6 +58,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Type *</label>
+                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
+                        <option disabled value="">Choose One</option>
+                        <option @if($promo->type == 'brand') selected @endif value="brand">Brand</option>
+                        <option @if($promo->type == 'category') selected @endif value="category">Category</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="d-block">Status</label>
                     <div class="custom-control custom-switch @error('status') is-invalid @enderror">
                         <input type="checkbox" class="custom-control-input" name="status" {{ (old("status") == "ON" || $promo->status == "ACTIVE" ? "checked":"") }} id="customSwitch1">
@@ -65,15 +74,6 @@
                     </div>
                     @hasError(['inputName' => 'status'])
                     @endhasError
-                </div>
-
-                <div class="form-group">
-                    <label>Type *</label>
-                    <select class="form-control" name="type" required id="type" onchange="promo_type();">
-                        <option disabled value="">Choose One</option>
-                        <option @if($promo->type == 'brand') selected @endif value="brand">Brand</option>
-                        <option @if($promo->type == 'category') selected @endif value="category">Category</option>
-                    </select>
                 </div>
 
                 <div style="display: @if($promo->type == 'brand') block @else none; @endif" id="tbl_brand">

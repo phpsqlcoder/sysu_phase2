@@ -1,4 +1,4 @@
-@extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
+    @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
@@ -297,6 +297,11 @@
             $('#coupon_counter').val(0);
             $('#solo_coupon_counter').val(0);
             $('#total_amount_discount_counter').val(0);
+
+            $('#total_amount_discount').val(0);
+            $('#promotionDiv').hide();
+
+
 
             $(".cart_product_reward").each(function() {
                 $(this).val(0);
