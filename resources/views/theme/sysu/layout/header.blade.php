@@ -115,9 +115,15 @@
 
                 <!-- RD Navbar Brand -->
                 <div class="rd-navbar-brand">
-                    <a href="{{route('home')}}" class="brand-name">
-                        <img src="{{ asset('storage').'/logos/'.Setting::getFaviconLogo()->company_logo }}" alt="Sysu" />
-                    </a>
+                    @if(Route::current()->getName() == 'product.front.list')
+                        <a href="{{route('product.front.list')}}" class="brand-name">
+                            <img src="{{ asset('storage').'/logos/Sysu_Foodhub_Online_Shop_Logo.jpg' }}" alt="Sysu" />
+                        </a>
+                    @else
+                         <a href="{{route('home')}}" class="brand-name">
+                            <img src="{{ asset('storage').'/logos/'.Setting::getFaviconLogo()->company_logo }}" alt="Sysu" />
+                        </a>
+                    @endif
                 </div>
                 <div class="rd-navbar-top-panel__content"> <!--desktop shopping icons-->
                     <div class="rd-navbar-top-panel__left">
