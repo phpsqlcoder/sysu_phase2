@@ -170,12 +170,10 @@
                                 $total_amount_discount = \App\EcommerceModel\CouponSale::total_discount_amount($sales->id);
                                 $total_discounted_amount = $subtotal-$total_amount_discount;
 
-                                $delivery_discount = 0;
+                                $delivery_discount = \App\EcommerceModel\CouponSale::total_discount_delivery($sales->id);
                                 $delivery_fee = $sales->delivery_fee_amount-$delivery_discount;
 
                                 $net_amount = $total_discounted_amount+$delivery_fee;
-
-
                             @endphp
                             <hr>
                             <li class="d-flex justify-content-between">
@@ -183,20 +181,24 @@
                                 <span>{{number_format($subtotal, 2)}}</span>
                             </li>
 
+                            @if($total_amount_discount > 0)
                             <li class="d-flex justify-content-between">
                                 <span>Order Discount</span>
                                 <span>{{number_format($total_amount_discount, 2)}}</span>
                             </li>
+                            @endif
 
                             <li class="d-flex justify-content-between">
                                 <span>Delivery Fee</span>
                                 <span>{{number_format($sales->delivery_fee_amount, 2)}}</span>
                             </li>
 
+                            @if($delivery_discount > 0)
                             <li class="d-flex justify-content-between">
                                 <span>Delivery Discount</span>
-                                <span>{{number_format(\App\EcommerceModel\CouponSale::total_discount_amount($sales->id), 2)}}</span>
+                                <span>{{number_format($delivery_discount, 2)}}</span>
                             </li>
+                            @endif
 
                             <li class="d-flex justify-content-between">
                                 <strong>Net Amount</strong>

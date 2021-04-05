@@ -65,5 +65,26 @@ class CouponSale extends Model
         }
 
         return $discount;
-    } 
+    }
+
+    public static function total_discount_delivery($orderid)
+    {
+        $coupons = CouponSale::where('sales_header_id',$orderid)->get();
+
+        $discount = 0;
+        foreach($coupons as $coupon){
+            if(isset($coupon->details->location)){
+                if($coupon->details->location_discount_type == 'full'){
+                    $sales = SalesHeader::find($orderid);
+
+                    $discount += $sales->delivery_fee_amount;
+
+                } else {
+                    $discount += $coupon->details->location_discount_amount;
+                }
+            }
+        }
+
+        return $discount;
+    }
 }

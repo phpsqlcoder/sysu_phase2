@@ -342,8 +342,6 @@ class CartController extends Controller
             ]);
           
         }
-
-        Mail::to(Auth::user())->send(new SalesCompleted($salesHeader));  
       
         $urls = [
             'notification' => route('cart.payment-notification'),
@@ -374,7 +372,7 @@ class CartController extends Controller
             }
         }
         
-        
+        Mail::to(Auth::user())->send(new SalesCompleted($salesHeader));  
         
         return view('theme.paynamics.sender', compact('base64Code'));
        
