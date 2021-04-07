@@ -214,21 +214,15 @@
                                         <tr>
                                             <td>Order:</td>
                                             <td align="right">
-                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$product_subtotal}}">
+                                                <input type="hidden" id="order_amount" name="order_amount" value="{{$grandTotal}}">
                                                 <input type="hidden" id="delivery_fee" name="delivery_fee" value="0">
                                                 <input type="hidden" id="total_amount" name="total_amount" value="{{$grandTotal}}">
-                                                &#8369; {{number_format($product_subtotal,2)}}
+                                                &#8369; {{number_format($grandTotal,2)}}
                                             </td>
                                         </tr>
                                         
-                                        <input type="hidden" id="total_amount_discount_counter" value="{{$total_amount_discount_counter}}">
-                                        <input type="hidden" id="total_amount_discount" value="{{$amountDiscount}}">
-                                        <tr id="promotion" style="@if($amountDiscount > 0) @else display:none @endif;">
-                                            <td class="text-danger">Order Discount</td>
-                                            <td align="right" class="text-danger" id="total_deduction">
-                                                &#8369; {{number_format($amountDiscount,2)}}
-                                            </td>
-                                        </tr>
+                                        {{--<input type="hidden" id="total_amount_discount_counter" value="{{$total_amount_discount_counter}}">--}}
+                                        {{--<input type="hidden" id="total_amount_discount" value="{{$amountDiscount}}">--}}
 
                                         <input type="hidden" id="sf_discount_amount" value="0">
                                         <input type="hidden" id="sf_discount_coupon" value="0">

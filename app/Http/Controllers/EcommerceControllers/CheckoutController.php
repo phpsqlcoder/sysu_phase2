@@ -45,6 +45,7 @@ class CheckoutController extends Controller
         $totalQty = 0;
         $product_subtotal = 0;
         $product_orig_subtotal = 0;
+        $total_discount = 0;
         foreach($products as $p){
 
 
@@ -66,6 +67,7 @@ class CheckoutController extends Controller
                 // get total discount amount
 
                 if(isset($coupon->details->amount)){
+                    $total_discount += $coupon->details->amount*$coupon->total_usage;
                     $product_subtotal += $productsub-($coupon->details->amount*$coupon->total_usage);
                 }   
 
@@ -73,6 +75,7 @@ class CheckoutController extends Controller
                     $percent = $coupon->details->percentage/100;
                     $discount = ($p->product->discountedprice*$percent)*$coupon->total_usage;
                     
+                    $total_discount += $discount;
                     $product_subtotal += $productsub-$discount;
                     
                 }
@@ -85,7 +88,6 @@ class CheckoutController extends Controller
 
         // get total amount discount
         $totalAmountCoupons = CouponCart::where('customer_id',Auth::id())->whereNull('product_id')->get();
-        $amountDiscount = 0;
         $total_amount_discount_counter = 0;
         foreach($totalAmountCoupons as $c){
             $coupon = Coupon::find($c->coupon_id);
@@ -93,21 +95,21 @@ class CheckoutController extends Controller
                 $total_amount_discount_counter++;
 
                 if(isset($coupon->amount)){
-                    $amountDiscount += $coupon->amount;
+                    $total_discount += $coupon->amount;
                 }
 
                 if(isset($coupon->percentage)){
                     $percent = $coupon->percentage/100;
                     $discount = $product_subtotal*$percent;
 
-                    $amountDiscount += $discount;
+                    $total_discount += $discount;
                 }
             }
         }
 
-        $grandTotal = $product_subtotal-$amountDiscount;
+        $grandTotal = $product_subtotal-$total_discount;
 
-        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','totalAmount','totalQty','grandTotal','amountDiscount','product_subtotal','couponUsed','total_amount_discount_counter'));
+        return view('theme.'.env('FRONTEND_TEMPLATE').'.ecommerce.cart.checkout', compact('products','user','locations','page','coupons','totalAmount','totalQty','grandTotal','product_subtotal','couponUsed','total_amount_discount_counter'));
     }
 
     public function remove_coupon($id)
