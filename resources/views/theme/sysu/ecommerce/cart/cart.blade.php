@@ -182,13 +182,13 @@
                                         </div>
                                     </div>
 
+                                    <input type="hidden" id="promo_total_discount" value="{{ $total_product_discount }}">
                                     @if($total_product_discount)
                                     <div class="cart-table-row">
                                         <div class="cart-table-2-col">
                                             <div class="cart-table-2-title text-danger">Promo Discount</div>                                  
                                         </div>
                                         <div class="cart-table-2-col">
-                                            <input type="hidden" id="promo_total_discount" value="{{ $total_product_discount }}">
                                             <div class="cart-table-2-title text-right text-danger">₱ <span id="span_promo_discount">{{number_format($total_product_discount,2)}}</span></div>
                                         </div>
                                     </div>
@@ -1387,7 +1387,7 @@
             if(couponTotalDiscount == 0){
                 $('.couponDiscountDiv').css('display','none');
             }
-
+            console.log(promoTotalDiscount);
             var totalDeduction = promoTotalDiscount+couponTotalDiscount;
             var grandTotal = subtotal-totalDeduction;
 
