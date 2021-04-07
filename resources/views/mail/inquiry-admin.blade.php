@@ -56,6 +56,10 @@
         <table style="width:100%; padding: 20px;background: #f0f0f0;font-size: 14px;">
             <tbody>
             <tr>
+                <td width="30%"><strong>Type</strong></td>
+                <td>{{ $clientInfo['type'] }}</td>
+            </tr>
+            <tr>
                 <td width="30%"><strong>Name</strong></td>
                 <td>{{ $clientInfo['name'] }}</td>
             </tr>
