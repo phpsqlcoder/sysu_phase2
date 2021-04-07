@@ -197,7 +197,7 @@
                                                                         <td>&nbsp;</td>
                                                                         <td class="text-right">'.number_format($total_sales,2).'</td>
                                                                     </tr>
-
+                                                                    
                                                                     <tr style="font-weight:bold;">
                                                                         <td colspan="4">Coupon Discount</td>
                                                                         <td class="text-right">- '.number_format($sale->discount_amount,2).'</td>
