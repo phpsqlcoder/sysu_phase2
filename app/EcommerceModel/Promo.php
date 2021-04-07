@@ -5,6 +5,7 @@ namespace App\EcommerceModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use DB;
 class Promo extends Model
 {
 	use SoftDeletes;
@@ -17,14 +18,17 @@ class Promo extends Model
     	return $this->hasMany('\App\EcommerceModel\PromoProducts','promo_id');
     }
 
-    public static function update_promo_xpiration()
+    public static function promo_percentage($productid)
     {
-    	$promos = Promo::where('status','ACTIVE')->where('is_expire',0)->get();
+        $promo = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$productid);
 
-    	foreach($promos as $promo){
-    		if($promo->promo_end <= now()){
-    			Promo::find($promo->id)->update(['is_expire' => 1]);
-    		}
-    	}
+        
+        if($promo->count() > 0){
+            $discount_percentage = $promo->max('promos.discount');
+        } else {
+            $discount_percentage = 0;
+        }
+
+        return $discount_percentage;
     }
 }

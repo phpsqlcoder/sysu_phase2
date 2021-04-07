@@ -217,7 +217,8 @@
                                                 <input type="hidden" id="order_amount" name="order_amount" value="{{$product_subtotal}}">
                                                 <input type="hidden" id="delivery_fee" name="delivery_fee" value="0">
                                                 <input type="hidden" id="total_amount" name="total_amount" value="{{$grandTotal}}">
-                                                &#8369; {{number_format($product_subtotal,2)}}</td>
+                                                &#8369; {{number_format($product_subtotal,2)}}
+                                            </td>
                                         </tr>
                                         
                                         <input type="hidden" id="total_amount_discount_counter" value="{{$total_amount_discount_counter}}">
@@ -242,7 +243,7 @@
                                         </tr>
 
                                         <tr style="font-size:20px;font-weight:bold;">
-                                            <td>Total:</td>
+                                            <td>TOTAL:</td>
                                             <td align="right">&#8369; <span id="total_amount_div">{{number_format($grandTotal,2)}}</span></td>
                                         </tr>
                                     </table>                    
@@ -896,8 +897,6 @@
 
             $('#total_amount_div').html(addCommas(parseFloat(gtotal).toFixed(2)));
             $('#total_amount').val(gtotal.toFixed(2));
-            $('#deposit').val(gtotal);
-            $('#dep50').html('(&#8369; '+parseFloat(gtotal)/2+')');
         }
 
 

@@ -166,7 +166,7 @@
                                                                         <th>Description</th>
                                                                         <th>Qty</th>
                                                                         <th>Price</th>
-                                                                        <th>Total</th>
+                                                                        <th class="text-right">Total</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>';
@@ -184,24 +184,40 @@
                                                                             <td>'.$item->product_name.'</td>
                                                                             <td>'.$item->qty.' '.$item->uom.'</td>
                                                                             <td>'.number_format($item->price,2).'</td>
-                                                                            <td>'.number_format(($item->price * $item->qty),2).'</td>
+                                                                            <td class="text-right">'.number_format(($item->price * $item->qty),2).'</td>
                                                                         </tr>';
                                                                     }
+
+                                                                    $delivery_discount = \App\EcommerceModel\CouponSale::total_discount_delivery($sale->id);
+
                                                                     $modals.='
                                                                     <tr style="font-weight:bold;">
                                                                         <td colspan="2">Sub total</td>
                                                                         <td>'.number_format($total_qty,2).'</td>
                                                                         <td>&nbsp;</td>
-                                                                        <td>'.number_format($total_sales,2).'</td>
+                                                                        <td class="text-right">'.number_format($total_sales,2).'</td>
                                                                     </tr>
+
+                                                                    <tr style="font-weight:bold;">
+                                                                        <td colspan="4">Coupon Discount</td>
+                                                                        <td class="text-right">- '.number_format($sale->discount_amount,2).'</td>
+                                                                    </tr>
+
                                                                     <tr style="font-weight:bold;">
                                                                         <td colspan="4">Delivery Fee</td>                                 
-                                                                        <td>'.number_format($sale->delivery_fee_amount,2).'</td>
+                                                                        <td class="text-right">'.number_format($sale->delivery_fee_amount,2).'</td>
                                                                     </tr>
+
+                                                                    <tr style="font-weight:bold;">
+                                                                        <td colspan="4">Delivery Discount</td>                                 
+                                                                        <td class="text-right">- '.number_format($delivery_discount,2).'</td>
+                                                                    </tr>
+
+
                                                                     <tr style="font-weight:bold;">
                                                                         <td colspan="4">Grand total</td>
                                                                        
-                                                                        <td>'.number_format($total_sales+$sale->delivery_fee_amount,2).'</td>
+                                                                        <td class="text-right">'.number_format(($total_sales-$sale->discount_amount)+($sale->delivery_fee_amount-$delivery_discount),2).'</td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>

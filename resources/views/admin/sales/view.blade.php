@@ -97,7 +97,6 @@
                                 <th class="wd-30p">Product Name</th>
                                 <th class="tx-center">Quantity</th>
                                 <th class="tx-right">Price</th>
-                                <th class="tx-right">Discount</th>
                                 <th class="tx-right">Total</th>
                             </tr>
                             </thead>
@@ -107,16 +106,16 @@
                             
                             @php
                                 $discount = \App\EcommerceModel\CouponSale::total_product_discount($sales->id,$details->product_id,$details->qty,$details->price);
-                                $total = $details->gross_amount-$discount;
-                                $subtotal += $total;
+                                $product_subtotal = $details->price*$details->qty;
+
+                                $subtotal += $product_subtotal;
                             @endphp
                             <tr>
                                 <td class="tx-nowrap">{{$details->product->code}}</td>
                                 <td class="tx-nowrap">{{$details->product_name}}</td>
                                 <td class="tx-center">{{number_format($details->qty, 0)}}</td>
                                 <td class="tx-right">{{number_format($details->price, 2)}}</td>
-                                <td class="tx-right">{{ number_format($discount,2) }}</td>
-                                <td class="tx-right">{{number_format($total, 2)}}</td>
+                                <td class="tx-right">{{number_format($product_subtotal, 2)}}</td>
                                
                             </tr>
                             @empty
@@ -167,24 +166,19 @@
                             @endforelse
 
                             @php
-                                $total_amount_discount = \App\EcommerceModel\CouponSale::total_discount_amount($sales->id);
-                                $total_discounted_amount = $subtotal-$total_amount_discount;
-
                                 $delivery_discount = \App\EcommerceModel\CouponSale::total_discount_delivery($sales->id);
-                                $delivery_fee = $sales->delivery_fee_amount-$delivery_discount;
-
-                                $net_amount = $total_discounted_amount+$delivery_fee;
+                                $net_amount = ($subtotal-$sales->discount_amount)+($sales->delivery_fee_amount-$delivery_discount);
                             @endphp
                             <hr>
                             <li class="d-flex justify-content-between">
-                                <span>Gross</span>
+                                <span>Sub Total</span>
                                 <span>{{number_format($subtotal, 2)}}</span>
                             </li>
 
-                            @if($total_amount_discount > 0)
+                            @if($sales->discount_amount > 0)
                             <li class="d-flex justify-content-between">
-                                <span>Order Discount</span>
-                                <span>{{number_format($total_amount_discount, 2)}}</span>
+                                <span>Coupon Discount</span>
+                                <span>{{number_format($sales->discount_amount, 2)}}</span>
                             </li>
                             @endif
 

@@ -1,4 +1,4 @@
-    @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
+     @extends('theme.'.env('FRONTEND_TEMPLATE').'.main')
 
 @section('pagecss')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
@@ -16,6 +16,9 @@
                         <div class="col-lg-8 pb-5">
                             <h3 class="catalog-title">My Carts</h3>
                             @php
+                                $total_product_discount = 0;
+                                $total_orig_price = 0;
+                                $total_price_wout_promo = 0;
                                 $total = 0;
                                 $total_product_count=0;
                                 $cproducts  = '';
@@ -25,12 +28,19 @@
                                     $total_product_count++;
                                     $product = $order->product;
                                     $total += $order->product->discountedprice*$order->qty;
+                                    $total_orig_price = $order->product->price*$order->qty;
                                     $max = $product->Maxpurchase;
                                     if (empty($product)) {
                                         continue;
                                     }
 
+                                    $total_price_wout_promo += $total_orig_price;
+
+                                    $product_discount = $order->product->price-$order->product->discountedprice;
+                                    $total_product_discount += $product_discount*$order->qty;
                                     $cproducts .= $order->product_id.'|';
+
+                                    $promo_discount_percentage = \App\EcommerceModel\Promo::promo_percentage($order->product_id);
                                 @endphp
                                 
                                 <input type="hidden" id="iteration{{$order->product_id}}" value="{{$loop->iteration}}">
@@ -76,9 +86,6 @@
                                                             <input type="hidden" id="maxorder{{$loop->iteration}}" value="{{ $max }}">
                                                         </div>
                                                     </div>
-                                                    <small>Total</small>
-                                                    <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">₱ {{number_format($order->product->discountedprice*$order->qty,2)}}</div>
-                                                    <div class="prod-total prod_new_price" id="product_new_price{{$loop->iteration}}" style="font-weight:bold;"></div>
                                                     
                                                     <input type="hidden" class="loop-iteration" id="cart_product_{{$loop->iteration}}" value="{{$loop->iteration}}">
                                                     <input type="hidden" class="cart_product_reward" id="cart_product_reward{{$loop->iteration}}" value="0">
@@ -87,6 +94,24 @@
                                                     <input type="hidden" id="product_name_{{$loop->iteration}}" value="{{$product->name}}">
                                                     <input type="hidden" name="price{{$loop->iteration}}" id="price{{$loop->iteration}}" value="{{number_format($product->discountedprice,2,'.','')}}">
                                                     <input type="hidden" data-id="{{$loop->iteration}}" data-productid="{{$order->product_id}}" id="sum_sub_price{{$loop->iteration}}" class="sum_sub_price" name="sum_sub_price{{$loop->iteration}}" value="{{number_format($order->product->discountedprice*$order->qty,2,'.','')}}">
+
+                                                    <div style="font-weight:bold;color:grey;font-size:15px;">Before : ₱ 
+                                                        <span id="priceBefore{{$loop->iteration}}">{{ number_format($total_orig_price,2) }}</span>
+                                                    </div>
+
+                                                    @if($promo_discount_percentage > 0)
+                                                    <div style="font-weight:bold;font-size:15px;">
+                                                        <span class="text-danger">Promo Discount : {{$promo_discount_percentage}}% OFF</span>
+                                                    </div>
+                                                    @endif
+
+                                                    <div class="text-danger couponDiscountSpan{{$loop->iteration}}" style="font-weight:bold;display: none;font-size:15px;">
+                                                        Coupon Discount :
+                                                        <span class="text-danger" id="product_coupon_discount{{$loop->iteration}}"></span>&nbsp;OFF
+                                                    </div>
+
+                                                    <div class="prod-total" id="product_total_price{{$loop->iteration}}" style="font-weight:bold;">Total ₱ {{number_format($order->product->discountedprice*$order->qty,2)}}</div>
+                                                    <div class="prod-total prod_new_price" id="product_new_price{{$loop->iteration}}" style="font-weight:bold;"></div>
 
                                                 </div>
                                             </div>
@@ -150,18 +175,32 @@
                                             <div class="cart-table-2-title">Subtotal</div>                                  
                                         </div>
                                         <div class="cart-table-2-col">
-                                            <div class="cart-table-2-title text-right" id="total_sub">₱ {{number_format($total,2)}}</div>
+                                            <input type="hidden" id="subtotal" value="{{$total_price_wout_promo}}">
+                                            <div class="cart-table-2-title text-right" id="total_sub">₱ {{number_format($total_price_wout_promo,2)}}</div>
                                         </div>
                                     </div>
 
+                                    @if($total_product_discount)
+                                    <div class="cart-table-row">
+                                        <div class="cart-table-2-col">
+                                            <div class="cart-table-2-title text-danger">Promo Discount</div>                                  
+                                        </div>
+                                        <div class="cart-table-2-col">
+                                            <input type="hidden" id="promo_total_discount" value="{{ $total_product_discount }}">
+                                            <div class="cart-table-2-title text-right text-danger">₱ <span id="span_promo_discount">{{number_format($total_product_discount,2)}}</span></div>
+                                        </div>
+                                    </div>
+                                    @endif
+
                                     
-                                    <div class="cart-table-row promotionDiv" style="display: none;">
+                                    <div class="cart-table-row couponDiscountDiv" style="display: none;">
                                         <div class="cart-table-row">
                                             <div class="cart-table-2-col">
-                                                <div class="cart-table-2-title text-danger">Order Discount</div>                                  
+                                                <div class="cart-table-2-title text-danger">Coupon Discount</div>                                  
                                             </div>
                                             <div class="cart-table-2-col">
-                                                <div class="cart-table-2-title text-right text-danger" id="total_deduction"></div>                                   
+                                                <input type="hidden" id="coupon_total_discount" value="0">
+                                                <div class="cart-table-2-title text-right text-danger" id="total_coupon_deduction"></div>                               
                                             </div>
                                         </div>
                                     </div>
@@ -169,7 +208,7 @@
                                     <input type="hidden" id="total_amount_discount" value="0">
                                     <div class="cart-table-row">
                                         <div class="cart-table-2-col">
-                                            <div class="cart-table-2-title"><strong>Grand Total</strong></div>
+                                            <div class="cart-table-2-title"><strong>GRAND TOTAL</strong></div>
                                         </div>
                                         <div class="cart-table-2-col">
                                             <input type="hidden" id="grandTotal" value="{{number_format($total,2,'.','')}}">
@@ -287,33 +326,63 @@
                 url: "{{route('cart.ajax_update')}}",
                 
                 success: function(returnData) {
-                   
+
+                    var priceBefore = parseFloat(returnData.price_before);
+                    $('#priceBefore'+id).html(addCommas(priceBefore.toFixed(2)));
+
+                    var promo_discount = parseFloat(returnData.total_promo_discount);
+                    $('#span_promo_discount').html(addCommas(promo_discount.toFixed(2)));
+                    $('#promo_total_discount').val(promo_discount.toFixed(2));
+                    $('#subtotal').val(returnData.subtotal);
+
+                    $('#couponList').empty();
+                    $('.prod_new_price').hide();
+                    $('#coupon_counter').val(0);
+                    $('#solo_coupon_counter').val(0);
+                    $('#total_amount_discount_counter').val(0);
+                    $('#coupon_total_discount').val(0);
+
+                    $('#total_amount_discount').val(0);
+                    $('.couponDiscountDiv').hide();
+
+
+
+                    $(".cart_product_reward").each(function() {
+                        $(this).val(0);
+                    });
+
+                    $(".cart_product_discount").each(function() {
+                        $(this).val(0);
+                    });
+
+                    update_sub_total_price_per_item(id);
+
+                    compute_grand_total();
                 }
-                
             });
             
-            $('#couponList').empty();
-            $('.prod_new_price').hide();
-            $('#coupon_counter').val(0);
-            $('#solo_coupon_counter').val(0);
-            $('#total_amount_discount_counter').val(0);
+            // $('#couponList').empty();
+            // $('.prod_new_price').hide();
+            // $('#coupon_counter').val(0);
+            // $('#solo_coupon_counter').val(0);
+            // $('#total_amount_discount_counter').val(0);
 
-            $('#total_amount_discount').val(0);
-            $('#promotionDiv').hide();
+            // $('#total_amount_discount').val(0);
+            // $('.couponDiscountDiv').hide();
 
 
 
-            $(".cart_product_reward").each(function() {
-                $(this).val(0);
-            });
+            // $(".cart_product_reward").each(function() {
+            //     $(this).val(0);
+            // });
 
-            $(".cart_product_discount").each(function() {
-                $(this).val(0);
-            });
+            // $(".cart_product_discount").each(function() {
+            //     $(this).val(0);
+            // });
 
-            update_sub_total_price_per_item(id);
+            // update_sub_total_price_per_item(id);
 
-            compute_grand_total();
+            // compute_grand_total();
         });
 
         $('#couponManualBtn').click(function(){
@@ -887,13 +956,28 @@
                     var amountdiscount = discount;
                 }
 
+                var coupon_discount = parseFloat($('#coupon_total_discount').val());
+
+                var total_coupon_deduction = coupon_discount+amountdiscount;
+                $('#coupon_total_discount').val(total_coupon_deduction.toFixed(2));
+                $('#total_coupon_deduction').html('₱ '+addCommas(total_coupon_deduction.toFixed(2))); 
+                $('.couponDiscountDiv').css('display','block');
+
                 $('#total_amount_discount').val(amountdiscount);
+
                 compute_grand_total();
             }
         }
 
         $(document).on('click', '.couponRemove', function(){  
-            var id = $(this).attr("id");  
+            var id = $(this).attr("id"); 
+
+            var coupon_total_discount = parseFloat($('#coupon_total_discount').val());
+            var total_amount_discount = $('#total_amount_discount').val();
+            
+            var updated_coupon_discount = coupon_total_discount-total_amount_discount;
+            $('#coupon_total_discount').val(updated_coupon_discount.toFixed(2));
+            $('#total_coupon_deduction').html('₱ '+ addCommas(updated_coupon_discount.toFixed(2))); 
             
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
@@ -908,7 +992,6 @@
             }
 
             $('#couponDiv'+id+'').remove(); 
-
             compute_grand_total();
         });
     // end use coupon on total amount
@@ -932,7 +1015,7 @@
             if(coupon_counter(cid)){
                 if(pdiscount == 'specific'){
                     var iteration = $('#iteration'+discountproductid).val();
-                    var total_cart_reward = parseInt($('#cart_product_reward'+iteration).val())
+                    //var total_cart_reward = parseFloat($('#cart_product_reward'+iteration).val())
 
                     var pname = $('#product_name_'+iteration).val();
                     var productid = $('#pp'+iteration).val();
@@ -981,7 +1064,7 @@
                     );
 
                     $('[data-toggle="popover"]').popover();
-                    total_cart_reward++;
+                    $('#cart_product_reward'+iteration).val(1);
                 }
 
                 if(pdiscount == 'current'){
@@ -1122,7 +1205,6 @@
                         }
                     }
                     
-                    var total_cart_reward = parseInt($('#cart_product_reward'+iteration).val());
                     var price = parseFloat($('#price'+iteration).val());
                 
                     var totalpurchaseqty = parseFloat($('#purchaseqty'+cid).val())+1;
@@ -1164,6 +1246,7 @@
                         } 
 
                         totaldiscount += tdiscount;
+                        discount = totaldiscount;
                         counter++;
                     }
 
@@ -1201,18 +1284,31 @@
                     var productSubTotalDiscount = parseFloat(sub_price)-parseFloat(totaldiscount);
                 }
 
+                // Total Amount Coupon Discount 
+                    var coupon_discount = parseFloat($('#coupon_total_discount').val());
+
+                    var total_coupon_deduction = coupon_discount+discount;
+                    $('#coupon_total_discount').val(total_coupon_deduction.toFixed(2));
+                    $('#total_coupon_deduction').html('₱ '+addCommas(total_coupon_deduction.toFixed(2))); 
+                    $('.couponDiscountDiv').css('display','block');
+                //
+
+
                 // Total Summary Computation
-                    //$('#cart_product_discount'+iteration).val(discount.toFixed(2));
+                    $('#cart_product_discount'+iteration).val(discount.toFixed(2));
+                    $('#product_coupon_discount'+iteration).html('₱ '+addCommas(discount.toFixed(2)));
+                    $('.couponDiscountSpan'+iteration).css('display','block');
+
                     $('#sum_sub_price'+iteration).val(productSubTotalDiscount.toFixed(2));
 
-                    $('#product_total_price'+iteration).css({'text-decoration':'line-through','color':'grey'});
+                    $('#product_total_price'+iteration).css('display','none');
                     $('#product_new_price'+iteration).css('display','block');
                     $('#product_new_price'+iteration).html('₱ '+addCommas(productSubTotalDiscount.toFixed(2))); 
 
                     compute_grand_total();
                 //
 
-                $('#cart_product_reward'+iteration).val(total_cart_reward);
+                $('#cart_product_reward'+iteration).val(1);
                 $('#couponBtn'+cid).prop('disabled',true);
                 $('#btnCpnTxt'+cid).html('Applied');
             }
@@ -1226,20 +1322,19 @@
             var total_reward_on_product = $('#cart_product_reward'+pid).val();
             var discount = $('#coupon_discount'+id).val();
 
-            if(total_reward_on_product > 1){
-                var pr = product_subtotal+parseFloat(discount);
+            var coupon_total_discount = parseFloat($('#coupon_total_discount').val());
+            var coupon_product_discount = parseFloat($('#cart_product_discount'+pid).val());
+            
+            var updated_coupon_discount = coupon_total_discount-coupon_product_discount;
+            $('#coupon_total_discount').val(updated_coupon_discount.toFixed(2));
+            $('#total_coupon_deduction').html('₱ '+ addCommas(updated_coupon_discount.toFixed(2))); 
 
-                $('#sum_sub_price'+pid).val(pr);
-                $('#product_new_price'+pid).html('₱ '+addCommas(pr.toFixed(2))); 
+            $('#cart_product_reward'+pid).val(0);
+            $('#cart_product_discount'+pid).val(0);
 
-                $('#cart_product_reward'+pid).val(total_reward_on_product-1);
-            } else {
-                var pr = parseFloat($('#quantity'+pid).val()) * parseFloat($('#price'+pid).val());
-
-                $('#sum_sub_price'+pid).val(pr);
-                $('#product_new_price'+pid).css('display','none');
-                $('#product_total_price'+pid).css({'text-decoration':'','color':'black'});
-            }
+            $('#product_new_price'+pid).css('display','none');
+            $('#product_total_price'+pid).css('display','block');
+            $('.couponDiscountSpan'+pid).css('display','none');
 
             var counter = $('#coupon_counter').val();
             $('#coupon_counter').val(parseInt(counter)-1);
@@ -1278,25 +1373,25 @@
     // calculate grand total
         function compute_grand_total(){
             let summary_sub_price = 0;  
-            var amountDiscount = parseFloat($('#total_amount_discount').val());
+            var subtotal = parseFloat($('#subtotal').val());
+            var promoTotalDiscount = parseFloat($('#promo_total_discount').val());
+            var couponTotalDiscount = parseFloat($('#coupon_total_discount').val());
+            
 
-            for(x=1;x<={{ $totalProducts }};x++){          
-                summary_sub_price+=parseFloat($('#sum_sub_price'+x).val());
+            // for(x=1;x<={{ $totalProducts }};x++){          
+            //     summary_sub_price+=parseFloat($('#sum_sub_price'+x).val());
+            // }
+
+            if(couponTotalDiscount == 0){
+                $('.couponDiscountDiv').css('display','none');
             }
 
-            // total amount discount
-            if(amountDiscount > 0){
-                var total = parseFloat(summary_sub_price)-amountDiscount;
+            var totalDeduction = promoTotalDiscount+couponTotalDiscount;
+            var grandTotal = subtotal-totalDeduction;
 
-                $('.promotionDiv').css('display','block');
-                $('#total_deduction').html('₱ '+addCommas(amountDiscount.toFixed(2)));
-            } else {
-                var total = summary_sub_price;
-                $('.promotionDiv').css('display','none');
-            }
-
-            $('#total_sub').html('₱ '+addCommas(summary_sub_price.toFixed(2)));
-            $('#total_grand').html('₱ '+addCommas(total.toFixed(2)));  
+            
+            $('#total_sub').html('₱ '+addCommas(subtotal.toFixed(2)));
+            $('#total_grand').html('₱ '+addCommas(grandTotal.toFixed(2)));  
         }
     //
 
