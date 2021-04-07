@@ -3,6 +3,7 @@ Dear {{ $adminInfo->firstname }},
 {{ $clientInfo['name'] }} has sent an inquiry for your action.
 Please see details of the inquiry below.
 
+Type: {{ $clientInfo['type'] }}
 Name: {{ $clientInfo['name'] }}
 Email: {{ $clientInfo['email'] }}
 Contact Number: {{ $clientInfo['contact'] }}
