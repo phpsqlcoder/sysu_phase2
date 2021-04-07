@@ -44,7 +44,10 @@ class CheckoutController extends Controller
         $totalAmount = 0;
         $totalQty = 0;
         $product_subtotal = 0;
+        $product_orig_subtotal = 0;
         foreach($products as $p){
+
+
             $totalQty += $p->qty;
             $totalAmount += $p->product->discountedprice*$p->qty;
 

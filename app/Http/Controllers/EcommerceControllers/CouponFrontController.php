@@ -477,15 +477,15 @@ class CouponFrontController extends Controller
             $coupon_customer = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','specific')->whereNull('location')->get();
         } else {
             $coupons = $coupons->where('amount_discount_type',1)->where(function ($orWhereQuery){
-                $orWhereQuery->orwhereNotNull('location')
-                    ->orwhereNotNull('amount')
-                    ->orwhereNotNull('percentage');
+                $orWhereQuery->orwhereNotNull('location');
+                    // ->orwhereNotNull('amount')
+                    // ->orwhereNotNull('percentage');
                 })->orderBy('name','asc');
 
             $coupon_customer = Coupon::where('status','ACTIVE')->where('availability',1)->where('activation_type','auto')->where('customer_scope','specific')->where('amount_discount_type',1)->where(function ($orWhereQuery){
-                $orWhereQuery->orwhereNotNull('location')
-                    ->orwhereNotNull('amount')
-                    ->orwhereNotNull('percentage');
+                $orWhereQuery->orwhereNotNull('location');
+                    // ->orwhereNotNull('amount')
+                    // ->orwhereNotNull('percentage');
                 })->get();
         }
 

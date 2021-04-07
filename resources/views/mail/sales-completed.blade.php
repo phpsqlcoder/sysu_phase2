@@ -677,39 +677,29 @@
                                         <td>Product Name</td>
                                         <td style="text-align:right">Qty</td>
                                         <td style="text-align:right">Price</td>
-                                        <td style="text-align:right">Discount</td>
                                         <td style="text-align:right">Total</td>
                                     </tr>  
                                     <tr>
                                           <td colspan="5"></td>
                                     </tr>
-                                    @php $discount = 0; $subtotal = 0; @endphp
+                                    @php $subtotal = 0; @endphp
 
                                     @forelse($h->items as $i)
-                                        @php
-                                            $discount = \App\EcommerceModel\CouponSale::total_product_discount($h->id,$i->product_id,$i->qty,$i->price);
-                                            $total = $i->gross_amount-$discount;
-                                            $subtotal += $total;
-                                        @endphp
-                                        <tr>
-                                            <td>{{$i->product->code}}</td>
-                                            <td>{{$i->product_name}}</td>
-                                            <td style="text-align:right">{{$i->qty}}</td>
-                                            <td style="text-align:right">Php {{number_format($i->price,2)}}</td>
-                                            <td style="text-align:right">Php {{number_format($discount,2)}}</td>
-                                            <td style="text-align:right">Php {{number_format(($total),2)}}</td>
-                                        </tr>  
-                                      @empty
+                                          @php
+                                                $subtotal += $i->price * $i->qty;
+                                          @endphp
+                                          <tr>
+                                                <td>{{$i->product->code}}</td>
+                                                <td>{{$i->product_name}}</td>
+                                                <td style="text-align:right">{{$i->qty}}</td>
+                                                <td style="text-align:right">Php {{number_format($i->price,2)}}</td>
+                                                <td style="text-align:right">Php {{number_format(($i->price*$i->qty),2)}}</td>
+                                          </tr>  
+                                          @empty
                                     @endforelse
 
                                     @php
-                                        $total_amount_discount = \App\EcommerceModel\CouponSale::total_discount_amount($h->id);
-                                        $total_discounted_amount = $subtotal-$total_amount_discount;
-
                                         $delivery_discount = \App\EcommerceModel\CouponSale::total_discount_delivery($h->id);
-                                        $delivery_fee = $h->delivery_fee_amount-$delivery_discount;
-
-                                        $net_amount = $total_discounted_amount+$delivery_fee;
                                     @endphp
                                     <tr>
                                         <td colspan="6"><hr></td>
@@ -719,10 +709,10 @@
                                         <td colspan="5" style="text-align:right">Php {{number_format($subtotal,2)}}</td>
                                     </tr>
 
-                                    @if($total_amount_discount > 0)
+                                    @if($h->discount_amount > 0)
                                     <tr>
-                                        <td>Order Discount</td>
-                                        <td colspan="5" style="text-align:right;">Php {{number_format($total_amount_discount, 2)}}</td>
+                                        <td>Coupon Discount</td>
+                                        <td colspan="5" style="text-align:right">Php {{number_format($h->discount_amount,2)}}</td>
                                     </tr>
                                     @endif
 
@@ -740,7 +730,7 @@
 
                                     <tr style="font-weight:bold;">
                                         <td>Total</td>
-                                        <td colspan="5" style="text-align:right">Php {{number_format($net_amount,2)}}</td>
+                                        <td colspan="5" style="text-align:right">Php {{number_format(($subtotal-$h->discount_amount)+($h->delivery_fee_amount-$delivery_discount),2)}}</td>
                                     </tr>         
                                 </table>
                             </td>

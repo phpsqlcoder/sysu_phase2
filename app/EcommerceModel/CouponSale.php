@@ -41,7 +41,7 @@ class CouponSale extends Model
             $discount = 0;
         }
 
-        return $discount;
+        return number_format($discount,2);
     }
 
     public static function total_discount_amount($orderid)
