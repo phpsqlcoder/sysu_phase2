@@ -298,7 +298,7 @@
                     title: '',
                     text: 'Sorry. Currently, there is no sufficient stocks for the item you wish to order.',
                     icon: 'warning'
-                    });
+                });
                 $(this).val($('#maxorder'+id).val());
                 return false;
             }
@@ -1368,7 +1368,7 @@
             }
             //$('#total_price'+id).html('Php '+ addCommas(pr.toFixed(2)));
             $('#sum_sub_price'+id).val(total_pr.toFixed(2));
-            $('#product_total_price'+id).html('₱ '+ addCommas(pr.toFixed(2)));  
+            $('#product_total_price'+id).html('Total ₱ '+ addCommas(pr.toFixed(2)));  
         }
     //
 
