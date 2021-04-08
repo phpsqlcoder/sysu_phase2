@@ -195,14 +195,14 @@
                                     @endif
 
                                     
+                                    <input type="hidden" id="coupon_total_discount" name="coupon_total_discount" value="0">
                                     <div class="cart-table-row couponDiscountDiv" style="display: none;">
                                         <div class="cart-table-row">
                                             <div class="cart-table-2-col">
                                                 <div class="cart-table-2-title text-danger">Coupon Discount</div>                                  
                                             </div>
                                             <div class="cart-table-2-col">
-                                                <input type="hidden" id="coupon_total_discount" value="0">
-                                                <div class="cart-table-2-title text-right text-danger" id="total_coupon_deduction"></div>                               
+                                                <div class="cart-table-2-title text-right text-danger" id="total_coupon_deduction"></div>     
                                             </div>
                                         </div>
                                     </div>
