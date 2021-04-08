@@ -291,7 +291,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
     <script>
         $('#couponManualBtn').click(function(){
-            var couponCode = $('#coupon_code').val()
+            var couponCode = $('#coupon_code').val();
+            var grandtotal = parseFloat($('#total_amount').val());
 
             $.ajax({
                 data: {
@@ -354,10 +355,51 @@
                                 if(returnData.coupon_details['free_product_id'] != null){
                                     free_product_coupon(returnData.coupon_details['id']);
                                 } else {
+                                    if(returnData.coupon_details['amount'] > 0){ 
+                                        var amountdiscount = parseFloat(returnData.coupon_details['amount']);
+                                    }
+
+                                    if(returnData.coupon_details['percentage'] > 0){
+                                        var percent  = parseFloat(returnData.coupon_details['percentage'])/100;
+                                        var discount = parseFloat(grandtotal)*percent;
+
+                                        var amountdiscount = parseFloat(discount);
+                                    }
+
+                                    var total = grandtotal-amountdiscount;
+                                    if(total.toFixed(2) < 1){
+                                        swal({
+                                            title: '',
+                                            text: "The total amount is less than the coupon discount.",         
+                                        });
+
+                                        return false;
+                                    }
                                     use_coupon_total_amount(returnData.coupon_details['id']);
                                 }
                             }
                         } else {
+                            if(returnData.coupon_details['amount'] > 0){ 
+                                var amountdiscount = parseFloat(returnData.coupon_details['amount']);
+                            }
+
+                            if(returnData.coupon_details['percentage'] > 0){
+                                var percent  = parseFloat(returnData.coupon_details['percentage'])/100;
+                                var discount = parseFloat(grandtotal)*percent;
+
+                                var amountdiscount = parseFloat(discount);
+                            }
+
+                            var total = grandtotal-amountdiscount;
+                            if(total.toFixed(2) < 1){
+                                swal({
+                                    title: '',
+                                    text: "The total amount is less than the coupon discount.",         
+                                });
+
+                                return false;
+                            }
+                            
                             use_sf_coupon(returnData.coupon_details['id']);
                         }
                     } 
