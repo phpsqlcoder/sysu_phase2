@@ -160,9 +160,9 @@
                                 </div>
                             </div>
 
-                            <div id="couponList">
-                                <div id="manual-coupon-details"></div>
-                            </div>
+                            <div id="couponList"></div>
+                            <div id="manual-coupon-details"></div>
+
                             <input type="hidden" id="coupon_limit" value="{{ Setting::info()->coupon_limit }}">
                             <input type="hidden" id="coupon_counter" name="coupon_counter" value="0">
                             <input type="hidden" id="solo_coupon_counter" value="0">
@@ -213,7 +213,7 @@
                                             <div class="cart-table-2-title"><strong>GRAND TOTAL</strong></div>
                                         </div>
                                         <div class="cart-table-2-col">
-                                            <input type="hidden" id="grandTotal" value="{{number_format($total,2,'.','')}}">
+                                            <input type="text" id="grandTotal" value="{{number_format($total,2,'.','')}}">
                                             <div class="cart-table-2-title text-right" id="total_grand" style="font-weight:bold">₱ {{number_format($total,2)}}</div>
                                         </div>
                                     </div>
@@ -338,6 +338,7 @@
                     $('#subtotal').val(returnData.subtotal);
 
                     $('#couponList').empty();
+                    $('#manual-coupon-details').empty();
                     $('.prod_new_price').hide();
                     $('#coupon_counter').val(0);
                     $('#solo_coupon_counter').val(0);
@@ -362,33 +363,12 @@
                     compute_grand_total();
                 }
             });
-            
-            // $('#couponList').empty();
-            // $('.prod_new_price').hide();
-            // $('#coupon_counter').val(0);
-            // $('#solo_coupon_counter').val(0);
-            // $('#total_amount_discount_counter').val(0);
 
-            // $('#total_amount_discount').val(0);
-            // $('.couponDiscountDiv').hide();
-
-
-
-            // $(".cart_product_reward").each(function() {
-            //     $(this).val(0);
-            // });
-
-            // $(".cart_product_discount").each(function() {
-            //     $(this).val(0);
-            // });
-
-            // update_sub_total_price_per_item(id);
-
-            // compute_grand_total();
         });
 
         $('#couponManualBtn').click(function(){
-            var couponCode = $('#coupon_code').val()
+            var couponCode = $('#coupon_code').val();
+            var grandtotal = parseFloat($('#grandTotal').val());
 
             $.ajax({
                 data: {
@@ -446,9 +426,52 @@
                             if(returnData.coupon_details['free_product_id'] != null){
                                 free_product_coupon(returnData.coupon_details['id']);
                             } else {
+                                if(returnData.coupon_details['amount'] > 0){ 
+                                    var amountdiscount = parseFloat(returnData.coupon_details['amount']);
+                                }
+
+                                if(returnData.coupon_details['percentage'] > 0){
+                                    var percent  = parseFloat(returnData.coupon_details['percentage'])/100;
+                                    var discount = parseFloat(grandtotal)*percent;
+
+                                    var amountdiscount = parseFloat(discount);
+                                }
+
+                                var total = grandtotal-amountdiscount;
+                                if(total.toFixed(2) < 1){
+                                    swal({
+                                        title: '',
+                                        text: "The total amount is less than the coupon discount.",         
+                                    });
+
+                                    return false;
+                                }
+
                                 use_coupon_total_amount(returnData.coupon_details['id']);
                             }
                         } else {
+
+                            if(returnData.coupon_details['amount'] > 0){ 
+                                var amountdiscount = parseFloat(returnData.coupon_details['amount']);
+                            }
+
+                            if(returnData.coupon_details['percentage'] > 0){
+                                var percent  = parseFloat(returnData.coupon_details['percentage'])/100;
+                                var discount = parseFloat(grandtotal)*percent;
+
+                                var amountdiscount = parseFloat(discount);
+                            }
+
+                            var total = grandtotal-amountdiscount;
+                            if(total.toFixed(2) < 1){
+                                swal({
+                                    title: '',
+                                    text: "The total amount is less than the coupon discount.",         
+                                });
+
+                                return false;
+                            }
+
                             use_coupon_on_product(returnData.coupon_details['id']);
                         }
                     }  
@@ -893,6 +916,7 @@
     
     // use coupon on total amount   
         function use_coupon_total_amount(cid){
+
             var totalAmountDiscountCounter = $('#total_amount_discount_counter').val();
             var name  = $('#couponname'+cid).val();
             var desc = $('#coupondesc'+cid).val();
@@ -1387,12 +1411,13 @@
             if(couponTotalDiscount == 0){
                 $('.couponDiscountDiv').css('display','none');
             }
-            console.log(promoTotalDiscount);
+
             var totalDeduction = promoTotalDiscount+couponTotalDiscount;
             var grandTotal = subtotal-totalDeduction;
 
             
             $('#total_sub').html('₱ '+addCommas(subtotal.toFixed(2)));
+            $('#grandTotal').val(grandTotal.toFixed(2));
             $('#total_grand').html('₱ '+addCommas(grandTotal.toFixed(2)));  
         }
     //
