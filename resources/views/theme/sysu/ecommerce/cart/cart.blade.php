@@ -948,14 +948,14 @@
                 var percnt= $('#discountpercentage'+cid).val();
 
                 if(amount > 0){ 
-                    var amountdiscount = amount;
+                    var amountdiscount = parseFloat(amount);
                 }
 
                 if(percnt > 0){
                     var percent  = parseFloat(percnt)/100;
                     var discount = parseFloat(grandTotal)*percent;
 
-                    var amountdiscount = discount;
+                    var amountdiscount = parseFloat(discount);
                 }
 
                 var coupon_discount = parseFloat($('#coupon_total_discount').val());
