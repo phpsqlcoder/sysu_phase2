@@ -213,7 +213,7 @@
                                             <div class="cart-table-2-title"><strong>GRAND TOTAL</strong></div>
                                         </div>
                                         <div class="cart-table-2-col">
-                                            <input type="text" id="grandTotal" value="{{number_format($total,2,'.','')}}">
+                                            <input type="hidden" id="grandTotal" value="{{number_format($total,2,'.','')}}">
                                             <div class="cart-table-2-title text-right" id="total_grand" style="font-weight:bold">₱ {{number_format($total,2)}}</div>
                                         </div>
                                     </div>
