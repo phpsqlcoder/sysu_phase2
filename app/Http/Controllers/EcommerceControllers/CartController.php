@@ -14,6 +14,7 @@ use App\EcommerceModel\Coupon;
 use App\EcommerceModel\CustomerCoupon;
 use App\EcommerceModel\CouponCart;
 use App\EcommerceModel\CouponSale;
+use App\EcommerceModel\CouponCartDiscount;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -234,7 +235,13 @@ class CartController extends Controller
                     }
                 }
             }
-            
+
+            CouponCartDiscount::where('customer_id',Auth::id())->delete();
+            CouponCartDiscount::create([
+                'customer_id' => Auth::id(),
+                'coupon_discount' => $request->coupon_total_discount
+            ]);
+
             return redirect()->route('cart.front.checkout');
         } else {
             $cart = session('cart', []);
@@ -295,68 +302,14 @@ class CartController extends Controller
         $customer_delivery_adress = $request->delivery_address ?? ' ';
         $customer_name = Auth::user()->fullName;
         $customer_contact_number =  $request->mobile ?? Auth::user()->mobile;
-           
+        
+        $coupon_total_discount = number_format($request->coupon_total_discount,2,'.','');
+
         $totalPrice = $request->total_amount;
         $requestId = $this->next_order_number();  
         $member = Auth::user();
 
 
-        $carts = Cart::where('user_id',Auth::id())->get();
-
-        $total_discount = 0;
-        $product_subtotal = 0;
-        foreach ($carts as $product) {
-            $couponCart = CouponCart::where('customer_id',Auth::id())->where('product_id',$product->product_id);;
-
-            if($couponCart->count()){
-                $coupon = $couponCart->first();
-                
-                $remainingQty = $product->qty-$coupon->total_usage;
-
-                $productsub = $product->product->discountedprice*$coupon->total_usage;
-
-                $product_subtotal += $product->product->discountedprice*$remainingQty;
-                // get total product discount amount
-                
-
-                if(isset($coupon->details->amount)){
-                    $total_discount += $coupon->details->amount*$coupon->total_usage;
-                    $product_subtotal += $productsub-($coupon->details->amount*$coupon->total_usage);
-                }   
-
-                if(isset($coupon->details->percentage)){
-                    $percent = $coupon->details->percentage/100;
-                    $discount = ($product->product->discountedprice*$percent)*$coupon->total_usage;
-                    
-                    $total_discount += $discount;
-                    $product_subtotal += $productsub-$discount;
-                }
-            } else {
-                $product_subtotal += $product->product->discountedprice*$product->qty;
-            }
-        }
-
-
-        // get total amount discount
-        $totalAmountCoupons = CouponCart::where('customer_id',Auth::id())->whereNull('product_id')->get();
-        foreach($totalAmountCoupons as $c){
-            $coupon = Coupon::find($c->coupon_id);
-            if($coupon->amount_discount_type == 1){
-
-                if(isset($coupon->amount)){
-                    $total_discount += $coupon->amount;
-                }
-
-                if(isset($coupon->percentage)){
-                    $percent = $coupon->percentage/100;
-                    $discount = number_format($product_subtotal*$percent,2,'.','');
-
-                    $total_discount += $discount;
-                }
-            }
-        }
-
-              
         $salesHeader = SalesHeader::create([
             'user_id' => auth()->id(),
             'order_number' => $requestId,
@@ -372,12 +325,14 @@ class CartController extends Controller
             'gross_amount' => number_format($totalPrice,2,'.','') ,
             'tax_amount' => 0,
             'net_amount' => number_format($totalPrice,2,'.',''),
-            'discount_amount' => number_format($total_discount,2,'.',''),
+            'discount_amount' => $coupon_total_discount,
             'payment_status' => 'UNPAID',
             'delivery_status' => 'Waiting for Payment',
             'status' => 'active',
         ]);
      
+        $carts = Cart::where('user_id',Auth::id())->get();
+
         $grand_gross = 0;
         $grand_tax = 0;
 
@@ -439,7 +394,7 @@ class CartController extends Controller
             }
         }
 
-        $base64Code = PaynamicsHelper::payNow($requestId, Auth::user(), $carts, $totalPrice, $urls, false ,$request->delivery_fee, $total_discount);
+        $base64Code = PaynamicsHelper::payNow($requestId, Auth::user(), $carts, $totalPrice, $urls, false ,$request->delivery_fee, $coupon_total_discount);
 
         Cart::where('user_id', Auth::id())->delete();
         if($base64Code){
