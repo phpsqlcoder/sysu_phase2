@@ -95,13 +95,33 @@
             <td>Sub Total</td>
             <td colspan="4" align="right">{{number_format($total,2)}}</td>
         </tr>
+
+        @if($rs->discount_amount > 0)
+        <tr>
+            <td>Coupon Discount</td>
+            <td colspan="4" align="right">{{number_format($rs->discount_amount,2)}}</td>
+        </tr>
+        @endif
+
         <tr>
             <td>Delivery Fee</td>
             <td colspan="4" align="right">{{number_format($rs->delivery_fee_amount,2)}}</td>
         </tr>
+        @php
+            $delivery_discount = \App\EcommerceModel\CouponSale::total_discount_delivery($rs->id);
+            $net_amount = ($total-$rs->discount_amount)+($rs->delivery_fee_amount-$delivery_discount);
+        @endphp
+
+        @if($delivery_discount > 0)
+        <tr>
+            <td>Delivery Discount</td>
+            <td colspan="4" align="right">{{number_format($delivery_discount,2)}}</td>
+        </tr>
+        @endif
+
         <tr>
             <td>Grand Total</td>
-            <td colspan="4" align="right">{{number_format($rs->delivery_fee_amount+$total,2)}}</td>
+            <td colspan="4" align="right">{{number_format($net_amount,2)}}</td>
         </tr>
     </tbody>
 
