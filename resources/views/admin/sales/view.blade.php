@@ -39,7 +39,7 @@
                         <p class="mg-b-3 tx-semibold">{{$sales->customer_name}}</p>
                         <p class="mg-b-3">{{$sales->customer_address}}</p>
                         <p class="mg-b-3">Tel No: {{$sales->customer_contact_number}}</p>
-                        <p class="mg-b-3">Email: youremail@companyname.com</p>
+                        <p class="mg-b-3">Email: {{$sales->customer_details->email}}</p>
                         <p class="mg-b-3">Instruction: {{$sales->other_instruction}}</p>
                     </div>
                     <!-- col -->
