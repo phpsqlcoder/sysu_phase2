@@ -51,10 +51,34 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Discount type *</label>
+                    <select class="form-control" name="discount_type" required id="discounttype" onchange="discountType();">
+                        <option @if($promo->discount_type == 'percentage') selected @endif value="percentage">Percentage</option>
+                        <option @if($promo->discount_type == 'amount') selected @endif value="amount">Amount</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="percentageDiv" style="display: @if($promo->discount_type == 'percentage') block @else none @endif;">
                     <label>Discount (%)*</label>
-                    <input required name="discount" id="discount" value="{{ old('discount',$promo->discount) }}" type="number" class="form-control @error('discount') is-invalid @enderror" max="100" min="1">
-                    @hasError(['inputName' => 'discount'])
-                    @endhasError
+
+                    @php
+                        $percentage = 0; $amount = 0;
+
+                        if($promo->discount_type == 'percentage'){
+                            $percentage = $promo->discount;
+                        }
+
+                        if($promo->discount_type == 'amount'){
+                            $amount = $promo->discount;
+                        }
+                    @endphp
+
+                    <input name="percentage" id="percentage" value="{{ old('percentage',$percentage) }}" type="number" class="form-control" max="100" min="1">
+                </div>
+
+                <div class="form-group" id="amountDiv" style="display: @if($promo->discount_type == 'amount') block @else none @endif;">
+                    <label>Amount *</label>
+                    <input name="amount" id="amount" value="{{ old('amount',$amount) }}" type="number" class="form-control" min="1" placeholder="PHP">
                 </div>
 
                 <div class="form-group">
@@ -377,6 +401,24 @@
             if(val == 'category'){
                 $('#tbl_brand').css('display','none');
                 $('#tbl_product').css('display','block');
+            }
+        }
+
+        function discountType(){
+            var type = $('#discounttype').val();
+
+            if(type == 'percentage'){
+                $('#percentage').prop('required', true);
+                $('#amount').prop('required', false);
+
+                $('#percentageDiv').css('display','block');
+                $('#amountDiv').css('display','none');
+            } else {
+                $('#percentage').prop('required', false);
+                $('#amount').prop('required', true);
+
+                $('#percentageDiv').css('display','none');
+                $('#amountDiv').css('display','block');
             }
         }
 
