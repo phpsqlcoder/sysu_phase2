@@ -55,7 +55,7 @@
                                                     <input type="hidden" id="product_price" value="{{ $product->discountedprice }}">
                                                     <span class="price-after">₱ {{ number_format($product->discountedprice,2) }}</span>
                                                     <span class="price-before">
-                                                        <div class="price-less">{{ $product->promodiscount }}% OFF</div>
+                                                        <div class="price-less">{{ $product->promodiscount }} OFF</div>
                                                         <div class="price-original">₱ {{ $product->PriceWithCurrency }}</div>
                                                     </span>
                                                 @else

@@ -50,10 +50,22 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Discount type *</label>
+                    <select class="form-control" name="discount_type" required id="discounttype" onchange="discountType();">
+                        <option selected disabled value="">Choose One</option>
+                        <option value="percentage">Percentage</option>
+                        <option value="amount">Amount</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="percentageDiv" style="display: none;">
                     <label>Discount (%)*</label>
-                    <input required name="discount" id="discount" value="{{ old('discount') }}" type="number" class="form-control @error('discount') is-invalid @enderror" max="100" min="1">
-                    @hasError(['inputName' => 'discount'])
-                    @endhasError
+                    <input name="percentage" id="percentage" value="{{ old('percentage') }}" type="number" class="form-control" max="100" min="1">
+                </div>
+
+                <div class="form-group" id="amountDiv" style="display: none;">
+                    <label>Amount *</label>
+                    <input name="amount" id="amount" value="{{ old('amount') }}" type="number" class="form-control" min="1" placeholder="PHP">
                 </div>
 
                 <div class="form-group">
@@ -67,11 +79,9 @@
 
                 <div class="form-group">
                     <label class="d-block">Status</label>
-                    <div class="custom-control custom-switch @error('status') is-invalid @enderror">
+                    <div class="custom-control custom-switch">
                         <input type="checkbox" class="custom-control-input" name="status" {{ (old("status") ? "checked":"") }} id="customSwitch1">
                         <label class="custom-control-label" id="label_visibility" for="customSwitch1">Inactive</label>
-                        @hasError(['inputName' => 'status'])
-                        @endhasError
                     </div>
                 </div>
 
@@ -319,6 +329,24 @@
             if(val == 'category'){
                 $('#tbl_brand').css('display','none');
                 $('#tbl_product').css('display','block');
+            }
+        }
+
+        function discountType(){
+            var type = $('#discounttype').val();
+
+            if(type == 'percentage'){
+                $('#percentage').prop('required', true);
+                $('#amount').prop('required', false);
+
+                $('#percentageDiv').css('display','block');
+                $('#amountDiv').css('display','none');
+            } else {
+                $('#percentage').prop('required', false);
+                $('#amount').prop('required', true);
+
+                $('#percentageDiv').css('display','none');
+                $('#amountDiv').css('display','block');
             }
         }
 

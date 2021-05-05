@@ -95,15 +95,15 @@
                                                     <input type="hidden" name="price{{$loop->iteration}}" id="price{{$loop->iteration}}" value="{{number_format($product->discountedprice,2,'.','')}}">
                                                     <input type="hidden" data-id="{{$loop->iteration}}" data-productid="{{$order->product_id}}" id="sum_sub_price{{$loop->iteration}}" class="sum_sub_price" name="sum_sub_price{{$loop->iteration}}" value="{{number_format($order->product->discountedprice*$order->qty,2,'.','')}}">
 
-                                                    @if($promo_discount_percentage > 0)
+                                                    @if($promo_discount_percentage['discount'] > 0)
                                                     <div style="font-weight:bold;color:grey;font-size:15px;">Before : ₱ 
                                                         <span id="priceBefore{{$loop->iteration}}">{{ number_format($total_orig_price,2) }}</span>
                                                     </div>
                                                     @endif
 
-                                                    @if($promo_discount_percentage > 0)
+                                                    @if($promo_discount_percentage['discount'] > 0)
                                                     <div style="font-weight:bold;font-size:15px;">
-                                                        <span class="text-danger">Promo Discount : {{$promo_discount_percentage}}% OFF</span>
+                                                        <span class="text-danger">Promo Discount : {{$promo_discount_percentage['text']}} OFF</span>
                                                     </div>
                                                     @endif
 
