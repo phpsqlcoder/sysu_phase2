@@ -254,15 +254,23 @@ class Product extends Model
 
     public function getDiscountedPriceAttribute()
     {
-        $promo = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id);
+        // $promo = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id);
+
+        $promo = DB::table('promos')->select('promos.discount','promos.discount_type')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id);
+
 
         if($promo->count() > 0){
-            $discount = $promo->max('promos.discount');
+            // $discount = $promo->max('promos.discount');
+            $query = $promo->orderBy('discount','desc')->first();
 
-            $percentage = ($discount/100);
-            $discountedAmount = ($this->price * $percentage);
+            if($query->discount_type == 'amount'){
+                $price = ($this->price - $query->discount);
+            } else {
+                $percentage = ($query->discount/100);
+                $discountedAmount = ($this->price * $percentage);
 
-            $price = ($this->price - $discountedAmount);
+                $price = ($this->price - $discountedAmount);
+            } 
         } else {
             $price = $this->price;
         }
@@ -284,8 +292,16 @@ class Product extends Model
 
     public function getPromoDiscountAttribute()
     {
-        $discount = DB::table('promos')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id)->max('promos.discount');
+        // $discount = DB::table('promos')->select('promos.discount','promos.discount_type')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id)->max('promos.discount','promos.discount_type');
 
-        return $discount;
+        $qry = DB::table('promos')->select('promos.discount','promos.discount_type')->join('promo_products','promos.id','=','promo_products.promo_id')->where('promos.status','ACTIVE')->where('promos.is_expire',0)->where('promo_products.product_id',$this->id)->orderBy('discount','desc')->first();
+
+        if($qry->discount_type == 'amount'){
+            $d = 'Php '.$qry->discount;
+        } else {
+            $d = $qry->discount.'%';
+        }
+
+        return $d;
     }
 }

@@ -273,6 +273,10 @@ class ReportsController extends Controller
         if(isset($_GET['customer']) && strlen($_GET['customer'])>=1){
             $qry.= " and cs.customer_id = '".$_GET['customer']."' ";
         }
+
+        if(isset($_GET['start']) && strlen($_GET['start'])>=1){
+            $qry.= " and h.created_at >='".$_GET['start']."' and h.created_at <='".$_GET['end']."'";
+        }
    
       
         $rs = DB::select($qry);

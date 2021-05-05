@@ -43,7 +43,7 @@
                         <div class="main-banner">
                             <div class="slick-slider" id="banner">
                                 @php
-                                    $banners = \App\Banner::where('album_id',5)->get();
+                                    $banners = \App\Banner::where('album_id',10)->get();
                                 @endphp
 
                                 @foreach($banners as $banner)
@@ -281,7 +281,7 @@
                                                         @if(\App\EcommerceModel\Product::onsale_checker($product->id) > 0)
                                                             <div class="col-12"><h3 class="product-price"><span>₱ {{ number_format($product->discountedprice,2) }}</span> | {{$product->uom}}</h3></div>
                                                             <span class="text-muted small mr-2 h6"><del>₱{{ number_format($product->price,2) }}</del></span>
-                                                            <span class="card-discount-percent small h6">{{ $product->promodiscount }}% OFF</span>
+                                                            <span class="card-discount-percent small h6">{{ $product->promodiscount }} OFF</span>
                                                         @else
                                                             <div class="col-12"><h3 class="product-price">
                                                                 <span>₱ {{number_format($product->price,2)}}</span> | {{$product->uom}}</h3>

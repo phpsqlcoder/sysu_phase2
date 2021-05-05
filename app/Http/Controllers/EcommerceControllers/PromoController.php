@@ -71,8 +71,6 @@ class PromoController extends Controller
         $this->validate(
             $request,[
                 'name' => 'required|max:150|unique:promos,name',
-                'promotion_dt' => 'required',
-                'discount' => 'required'
             ],
             [
                 'name.unique' => 'This promo is already in the list.',
@@ -83,14 +81,21 @@ class PromoController extends Controller
         $date = explode(' - ',$request->promotion_dt);
         $prodId = $data['productid'];
 
+        if($request->discount_type == 'percentage'){
+            $discount = $request->percentage;
+        } else {
+            $discount = $request->amount;
+        }
+
         $promo = Promo::create([
             'name' => $request->name,
             'promo_start' => $date[0].':00.000',
             'promo_end' => $date[1].':00.000',
-            'discount' => $request->discount,
+            'discount' => $discount,
             'status' => ($request->has('status') ? 'ACTIVE' : 'INACTIVE'),
             'is_expire' => 0,
             'type' => $request->type,
+            'discount_type' => $request->discount_type,
             'user_id' => Auth::id()
         ]);
 
