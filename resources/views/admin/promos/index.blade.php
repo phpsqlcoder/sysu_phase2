@@ -153,7 +153,13 @@ Manage Customer
                                     </td>
                                     <td>{{ date('Y-m-d h:i A',strtotime($promo->promo_start)) }}</td>
                                     <td>{{ date('Y-m-d h:i A',strtotime($promo->promo_end)) }}</td>
-                                    <td>{{ $promo->discount }}%</td>
+                                    <td>
+                                        @if($promo->discount_type == 'amount')
+                                            Php {{ $promo->discount }}
+                                        @else
+                                            {{ $promo->discount }}%
+                                        @endif
+                                    </td>
                                     <td>{{ $promo->status }}</td>
                                     <td>{{ Setting::date_for_listing($promo->updated_at) }}</td>
                                     <td>
