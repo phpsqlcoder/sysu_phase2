@@ -155,7 +155,7 @@ Manage Customer
                                     <td>{{ date('Y-m-d h:i A',strtotime($promo->promo_end)) }}</td>
                                     <td>
                                         @if($promo->discount_type == 'amount')
-                                            Php {{ $promo->discount }}
+                                            Php {{ number_format($promo->discount,2) }}
                                         @else
                                             {{ $promo->discount }}%
                                         @endif
