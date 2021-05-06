@@ -62,7 +62,7 @@
                     <label>Discount (%)*</label>
 
                     @php
-                        $percentage = 0; $amount = 0;
+                        $percentage = ''; $amount = '';
 
                         if($promo->discount_type == 'percentage'){
                             $percentage = $promo->discount;
